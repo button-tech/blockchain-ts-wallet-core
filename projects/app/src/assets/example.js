@@ -1,0 +1,1 @@
+someGlobalVariableIsSet = true;
