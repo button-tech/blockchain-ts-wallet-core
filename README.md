@@ -36,7 +36,6 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
     ng generate module send --route send --module app.module
     ```
 - Add example of lazy loaded js script in into `send` module `example.js`.
-- Generated separate library for `hd-wallet` logic `ng generate library hd-wallet`
 - Support translations:
     ```
     ng add @ngx-i18nsupport/tooling --i18nLocale=en --languages en,ru

@@ -26,8 +26,13 @@
     "@angular/router": "~8.2.14",
     "@ngx-i18nsupport/tooling": "^8.0.3",
     "@waves/ts-lib-crypto": "^1.4.1",
+    "bchaddrjs": "^0.4.4",
     "bignumber.js": "^9.0.0",
+    "bip39": "^3.0.2",
+    "bitcoinjs-lib-cash": "github:krboktv/bitcoinjs-lib#70e2ca6f33d258dce29ae49fcbb107d2aaff53be",
     "buffer": "^5.4.3",
+    "ethereumjs-tx": "^2.1.1",
+    "ethereumjs-util": "^6.2.0",
     "hammerjs": "^2.0.8",
     "process": "^0.11.10",
     "rxjs": "~6.4.0",
@@ -35,11 +40,7 @@
     "tslib": "^1.10.0",
     "waves-transactions": "^3.0.13",
     "web3": "^1.2.4",
-    "zone.js": "~0.9.1",
-    "bchaddrjs": "^0.4.4",
-    "bitcoinjs-lib-cash": "github:krboktv/bitcoinjs-lib#70e2ca6f33d258dce29ae49fcbb107d2aaff53be",
-    "ethereumjs-tx": "^2.1.1",
-    "ethereumjs-util": "^6.2.0"
+    "zone.js": "~0.9.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.803.20",

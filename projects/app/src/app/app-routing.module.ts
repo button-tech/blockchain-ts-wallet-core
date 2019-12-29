@@ -4,6 +4,10 @@ import { Routes, RouterModule } from '@angular/router';
 
 const routes: Routes = [
   {
+    path: 'wallet',
+    loadChildren: () => import('./hd-wallet/hd-wallet.module').then(m => m.HdWalletModule)
+  },
+  {
     path: 'account',
     loadChildren: () => import('./account/account.module').then(m => m.AccountModule)
   },
