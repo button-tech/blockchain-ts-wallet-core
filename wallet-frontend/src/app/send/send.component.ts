@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { IBlockchainService, ISomeInterface } from 'send.module';
+import { IBlockchainService, ISomeInterface } from './send.module';
 import { BlockchainUtilsService } from '../shared/blockchainUtils.service';
 
 

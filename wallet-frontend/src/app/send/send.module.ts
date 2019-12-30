@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SendRoutingModule } from './send-routing.module';
 import { SendComponent } from './send.component';
-import { SendService } from 'send.service';
+import { SendService } from './send.service';
 import { Observable } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { BlockchainUtilsService } from '../shared/blockchainUtils.service';

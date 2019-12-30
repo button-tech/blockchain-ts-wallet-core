@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SignTransactionParams } from 'send.module';
+import { SignTransactionParams } from './send.module';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
