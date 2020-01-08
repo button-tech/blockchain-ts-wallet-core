@@ -3,21 +3,24 @@ import {CommonModule} from '@angular/common';
 import {StellarRoutingModule} from './stellar-routing.module';
 import {StellarComponent} from './stellar.component';
 import {SendModule} from '../../../../send/send.module';
-import {NodeApiProvider} from "../../../providers/node-api.provider";
-import {StellarUtils} from "./stellar.utils";
+import {NodeApiProvider} from '../../../providers/node-api.provider';
+import {StellarUtils} from './stellar.utils';
+import { CurrencyFactoryOptions } from '../../../shared.module';
+import { Stellar } from '../../../DomainCurrency';
+import { HdWallet } from '../../../services/hd-wallet/hd-wallet.service';
 
-console.log('hi xlm');
-
-export function factory(utils: NodeApiProvider) {
-  return new StellarUtils(utils);
+export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
+  const currency = Stellar.Instance();
+  const hdWallet = new HdWallet(opt.mnemonic, opt.password);
+  const keys = hdWallet.generateKeyPair(currency, opt.derivationPath);
+  return new StellarUtils(keys.privateKey, keys.address, utils);
 }
 
 @NgModule({
   declarations: [StellarComponent],
   imports: [
     SendModule.forChild({
-      someId: 'SB2QXEAQ7L3YAHRBEF3VGVFDJZOMBP2QBDUTG6A3JVD4IXBZP7MZI7TT',
-      factory
+      init
     }),
     CommonModule,
     StellarRoutingModule,

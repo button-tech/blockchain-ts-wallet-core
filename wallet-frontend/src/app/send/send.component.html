@@ -1,4 +1,6 @@
 
-<p>Send works!</p>
-<app-qr-code></app-qr-code>
+<input type="text" [(ngModel)]="toAddress" placeholder="to address">
+<input type="text" [(ngModel)]="amount" placeholder="amount">
+<b
+<app-qr-code (messageEvent)="receiveQrCodeData($event)"></app-qr-code>
 

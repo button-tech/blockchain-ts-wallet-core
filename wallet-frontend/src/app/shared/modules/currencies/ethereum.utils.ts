@@ -3,7 +3,7 @@ import { Transaction, TransactionOptions, TxData } from 'ethereumjs-tx';
 import { privateToAddress } from 'ethereumjs-util';
 import { Observable } from 'rxjs';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
-import { IBlockchainService, SignTransactionParams } from '../../../send/send.module';
+import { IBlockchainService, SignTransactionParams } from '../../shared.module';
 import { NodeApiProvider } from '../../providers/node-api.provider';
 
 export const EthereumDecimals = 18;
@@ -11,7 +11,8 @@ export const EthereumDecimals = 18;
 export class EthereumUtils implements IBlockchainService {
 
 
-  constructor(protected blockchainUtils: NodeApiProvider, protected currency: Ethereum | EthereumClassic) {
+  constructor(private readonly privateKey: string, private readonly fromAddress: string,
+              protected blockchainUtils: NodeApiProvider, protected currency: Ethereum | EthereumClassic) {
   }
 
   getAddress(privateKey: string): string {
@@ -32,12 +33,10 @@ export class EthereumUtils implements IBlockchainService {
   }
 
   async signTransaction$(params: SignTransactionParams, guid: string): Promise<string> {
-    const fromAddress = this.getAddress(params.privateKey);
-
     const value = this.blockchainUtils.toDecimal(params.amount, EthereumDecimals).toString();
-    const nonce = !params.nonce ? await this.blockchainUtils.getNonce$(this.currency, fromAddress, guid).toPromise() : params.nonce;
+    const nonce = !params.nonce ? await this.blockchainUtils.getNonce$(this.currency, this.fromAddress, guid).toPromise() : params.nonce;
 
-    const feeObj = await this.blockchainUtils.getCustomFee$(this.currency, fromAddress, value, guid).toPromise();
+    const feeObj = await this.blockchainUtils.getCustomFee$(this.currency, this.fromAddress, value, guid).toPromise();
 
     if (!feeObj.isEnough) {
       throw new Error('Not enough crypto for sending');
@@ -52,7 +51,7 @@ export class EthereumUtils implements IBlockchainService {
       data: params.data || '0x'
     };
 
-    return this.sign(txParam, params.privateKey);
+    return this.sign(txParam, this.privateKey);
   }
 
   sendTransaction$(rawTransaction: string, guid: string): Observable<string> {

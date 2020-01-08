@@ -5,7 +5,7 @@ import { Contract } from 'web3-eth-contract';
 import { EthereumUtils } from './ethereum.utils';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
 import { NodeApiProvider } from '../../providers/node-api.provider';
-import { ContractCall, IContractService, SignTransactionParams } from '../../../send/send.module';
+import { ContractCall, IContractService, SignTransactionParams } from '../../shared.module';
 import { Observable } from 'rxjs';
 
 export interface TxConfig {
@@ -21,8 +21,9 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
 
   private web3: Web3;
 
-  constructor(blockchainUtils: NodeApiProvider, currency: Ethereum | EthereumClassic, private rpcEndpoint?: string) {
-    super(blockchainUtils, currency);
+  constructor(private readonly privateKey: string, private readonly fromAddress: string,
+              blockchainUtils: NodeApiProvider, currency: Ethereum | EthereumClassic, private rpcEndpoint?: string) {
+    super(privateKey, fromAddress, blockchainUtils, currency);
     this.web3 = this.getProvider(rpcEndpoint);
   }
 
@@ -61,7 +62,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
       : params.gasLimit;
 
     const signingData: SignTransactionParams = {
-      privateKey: params.privateKey,
+      privateKey: this.privateKey,
       toAddress: params.contractAddress,
       amount: !params.amount ? '0' : params.amount,
       gasLimit,

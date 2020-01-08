@@ -8,7 +8,7 @@ import { Ethereum } from '../../../DomainCurrency';
 import { EthereumContractUtils } from '../ethereumContract.utils';
 
 
-export function factory(utils: NodeApiProvider) {
+export function init(utils: NodeApiProvider) {
   return new EthereumContractUtils(utils, Ethereum.Instance());
 }
 
