@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
-import { BlockchainUtilsService } from './blockchainUtils.service';
+import { NodeApiProvider } from './providers/node-api.provider';
+import { BotBackendProvider } from './providers/bot-backend.provider';
 
 @NgModule({
   declarations: [
@@ -7,7 +8,8 @@ import { BlockchainUtilsService } from './blockchainUtils.service';
   ],
   imports: [],
   providers: [
-    BlockchainUtilsService
+    NodeApiProvider,
+    BotBackendProvider
   ]
 })
 export class SharedModule {

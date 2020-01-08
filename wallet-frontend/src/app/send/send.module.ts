@@ -5,7 +5,7 @@ import { SendComponent } from './send.component';
 import { SendService } from './send.service';
 import { Observable } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
-import { BlockchainUtilsService } from '../shared/blockchainUtils.service';
+import { NodeApiProvider } from '../shared/providers/node-api.provider';
 import { SharedModule } from '../shared/shared.module';
 
 
@@ -16,16 +16,17 @@ import { ITransferTransaction } from 'waves-transactions/transactions';
 import { Transaction } from 'stellar-sdk';
 
 // Ethereum
-import { TxConfig } from '../shared/currencies/ethereumContract.utils';
+import { TxConfig } from '../shared/modules/currencies/ethereumContract.utils';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
+import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
 
 
 // TODO: make IBlockchainService.signTransaction$ template method, and move classes interfaces to shared
 
 export interface ISomeInterface {
   someId: string;
-  factory: (utils: BlockchainUtilsService) => IBlockchainService;
+  factory: (utils: NodeApiProvider) => IBlockchainService;
 }
 
 export interface SignTransactionParams {
@@ -73,7 +74,7 @@ export interface IContractService extends IBlockchainService {
 
 
 @NgModule({
-  declarations: [SendComponent],
+  declarations: [SendComponent, QrcodeComponent],
   imports: [
     HttpClientModule,
     CommonModule,
@@ -95,4 +96,6 @@ export class SendModule {
       ]
     };
   }
+
+
 }

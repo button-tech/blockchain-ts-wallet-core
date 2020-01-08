@@ -1,12 +1,13 @@
 import {
   Component,
   ElementRef,
-  OnInit,
   ViewChild,
   AfterViewInit
 } from '@angular/core';
-import { HdWallet } from '../shared/hd-wallet/hd-wallet.service';
-import { Options, QrCode } from '../shared/qrcode/qrcode.service';
+import { HdWallet } from '../shared/services/hd-wallet/hd-wallet.service';
+import { Options, QrCode } from '../shared/components/qrcode/qrcode.service';
+import { StorageService } from '../shared/services/storage/storage.service';
+import { Security } from '../shared/services/security/security.service';
 
 interface IRow {
   label: string;
@@ -18,7 +19,7 @@ interface IRow {
   selector: 'app-create-account',
   templateUrl: './hd-wallet.component.html',
   styles: [
-    `th, td {
+      `th, td {
       border: 1px solid black;
       padding: 10px;
     }
@@ -30,25 +31,32 @@ interface IRow {
     }`
   ]
 })
-export class HdWalletComponent implements OnInit {
+export class HdWalletComponent implements AfterViewInit {
   data: Array<IRow> = [];
   words: string;
-  password: string;
+  password = '';
 
   @ViewChild('qrcode', { static: false }) qrcode: ElementRef;
 
   generateMnemonic() {
     const newMnemonic = HdWallet.generateMnemonic();
-    this.words = newMnemonic;
+
+    const s = new StorageService();
 
     document.querySelector('div#qrcode').innerHTML = '';
 
-    const opt: Options = {
-      text: newMnemonic
-    };
-    const qr = new QrCode(opt);
+    const cypher = Security.encryptSecret(newMnemonic, this.password);
+    s.cypherParams = { salt: cypher.salt, iv: cypher.iv };
+    s.storage = { secret: cypher.text, expired: false };
 
-    qr.append(this.qrcode);
+    const opt: Options = { text: cypher.text };
+    const qr = new QrCode();
+    qr.render(opt, this.qrcode);
+
+    this.words = newMnemonic;
+
+    const mnemonic = Security.decryptSecret(cypher.text, this.password, cypher.salt,  cypher.iv);
+    console.log(mnemonic);
   }
 
   generateKeyPairs() {
@@ -66,11 +74,8 @@ export class HdWalletComponent implements OnInit {
     ];
   }
 
-  ngOnInit() {
 
-  }
-
-  ngAfterViewInit(): void {
+  ngAfterViewInit() {
     this.generateMnemonic();
     this.generateKeyPairs();
   }
