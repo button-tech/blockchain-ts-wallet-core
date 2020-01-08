@@ -1,5 +1,5 @@
-import {NgModule} from '@angular/core';
-import {BlockchainUtilsService} from './blockchainUtils.service';
+import { NgModule } from '@angular/core';
+import { BlockchainUtilsService } from './blockchainUtils.service';
 
 @NgModule({
   declarations: [

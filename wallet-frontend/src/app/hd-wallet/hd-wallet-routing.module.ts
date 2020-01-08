@@ -9,4 +9,5 @@ const routes: Routes = [{ path: '', component: HdWalletComponent }];
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class HdWalletRoutingModule { }
+export class HdWalletRoutingModule {
+}

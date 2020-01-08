@@ -31,6 +31,7 @@
     "bip39": "^3.0.2",
     "bitcoinjs-lib-cash": "github:krboktv/bitcoinjs-lib#70e2ca6f33d258dce29ae49fcbb107d2aaff53be",
     "buffer": "^5.4.3",
+    "easyqrcodejs": "^3.3.0",
     "ethereumjs-tx": "^2.1.1",
     "ethereumjs-util": "^6.2.0",
     "hammerjs": "^2.0.8",

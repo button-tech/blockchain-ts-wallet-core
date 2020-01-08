@@ -1,5 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  AfterViewInit
+} from '@angular/core';
 import { HdWallet } from '../shared/hd-wallet/hd-wallet.service';
+import { Options, QrCode } from '../shared/qrcode/qrcode.service';
 
 interface IRow {
   label: string;
@@ -28,9 +35,20 @@ export class HdWalletComponent implements OnInit {
   words: string;
   password: string;
 
+  @ViewChild('qrcode', { static: false }) qrcode: ElementRef;
+
   generateMnemonic() {
     const newMnemonic = HdWallet.generateMnemonic();
     this.words = newMnemonic;
+
+    document.querySelector('div#qrcode').innerHTML = '';
+
+    const opt: Options = {
+      text: newMnemonic
+    };
+    const qr = new QrCode(opt);
+
+    qr.append(this.qrcode);
   }
 
   generateKeyPairs() {
@@ -48,8 +66,13 @@ export class HdWalletComponent implements OnInit {
     ];
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
+
+  }
+
+  ngAfterViewInit(): void {
     this.generateMnemonic();
     this.generateKeyPairs();
   }
+
 }
