@@ -30,9 +30,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 export class ImportAccountComponent {
   display = true;
   href: string;
-  bcs: IBlockchainService;
   utils: NodeApiProvider;
-  currencyFactory: ICurrencyFactory;
 
   @ViewChild('qrcode', { static: false }) qrcode: ElementRef;
 
@@ -73,7 +71,6 @@ export class ImportAccountComponent {
 
   importByQR(qrRawData: string) {
     if (this.password_second === '') {
-      // todo: handle user doesn't entered password
       console.log('empty password'); return;
     }
     const decryptedText = this.decryptQrCodeData(qrRawData);
@@ -82,9 +79,6 @@ export class ImportAccountComponent {
       console.log(decryptedText); return;
     }
     console.log(decryptedText);
-    // todo: get derivationPath from backend
-    const opt: CurrencyFactoryOptions = { secret: decryptedText, password: '', derivationPath: 0 };
-    this.bcs = this.currencyFactory.init(this.utils, opt);
   }
 
 
