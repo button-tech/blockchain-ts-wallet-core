@@ -6,6 +6,7 @@ import { NewAccountComponent } from './new/new-account.component';
 import { MatButtonModule, MatCardModule, MatCheckboxModule, MatInputModule, MatSlideToggleModule } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImportAccountComponent } from './import/import-account.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -14,6 +15,7 @@ import { ImportAccountComponent } from './import/import-account.component';
     ImportAccountComponent,
   ],
   imports: [
+    HttpClientModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
