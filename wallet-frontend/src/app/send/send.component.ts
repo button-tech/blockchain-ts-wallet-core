@@ -50,12 +50,12 @@ export class SendComponent implements OnInit {
   receiveQrCodeData(qrRawData: string) {
     if (this.password === '') {
       // todo: handle user doesn't entered password
-      return;
+      console.log('empty password'); return;
     }
     const decryptedText = this.decryptQrCodeData(qrRawData);
     if (decryptedText instanceof Error) {
       // todo: handle error: from decryption + if the error was thrown
-      return;
+      console.log(decryptedText); return;
     }
     console.log(decryptedText);
     // todo: get derivationPath from backend
@@ -65,22 +65,37 @@ export class SendComponent implements OnInit {
 
   private decryptQrCodeData(qrRawData: string): string | PrivateKeys | Error {
     if (this.isJson(qrRawData)) {
-      const qrData = JSON.parse(qrRawData);
-      if (!((qrData as QrCodeData).mnemonic)) {
+      return this.decryptMnemonicVersion(qrRawData);
+    }
+    return this.decryptPrivateKeysVersion(qrRawData);
+  }
+
+  private decryptMnemonicVersion(qrRawData: string): string | Error {
+    const qrData = JSON.parse(qrRawData);
+    if (!((qrData as QrCodeData).mnemonic)) {
+      return new Error('qr code doesn\'t contain secret keys');
+    }
+    try {
+      return Security.decryptSecret(qrData.mnemonic, this.password, qrData.salt, qrData.iv);
+    } catch (e) {
+      return new Error('wrong password or qr code');
+    }
+  }
+
+  private decryptPrivateKeysVersion(qrRawData: string): PrivateKeys | Error {
+    try {
+      const privateKeysJson = Security.decryptSecret(qrRawData.toString(), this.password);
+      if (!this.isJson(privateKeysJson)) {
         return new Error('qr code doesn\'t contain secret keys');
       }
-      return Security.decryptSecret(qrData.mnemonic, this.password, qrData.salt, qrData.iv);
+      const privateKeys = JSON.parse(privateKeysJson);
+      if ((privateKeys as PrivateKeys).ethereum) {
+        return new Error('qr code doesn\'t contain secret keys');
+      }
+      return privateKeys;
+    } catch (e) {
+      return new Error('wrong password or qr code');
     }
-
-    const privateKeysJson = Security.decryptSecret(qrRawData.toString(), this.password);
-    if (!this.isJson(privateKeysJson)) {
-      return new Error('qr code doesn\'t contain secret keys');
-    }
-    const privateKeys = JSON.parse(privateKeysJson);
-    if ((privateKeys as PrivateKeys).ethereum) {
-      return new Error('qr code doesn\'t contain secret keys');
-    }
-    return privateKeys;
   }
 
   private getSendingMode(): SendingMode {

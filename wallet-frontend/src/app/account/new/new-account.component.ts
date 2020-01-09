@@ -7,6 +7,7 @@ import {StorageService} from '../../shared/services/storage/storage.service';
 import {Security} from '../../shared/services/security/security.service';
 import {Options, QrCode} from '../../shared/components/qrcode/qrcode.service';
 import { environment } from '../../../environments/environment';
+import { QrCodeData } from '../../shared/shared.module';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
