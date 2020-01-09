@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
@@ -7,6 +7,7 @@ import {StorageService} from '../../shared/services/storage/storage.service';
 import {Security} from '../../shared/services/security/security.service';
 import {Options, QrCode} from '../../shared/components/qrcode/qrcode.service';
 import { environment } from '../../../environments/environment';
+import { QrCodeData } from '../../shared/shared.module';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -78,7 +79,9 @@ export class NewAccountComponent {
 
   matcher = new MyErrorStateMatcher();
 
-  get email() { return this.newAccountForm.get('email'); }
+  get email() {
+    return this.newAccountForm.get('email');
+  }
 
   generateMnemonic() {
     const newMnemonic = HdWallet.generateMnemonic();
@@ -91,12 +94,17 @@ export class NewAccountComponent {
     s.cypherParams = { salt: cypher.salt, iv: cypher.iv };
     s.storage = { secret: cypher.text, expired: false };
 
-    const opt: Options = { text: cypher.text };
+    const qrData: QrCodeData = {
+      mnemonic: cypher.text,
+      iv: cypher.iv,
+      salt: cypher.salt
+    };
+    const opt: Options = { text: JSON.stringify(qrData) };
     const qr = new QrCode();
     qr.render(opt, this.qrcode);
 
     this.words = newMnemonic;
-    const mnemonic = Security.decryptSecret(cypher.text, this.password, cypher.salt,  cypher.iv);
+    const mnemonic = Security.decryptSecret(cypher.text, this.password, cypher.salt, cypher.iv);
     console.log(mnemonic);
   }
 

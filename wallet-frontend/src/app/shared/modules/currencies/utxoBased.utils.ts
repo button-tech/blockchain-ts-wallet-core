@@ -1,17 +1,12 @@
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { IBlockchainService, SignTransactionParams } from '../../../send/send.module';
-import { ECPair, payments, TransactionBuilder, Network, Transaction } from 'bitcoinjs-lib-cash';
+import { IBlockchainService, SignTransactionParams } from '../../shared.module';
+import { ECPair, payments, TransactionBuilder, Network, Transaction, Signer } from 'bitcoinjs-lib-cash';
 import { Bitcoin, BitcoinCash, Litecoin } from '../../DomainCurrency';
 import { NodeApiProvider } from '../../providers/node-api.provider';
 import { toCashAddress } from 'bchaddrjs';
 
 export const UtxoDecimals = 8;
-
-export interface Keys {
-  privateKey: any;
-  fromAddress: string;
-}
 
 const LitecoinConfig: Network = {
   messagePrefix: '\x19Litecoin Signed Message:\n',
@@ -40,7 +35,8 @@ const BitcoinCashConfig: Network = {
 
 export class UtxoBasedUtils implements IBlockchainService {
 
-  constructor(private blockchainUtils: NodeApiProvider, private currency: Bitcoin | BitcoinCash | Litecoin) {
+  constructor(private readonly privateKey: string,
+              private blockchainUtils: NodeApiProvider, private currency: Bitcoin | BitcoinCash | Litecoin) {
   }
 
   getAddress(privateKey: string): string {
@@ -67,7 +63,7 @@ export class UtxoBasedUtils implements IBlockchainService {
   }
 
   async signTransaction$(params: SignTransactionParams, guid: string): Promise<string> {
-    const { privateKey, fromAddress } = this.getKeys(params.privateKey);
+    const fromAddress = this.getAddress(this.privateKey);
     const value = this.blockchainUtils.toDecimal(params.amount, UtxoDecimals).toString();
 
     const utxosAddress = this.currency.short === 'bch'
@@ -97,7 +93,8 @@ export class UtxoBasedUtils implements IBlockchainService {
     }
 
     for (let i = 0; i < utxos.length; i++) {
-      tx.sign(0, privateKey, null, Transaction.SIGHASH_ALL | Transaction.SIGHASH_BITCOINCASHBIP143, utxos[i].satoshis);
+      tx.sign(0, this.getPrivateKey(this.privateKey),
+        null, Transaction.SIGHASH_ALL | Transaction.SIGHASH_BITCOINCASHBIP143, utxos[i].satoshis);
     }
 
     return await tx.build().toHex();
@@ -118,28 +115,18 @@ export class UtxoBasedUtils implements IBlockchainService {
     }
   }
 
-  private getKeys(privateKey: string): Keys {
-    const fromAddress = this.getAddress(privateKey);
+  private getPrivateKey(privateKey: string): Signer {
     switch (this.currency.short) {
       case 'btc':
-        return {
-          privateKey: this.getKeyPair(privateKey),
-          fromAddress
-        };
+        return this.getKeyPair(privateKey);
       case 'bch':
-        return {
-          privateKey: this.getKeyPair(privateKey, BitcoinCashConfig),
-          fromAddress
-        };
+        return this.getKeyPair(privateKey, BitcoinCashConfig);
       case 'ltc':
-        return {
-          privateKey: this.getKeyPair(privateKey, LitecoinConfig),
-          fromAddress
-        };
+        return this.getKeyPair(privateKey, LitecoinConfig);
     }
   }
 
-  private getKeyPair(privateKey: string, network?: Network): any {
+  private getKeyPair(privateKey: string, network?: Network): Signer {
     if (network) {
       const options: any = { network };
       return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'), options);

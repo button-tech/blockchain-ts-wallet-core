@@ -1,5 +1,5 @@
 import {
-  Component,
+  Component, EventEmitter, Output,
 } from '@angular/core';
 import { QrCode } from './qrcode.service';
 
@@ -11,6 +11,7 @@ import { QrCode } from './qrcode.service';
 export class QrcodeComponent {
 
   private file: any;
+  @Output() messageEvent = new EventEmitter<string>();
 
   fileChanged(e) {
     this.file = e.target.files[0];
@@ -22,10 +23,11 @@ export class QrcodeComponent {
     const canvasElement = document.getElementById('canvas') as HTMLCanvasElement;
     const qr = new QrCode();
     const data = qr.read(canvasElement, img);
-    console.log(data);
+    // todo: handle error
+    this.messageEvent.emit(data.toString());
   }
 
-  loadImage(): Promise<string> {
+  private loadImage(): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!this.file) {
         reject('You don\'t upload qr code');

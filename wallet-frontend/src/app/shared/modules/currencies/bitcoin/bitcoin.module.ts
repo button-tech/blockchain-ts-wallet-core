@@ -4,12 +4,31 @@ import { BitcoinRoutingModule } from './bitcoin-routing.module';
 import { SendModule } from '../../../../send/send.module';
 import { NodeApiProvider } from '../../../providers/node-api.provider';
 import { UtxoBasedUtils } from '../utxoBased.utils';
-import { SharedModule } from '../../../shared.module';
+import { CurrencyFactoryOptions, PrivateKeys, SharedModule } from '../../../shared.module';
 import { Bitcoin } from '../../../DomainCurrency';
+import { HdWallet } from '../../../services/hd-wallet/hd-wallet.service';
 
 
-export function factory(utils: NodeApiProvider) {
-  return new UtxoBasedUtils(utils, Bitcoin.Instance());
+export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
+  // todo: make a case for OLD VERSION with private key but with non-zero derivation path
+  const currency = Bitcoin.Instance();
+  if (typeof opt.secret === 'string') {
+    return handleMnemonicVersion(currency, utils, opt);
+  } else if ((opt.secret as PrivateKeys).bitcoin) {
+    return handlePrivateKeysVersion(currency, utils, opt);
+  } else {
+    // todo: handle error: this currency doesn't exist in privateKeys object
+  }
+}
+
+function handleMnemonicVersion(currency: Bitcoin, utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
+  const hdWallet = new HdWallet(opt.secret as string, opt.password);
+  const keys = hdWallet.generateKeyPair(currency, opt.derivationPath);
+  return new UtxoBasedUtils(keys.privateKey, utils, currency);
+}
+
+function handlePrivateKeysVersion(currency: Bitcoin, utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
+  return new UtxoBasedUtils((opt.secret as PrivateKeys).bitcoin, utils, currency);
 }
 
 @NgModule({
@@ -17,8 +36,7 @@ export function factory(utils: NodeApiProvider) {
   imports: [
     SharedModule,
     SendModule.forChild({
-        someId: '58de0d382810697275ee66e176c4d8a0bd2a397d93fa2560ec4d89db3ba5a353',
-        factory
+        init
       },
     ),
     CommonModule,

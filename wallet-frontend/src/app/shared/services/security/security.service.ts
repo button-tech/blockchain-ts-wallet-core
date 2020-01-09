@@ -24,17 +24,15 @@ export class Security {
   static decryptSecret(cipher: string, password: string, salt?: string, iv?: string): string {
     const key = this.generateKey(password, salt);
 
-    const opt = {
-      iv: enc.Hex.parse(iv),
-      mode: mode.CBC,
-      padding: pad.Pkcs7
-    };
-
+    const opt = iv
+      ? { iv: enc.Hex.parse(iv), mode: mode.CBC, padding: pad.Pkcs7 }
+      : { mode: mode.CBC, padding: pad.Pkcs7 };
     const secret = aes.decrypt(cipher, key, opt);
+    // todo: handle error: in case of empty string or error - throw error(bad password)
     return secret.toString(enc.Utf8);
   }
 
-  private static generateKey(password: string, salt?: string | WordArray) {
+  private static generateKey(password: string, salt?: string | WordArray): string | WordArray {
     if (salt) {
       if (typeof salt === 'string') {
         salt = enc.Hex.parse(salt);

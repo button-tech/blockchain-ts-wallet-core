@@ -3,7 +3,7 @@ import { map } from 'rxjs/operators';
 import { transfer } from 'waves-transactions';
 import { ITransferTransaction } from 'waves-transactions/transactions';
 import { address } from '@waves/ts-lib-crypto';
-import { IBlockchainService, SignTransactionParams } from '../../../../send/send.module';
+import { IBlockchainService, SignTransactionParams } from '../../../shared.module';
 import { NodeApiProvider } from '../../../providers/node-api.provider';
 import { Waves } from '../../../DomainCurrency';
 
@@ -13,7 +13,7 @@ export class WavesUtils implements IBlockchainService {
 
   private currency: Waves = Waves.Instance();
 
-  constructor(private blockchainUtils: NodeApiProvider) {
+  constructor(private readonly privateKey: string, private blockchainUtils: NodeApiProvider) {
   }
 
   getAddress(privateKey: string): string {
@@ -33,7 +33,7 @@ export class WavesUtils implements IBlockchainService {
       amount: +params.amount,
       recipient: params.toAddress,
       timestamp,
-    }, params.privateKey);
+    }, this.privateKey);
 
     return Promise.resolve(signedTx);
   }

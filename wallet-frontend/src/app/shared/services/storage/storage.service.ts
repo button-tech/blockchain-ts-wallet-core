@@ -1,17 +1,6 @@
 export interface Storage {
-  secret: string | PrivateKeys;
+  secret: string;
   expired: boolean; // false - mnemonic; true - privateKeys
-}
-
-// for old version
-export interface PrivateKeys {
-  Waves: string;
-  Ethereum: string;
-  Bitcoin: string;
-  BitcoinCash: string;
-  Litecoin: string;
-  EthereumClassic: string;
-  Stellar: string;
 }
 
 export interface CypherParams {
@@ -34,6 +23,7 @@ export class StorageService {
   }
 
   set storage(storage: Storage) {
+    this.secretStorage = storage;
     this.writeSecret(storage);
   }
 
@@ -42,7 +32,14 @@ export class StorageService {
   }
 
   set cypherParams(cp: CypherParams) {
+    this.cp = cp;
     this.writeCypherParams(cp);
+  }
+
+  clear() {
+    this.secretStorage = null;
+    this.cp = null;
+    localStorage.clear();
   }
 
   private readSecret(): void {
@@ -57,8 +54,9 @@ export class StorageService {
 
     const privateKeys = localStorage.getItem('privateKeys');
     if (privateKeys) {
+      const secret = privateKeys ? JSON.parse(privateKeys) : null;
       this.secretStorage = {
-        secret: JSON.parse(privateKeys),
+        secret,
         expired: true
       };
       return;
@@ -68,8 +66,7 @@ export class StorageService {
   private readCypherParams(): void {
     const iv = localStorage.getItem('iv');
     const salt = localStorage.getItem('salt');
-    const cp: CypherParams = { iv, salt };
-    this.cp = cp;
+    this.cp = { iv, salt };
   }
 
   private writeCypherParams(params: CypherParams): void {

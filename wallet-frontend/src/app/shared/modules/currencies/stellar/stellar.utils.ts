@@ -12,7 +12,7 @@ import {
   Memo,
   Transaction
 } from 'stellar-sdk';
-import { IBlockchainService, SignTransactionParams } from '../../../../send/send.module';
+import { IBlockchainService, SignTransactionParams } from '../../../shared.module';
 import { Stellar } from '../../../DomainCurrency';
 import { NodeApiProvider } from '../../../providers/node-api.provider';
 
@@ -25,7 +25,7 @@ export class StellarUtils implements IBlockchainService {
   private network;
   private currency = Stellar.Instance();
 
-  constructor(private blockchainUtils: NodeApiProvider) {
+  constructor(private readonly privateKey: string, private blockchainUtils: NodeApiProvider) {
     this.network = new Server('https://horizon.stellar.org');
   }
 
@@ -42,7 +42,8 @@ export class StellarUtils implements IBlockchainService {
   }
 
   async signTransaction$(params: SignTransactionParams): Promise<Transaction> {
-    const fromAddress = this.getAddress(params.privateKey);
+    const fromAddress = this.getAddress(this.privateKey);
+
     const accountTo = await this.getAccount(params.toAddress).toPromise();
     const accountFrom = await this.network.loadAccount(fromAddress);
     const memo: Memo = Memo.fromXDRObject(Memo.text(!params.memo ? 'BUTTON Wallet' : params.memo).toXDRObject());
@@ -69,7 +70,7 @@ export class StellarUtils implements IBlockchainService {
       .setTimeout(9999999999999)
       .build();
 
-    transaction.sign(Keypair.fromSecret(params.privateKey));
+    transaction.sign(Keypair.fromSecret(this.privateKey));
     return transaction;
   }
 
@@ -86,7 +87,7 @@ export class StellarUtils implements IBlockchainService {
       .setTimeout(9999999999999)
       .build();
 
-    transaction.sign(Keypair.fromSecret(params.privateKey));
+    transaction.sign(Keypair.fromSecret(this.privateKey));
     return transaction;
   }
 
