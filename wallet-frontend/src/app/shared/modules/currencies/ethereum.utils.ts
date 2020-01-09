@@ -11,7 +11,7 @@ export const EthereumDecimals = 18;
 export class EthereumUtils implements IBlockchainService {
 
 
-  constructor(private readonly privateKey: string, private readonly fromAddress: string,
+  constructor(private readonly privateKey: string,
               protected blockchainUtils: NodeApiProvider, protected currency: Ethereum | EthereumClassic) {
   }
 
@@ -33,10 +33,12 @@ export class EthereumUtils implements IBlockchainService {
   }
 
   async signTransaction$(params: SignTransactionParams, guid: string): Promise<string> {
-    const value = this.blockchainUtils.toDecimal(params.amount, EthereumDecimals).toString();
-    const nonce = !params.nonce ? await this.blockchainUtils.getNonce$(this.currency, this.fromAddress, guid).toPromise() : params.nonce;
+    const fromAddress = this.getAddress(this.privateKey);
 
-    const feeObj = await this.blockchainUtils.getCustomFee$(this.currency, this.fromAddress, value, guid).toPromise();
+    const value = this.blockchainUtils.toDecimal(params.amount, EthereumDecimals).toString();
+    const nonce = !params.nonce ? await this.blockchainUtils.getNonce$(this.currency, fromAddress, guid).toPromise() : params.nonce;
+
+    const feeObj = await this.blockchainUtils.getCustomFee$(this.currency, fromAddress, value, guid).toPromise();
 
     if (!feeObj.isEnough) {
       throw new Error('Not enough crypto for sending');

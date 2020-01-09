@@ -13,7 +13,7 @@ export class WavesUtils implements IBlockchainService {
 
   private currency: Waves = Waves.Instance();
 
-  constructor(private readonly privateKey: string, private readonly fromAddress: string, private blockchainUtils: NodeApiProvider) {
+  constructor(private readonly privateKey: string, private blockchainUtils: NodeApiProvider) {
   }
 
   getAddress(privateKey: string): string {

@@ -25,7 +25,7 @@ export class StellarUtils implements IBlockchainService {
   private network;
   private currency = Stellar.Instance();
 
-  constructor(private readonly privateKey: string, private readonly fromAddress: string, private blockchainUtils: NodeApiProvider) {
+  constructor(private readonly privateKey: string, private blockchainUtils: NodeApiProvider) {
     this.network = new Server('https://horizon.stellar.org');
   }
 
@@ -42,8 +42,10 @@ export class StellarUtils implements IBlockchainService {
   }
 
   async signTransaction$(params: SignTransactionParams): Promise<Transaction> {
+    const fromAddress = this.getAddress(this.privateKey);
+
     const accountTo = await this.getAccount(params.toAddress).toPromise();
-    const accountFrom = await this.network.loadAccount(this.fromAddress);
+    const accountFrom = await this.network.loadAccount(fromAddress);
     const memo: Memo = Memo.fromXDRObject(Memo.text(!params.memo ? 'BUTTON Wallet' : params.memo).toXDRObject());
     if (!accountTo) {
       return this.createAccount(params, accountFrom, memo);

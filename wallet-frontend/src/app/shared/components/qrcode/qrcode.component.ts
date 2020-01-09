@@ -1,8 +1,7 @@
 import {
-  Component, Output,
+  Component, EventEmitter, Output,
 } from '@angular/core';
 import { QrCode } from './qrcode.service';
-import EventEmitter = NodeJS.EventEmitter;
 
 @Component({
   selector: 'app-qr-code',
@@ -24,7 +23,8 @@ export class QrcodeComponent {
     const canvasElement = document.getElementById('canvas') as HTMLCanvasElement;
     const qr = new QrCode();
     const data = qr.read(canvasElement, img);
-    this.messageEvent.emit(data);
+    // todo: handle error
+    this.messageEvent.emit(data.toString());
   }
 
   private loadImage(): Promise<string> {

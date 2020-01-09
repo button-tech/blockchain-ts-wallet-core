@@ -14,8 +14,6 @@ import { TxConfig } from './modules/currencies/ethereumContract.utils';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { Observable } from 'rxjs';
-import { PrivateKeys } from './services/storage/storage.service';
-
 
 // TODO: make IBlockchainService.signTransaction$ template method, and move classes interfaces to shared
 
@@ -25,18 +23,24 @@ export interface QrCodeData {
   salt: string;
 }
 
-export interface OldQrCodeData {
-  privateKeys: PrivateKeys;
-}
-
 export interface ICurrencyFactory {
   init: (utils: NodeApiProvider, opt: CurrencyFactoryOptions) => IBlockchainService;
 }
 
 export interface CurrencyFactoryOptions {
-  mnemonic: string;
+  secret: string | PrivateKeys;
   password: string;
   derivationPath: number;
+}
+
+export interface PrivateKeys {
+  waves: string;
+  ethereum: string;
+  bitcoin: string;
+  bitcoinCash: string;
+  litecoin: string;
+  ethereumClassic: string;
+  stellar: string;
 }
 
 export interface SignTransactionParams {

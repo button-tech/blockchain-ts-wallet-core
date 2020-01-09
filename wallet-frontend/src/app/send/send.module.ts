@@ -6,6 +6,8 @@ import { SendService } from './send.service';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
+import { FormsModule } from '@angular/forms';
+import { StorageService } from '../shared/services/storage/storage.service';
 
 @NgModule({
   declarations: [SendComponent, QrcodeComponent],
@@ -13,7 +15,11 @@ import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
     HttpClientModule,
     CommonModule,
     SharedModule,
-    SendRoutingModule
+    SendRoutingModule,
+    FormsModule
+  ],
+  providers: [
+    StorageService
   ]
 })
 export class SendModule {

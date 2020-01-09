@@ -1,17 +1,6 @@
 export interface Storage {
-  secret: string | PrivateKeys;
+  secret: string;
   expired: boolean; // false - mnemonic; true - privateKeys
-}
-
-// for old version
-export interface PrivateKeys {
-  waves: string;
-  ethereum: string;
-  bitcoin: string;
-  bitcoinCash: string;
-  litecoin: string;
-  ethereumClassic: string;
-  stellar: string;
 }
 
 export interface CypherParams {
@@ -43,7 +32,7 @@ export class StorageService {
   }
 
   set cypherParams(cp: CypherParams) {
-    this.cypherParams = cp;
+    this.cp = cp;
     this.writeCypherParams(cp);
   }
 
@@ -51,11 +40,6 @@ export class StorageService {
     this.secretStorage = null;
     this.cp = null;
     localStorage.clear();
-  }
-
-  updateStorage(): void {
-    this.writeSecret(this.secretStorage);
-    this.writeCypherParams(this.cypherParams);
   }
 
   private readSecret(): void {

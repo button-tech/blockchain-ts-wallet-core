@@ -35,7 +35,7 @@ const BitcoinCashConfig: Network = {
 
 export class UtxoBasedUtils implements IBlockchainService {
 
-  constructor(private readonly privateKey: string, private readonly fromAddress: string,
+  constructor(private readonly privateKey: string,
               private blockchainUtils: NodeApiProvider, private currency: Bitcoin | BitcoinCash | Litecoin) {
   }
 
@@ -63,11 +63,12 @@ export class UtxoBasedUtils implements IBlockchainService {
   }
 
   async signTransaction$(params: SignTransactionParams, guid: string): Promise<string> {
+    const fromAddress = this.getAddress(this.privateKey);
     const value = this.blockchainUtils.toDecimal(params.amount, UtxoDecimals).toString();
 
     const utxosAddress = this.currency.short === 'bch'
-      ? toCashAddress(this.fromAddress)
-      : this.fromAddress;
+      ? toCashAddress(fromAddress)
+      : fromAddress;
     const feeObj = await this.blockchainUtils.getCustomFee$(this.currency, utxosAddress, value, guid).toPromise();
 
     if (!feeObj.isEnough) {
@@ -88,7 +89,7 @@ export class UtxoBasedUtils implements IBlockchainService {
       .minus(params.amount).minus(feeObj.fee).toNumber();
     tx.addOutput(params.toAddress, +params.amount);
     if (balanceWithoutFeeAndSendingAmount > 0) {
-      tx.addOutput(this.fromAddress, balanceWithoutFeeAndSendingAmount);
+      tx.addOutput(fromAddress, balanceWithoutFeeAndSendingAmount);
     }
 
     for (let i = 0; i < utxos.length; i++) {

@@ -21,9 +21,9 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
 
   private web3: Web3;
 
-  constructor(private readonly privateKey: string, private readonly fromAddress: string,
+  constructor(privateKey: string,
               blockchainUtils: NodeApiProvider, currency: Ethereum | EthereumClassic, private rpcEndpoint?: string) {
-    super(privateKey, fromAddress, blockchainUtils, currency);
+    super(privateKey, blockchainUtils, currency);
     this.web3 = this.getProvider(rpcEndpoint);
   }
 
@@ -62,7 +62,6 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
       : params.gasLimit;
 
     const signingData: SignTransactionParams = {
-      privateKey: this.privateKey,
       toAddress: params.contractAddress,
       amount: !params.amount ? '0' : params.amount,
       gasLimit,

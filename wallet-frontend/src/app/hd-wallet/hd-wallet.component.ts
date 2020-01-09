@@ -8,6 +8,7 @@ import { HdWallet } from '../shared/services/hd-wallet/hd-wallet.service';
 import { Options, QrCode } from '../shared/components/qrcode/qrcode.service';
 import { StorageService } from '../shared/services/storage/storage.service';
 import { Security } from '../shared/services/security/security.service';
+import { QrCodeData } from '../shared/shared.module';
 
 interface IRow {
   label: string;
@@ -49,7 +50,13 @@ export class HdWalletComponent implements AfterViewInit {
     s.cypherParams = { salt: cypher.salt, iv: cypher.iv };
     s.storage = { secret: cypher.text, expired: false };
 
-    const opt: Options = { text: cypher.text };
+    const qrData: QrCodeData = {
+      mnemonic: cypher.text,
+      iv: cypher.iv,
+      salt: cypher.salt
+    };
+
+    const opt: Options = { text: JSON.stringify(qrData) };
     const qr = new QrCode();
     qr.render(opt, this.qrcode);
 

@@ -1,6 +1,9 @@
 
 <input type="text" [(ngModel)]="toAddress" placeholder="to address">
+<br>
 <input type="text" [(ngModel)]="amount" placeholder="amount">
-<b
+<br>
+<label for="pass"></label><input id="pass" [(ngModel)]="password" type="password" width="200px">
+<br>
 <app-qr-code (messageEvent)="receiveQrCodeData($event)"></app-qr-code>
 
