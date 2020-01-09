@@ -1,6 +1,13 @@
-<form class="example-form" [formGroup]="importFormControl">
+<div id="qrcode" #qrcode></div>
+<a [href]="href" *ngIf="!(display)" (click)="downloadImage()" download>Download Image</a>
+<form class="example-form" *ngIf="display" [formGroup]="importFormControl">
   <mat-form-field class="example-full-width">
     <input matInput placeholder="Mnemonic" formControlName="mnemonic">
   </mat-form-field>
-  <button (click)="importMnemonic()">Import</button>
+  <br>
+  <mat-form-field class="example-full-width">
+    <input matInput placeholder="Password" formControlName="password">
+  </mat-form-field>
+  <br>
+  <button (click)="importByMnemonic()">Import</button>
 </form>
