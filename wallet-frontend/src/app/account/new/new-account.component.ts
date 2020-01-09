@@ -119,9 +119,10 @@ export class NewAccountComponent {
   }
 
   createNewAccount() {
+    this.password = this.newAccountForm.value.password;
     this.generateMnemonic();
     this.generateKeyPairs();
-    console.log(this.checked);
+    console.log(this.password);
     this.display = false;
     if (this.checked) {
       const body = {
