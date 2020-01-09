@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
-import {FormControl, FormGroupDirective, NgForm, Validators} from '@angular/forms';
+import {FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher} from '@angular/material/core';
+import { HdWallet } from '../../shared/services/hd-wallet/hd-wallet.service';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -17,10 +18,13 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styles: [],
 })
 export class ImportAccountComponent {
-  emailFormControl = new FormControl('', [
-    Validators.required,
-    Validators.email,
-  ]);
+  importFormControl  = new FormGroup({
+    mnemonic: new FormControl('', Validators.required),
+  });
+  get mnemonic() {
+    return this.importFormControl.value.mnemonic;
+  }
 
-  matcher = new MyErrorStateMatcher();
+  importMnemonic() {
+  }
 }

@@ -57,11 +57,9 @@ export class NewAccountComponent {
   }
   data: Array<IRow> = [];
   words: string;
-  password = '';
   checked = false;
   display = true;
   href: string;
-  formData: FormData;
   @ViewChild('qrcode', { static: false }) qrcode: ElementRef;
   color = 'accent';
 
@@ -81,6 +79,9 @@ export class NewAccountComponent {
 
   get email() {
     return this.newAccountForm.get('email');
+  }
+  get password() {
+    return this.newAccountForm.value.password;
   }
 
   generateMnemonic() {
@@ -127,14 +128,14 @@ export class NewAccountComponent {
   }
 
   createNewAccount() {
-    this.password = this.newAccountForm.value.password;
     this.generateMnemonic();
     this.generateKeyPairs();
     console.log(this.password);
     this.display = false;
     if (this.checked) {
       const body = {
-        src: this.href
+        src: this.href,
+        email: this.email
       };
       this.http.post(environment.backendUrl, body);
     }
