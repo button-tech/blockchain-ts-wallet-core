@@ -1,7 +1,7 @@
 <div id="qrcode" #qrcode></div>
 <a [href]="href" *ngIf="!(display)" (click)="downloadImage()" download>Download Image</a>
 
-<form class="example-form" *ngIf="display" [formGroup]="newAccountForm">
+<form class="example-form"  *ngIf="display" [formGroup]="newAccountForm">
 <h2>Создать аккаунт</h2>
 <div>
     Вы получите QR Code с зашифрованными секретными ключами на Вашу почту.
@@ -28,7 +28,7 @@
 
   <section>
     <mat-form-field class="example-full-width">
-      <input matInput placeholder="Favorite food" [checked]="password" value="">
+      <input matInput placeholder="Favorite food" formControlName="password" value="">
     </mat-form-field>
   </section>
 

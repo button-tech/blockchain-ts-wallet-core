@@ -6,8 +6,8 @@ export interface IDomainCurrency {
 
 }
 
-export type shortName = 'ltc' | 'btc' | 'eth' | 'etc' | 'bch' | 'waves' | 'xlm';
-export type fullName = 'litecoin' | 'bitcoin' | 'ethereum' | 'ethereumClassic' | 'bitcoinCash' | 'waves' | 'stellar';
+export type shortName = 'ltc' | 'btc' | 'eth' | 'etc' | 'bch' | 'waves' | 'xlm' | 'ton';
+export type fullName = 'litecoin' | 'bitcoin' | 'ethereum' | 'ethereumClassic' | 'bitcoinCash' | 'waves' | 'stellar' | 'ton';
 
 export class Ethereum implements IDomainCurrency {
 
@@ -117,6 +117,22 @@ export class Stellar implements IDomainCurrency {
 
   get short(): shortName {
     return 'xlm';
+  }
+
+}
+
+export class TON implements IDomainCurrency {
+
+  static Instance(): TON {
+    return new TON();
+  }
+
+  get full(): fullName {
+    return 'ton';
+  }
+
+  get short(): shortName {
+    return 'ton';
   }
 
 }

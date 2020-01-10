@@ -22,7 +22,7 @@ import {
   EthereumClassic,
   IDomainCurrency,
   Litecoin,
-  Stellar,
+  Stellar, TON,
   Waves
 } from '../../DomainCurrency';
 
@@ -36,7 +36,7 @@ interface Currencies {
   bch: Keys;
   waves: Keys;
   xlm: Keys;
-  // ton: Keys;
+  ton: Keys;
 }
 
 interface Keys {
@@ -83,7 +83,7 @@ export class HdWallet {
     const litecoin = Litecoin.Instance();
     const waves = Waves.Instance();
     const stellar = Stellar.Instance();
-    // const ton = TON.Instance();
+    const ton = TON.Instance();
 
     keyPairsObject[ethereum.short] = this.generateKeyPair(ethereum, index);
     keyPairsObject[ethereumClassic.short] = this.generateKeyPair(ethereumClassic, index);
@@ -92,7 +92,8 @@ export class HdWallet {
     keyPairsObject[litecoin.short] = this.generateKeyPair(litecoin, index);
     keyPairsObject[waves.short] = this.generateKeyPair(waves, index);
     keyPairsObject[stellar.short] = this.generateKeyPair(stellar, index);
-    // keyPairsObject[ton.short] = this.generateKeyPair(ton, index);
+    debugger
+    keyPairsObject[ton.short] = this.generateKeyPair(ton, index);
 
     return keyPairsObject;
   }
@@ -138,9 +139,13 @@ export class HdWallet {
         const stellarKeyPair = this.generateEd25519KeyPair(hdPath.stellar, index);
         return this.getStellarKeys(stellarKeyPair.key);
 
-      // case 'ton':
-      //   // const tonKeyPair = this.generateEd25519KeyPair(hdPath.ton, index);
-      //   return this.getTonKeys();
+      case 'ton':
+        const tonKeyPair = this.generateEd25519KeyPair(hdPath.ton, index);
+        const pvk = tonKeyPair.key.toString('hex');
+        return {
+          privateKey: pvk,
+          address: '123'
+        };
     }
   }
 
@@ -190,14 +195,4 @@ export class HdWallet {
       address: pbk
     };
   }
-
-  // private getTonKeys(): Keys {
-  //   const seed = dictionaries.english.toSeed(this.words, this.password);
-  //   console.log(new Buffer(seed, 'hex'))
-  //   console.log(seed)
-  //   return {
-  //     privateKey: seed.substring(0, 64),
-  //     address: "123"
-  //   };
-  // }
 }

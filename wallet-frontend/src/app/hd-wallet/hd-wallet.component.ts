@@ -68,7 +68,7 @@ export class HdWalletComponent implements AfterViewInit {
 
   generateKeyPairs() {
     const hdWallet = new HdWallet(this.words, this.password);
-    const { btc, ltc, eth, bch, etc, waves, xlm } = hdWallet.generateAllKeyPairs(0);
+    const { btc, ltc, eth, bch, etc, waves, xlm, ton } = hdWallet.generateAllKeyPairs(0);
     this.data = [
       { label: 'BTC', address: btc.address, privateKey: btc.privateKey },
       { label: 'LTC', address: ltc.address, privateKey: ltc.privateKey },
@@ -77,7 +77,7 @@ export class HdWalletComponent implements AfterViewInit {
       { label: 'ETC', address: etc.address, privateKey: etc.privateKey },
       { label: 'XLM', address: xlm.address, privateKey: xlm.privateKey },
       { label: 'Waves', address: waves.address, privateKey: waves.privateKey },
-      // { label: 'TON', address: ton.address, privateKey: ton.privateKey },
+      { label: 'TON', address: ton.address, privateKey: ton.privateKey },
     ];
   }
 

@@ -7,12 +7,14 @@ import { MatButtonModule, MatCardModule, MatCheckboxModule, MatInputModule, MatS
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImportAccountComponent } from './import/import-account.component';
 import { HttpClientModule } from '@angular/common/http';
+import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
 
 
 @NgModule({
   declarations: [
     NewAccountComponent,
     ImportAccountComponent,
+    QrcodeComponent
   ],
   imports: [
     HttpClientModule,
@@ -25,7 +27,7 @@ import { HttpClientModule } from '@angular/common/http';
     MatButtonModule,
     AccountRoutingModule,
     MatCardModule,
-    MatCheckboxModule,
+    MatCheckboxModule
   ]
 })
 export class AccountModule {
