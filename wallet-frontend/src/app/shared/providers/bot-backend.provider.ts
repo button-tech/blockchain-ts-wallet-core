@@ -1,6 +1,6 @@
 import { Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import {
   BackendResponse,
   CreateAccountRequest,
@@ -22,88 +22,58 @@ export class BotBackendProvider {
 
   registerAccount$(req: CreateAccountRequest, guid: string): Observable<string> {
     const url = `${environment.backendUrl}/api/blockchain/create/${guid}`;
-    return this.http.put<BackendResponse<string>>(url, req)
-      .pipe(
-        map(x => {
-          return this.handleResponse<string>(x);
-        })
-      );
+    return this.put<string>(url, req);
   }
 
   sendQrCodeToEmail$(qrCode: Blob, guid: string): Observable<string> {
     const url = `${environment.backendUrl}/api/blockchain/sendToEmail/${guid}`;
     const formData = new FormData();
     formData.append('file', qrCode, 'BUTTONWallet.jpg');
-    return this.http.post<string>(url, formData)
-      .pipe(map((x) => x));
+    return this.http.post<string>(url, formData);
   }
 
   getTransactionData$(guid: string): Observable<TransactionResponse> {
     const url = `${environment.backendUrl}/api/blockchain/transaction/${guid}`;
-    return this.http.get<BackendResponse<TransactionResponse>>(url)
-      .pipe(map(x => {
-        return this.handleResponse<TransactionResponse>(x);
-      }));
+    return this.get<TransactionResponse>(url);
   }
 
 
   getTokenData$(guid: string): Observable<TokenResponse> {
     const url = `${environment.backendUrl}/api/blockchain/token/${guid}`;
-    return this.http.get<BackendResponse<TokenResponse>>(url)
-      .pipe(map(x => {
-        return this.handleResponse<TokenResponse>(x);
-      }));
+    return this.get<TokenResponse>(url);
   }
 
   getExchangeData$(guid: string): Observable<ExchangeResponse> {
     const url = `${environment.backendUrl}/api/blockchain/exchange/${guid}`;
-    return this.http.get<BackendResponse<ExchangeResponse>>(url)
-      .pipe(map(x => {
-        return this.handleResponse<ExchangeResponse>(x);
-      }));
+    return this.get<ExchangeResponse>(url);
   }
 
   getOneInchData$(guid: string): Observable<OneInchExchangeResponse> {
     const url = `${environment.backendUrl}/api/blockchain/swap/${guid}`;
-    return this.http.get<BackendResponse<OneInchExchangeResponse>>(url)
-      .pipe(map(x => {
-        return this.handleResponse<OneInchExchangeResponse>(x);
-      }));
+    return this.get<OneInchExchangeResponse>(url);
   }
 
   getMoonpayData$(guid: string): Observable<MoonPayResponse> {
     const url = `${environment.backendUrl}/api/moonPay/${guid}`;
-    return this.http.get<BackendResponse<MoonPayResponse>>(url)
-      .pipe(map(x => {
-        return this.handleResponse<MoonPayResponse>(x);
-      }));
+    return this.get<MoonPayResponse>(url);
   }
 
   sendTransactionData$(txHash: string, guid: string): Observable<string> {
     const url = `${environment.backendUrl}/api/blockchain/transaction/${guid}`;
     const body: TxHashRequest = { txHash };
-    return this.http.put<BackendResponse<string>>(url, body)
-      .pipe(map(x => {
-        return this.handleResponse<string>(x);
-      }));
+    return this.put<string>(url, body);
   }
 
   sendTokenData$(txHash: string, guid: string): Observable<string> {
     const url = `${environment.backendUrl}/api/blockchain/token/${guid}`;
     const body: TxHashRequest = { txHash };
-    return this.http.put<BackendResponse<string>>(url, body)
-      .pipe(map(x => {
-        return this.handleResponse<string>(x);
-      }));
+    return this.put<string>(url, body);
   }
 
   sendExchangeData$(txHash: string, guid: string): Observable<string> {
     const url = `${environment.backendUrl}/api/blockchain/exchange/${guid}`;
     const body: TxHashRequest = { txHash };
-    return this.http.put<BackendResponse<string>>(url, body)
-      .pipe(map(x => {
-        return this.handleResponse<string>(x);
-      }));
+    return this.put<string>(url, body);
   }
 
   sendOneInchData$(txHash: string, guid: string): Observable<string> {
@@ -111,18 +81,18 @@ export class BotBackendProvider {
     const body: TxHashRequest = { txHash };
     return this.http.put<BackendResponse<string>>(url, body)
       .pipe(map(x => {
-        return this.handleResponse<string>(x);
+        if (x.error) {
+          throw new Error('transaction with this identifier doesn\'t exist');
+        }
+        return x.result;
       }));
   }
 
   getExpiredDate$(guid: string): Observable<number> {
     const url = `${environment.backendUrl}/api/blockchain/validator/${guid}`;
-    return this.http.get<BackendResponse<string>>(url)
+    return this.get<string>(url)
       .pipe(map(x => {
-        if (x.error) {
-          return throwError('transaction with this identifier doesn\'t exist');
-        }
-        const deleteDate = new Date(x.result).getTime();
+        const deleteDate = new Date(x).getTime();
         const now = Date.now();
         const difference = Number(deleteDate) - now;
         if (difference <= 0) {
@@ -134,11 +104,28 @@ export class BotBackendProvider {
       }));
   }
 
-  private handleResponse<T>(response: BackendResponse): T | Error {
-    if (response.error) {
-      return throwError('transaction with this identifier doesn\'t exist');
-    }
-    return response.result;
+  private get<T>(url: string): Observable<T> {
+    return this.http.get<BackendResponse<T>>(url)
+      .pipe(
+        map(x => {
+          if (x.error) {
+            throw new Error('transaction with this identifier doesn\'t exist');
+          }
+          return x.result;
+        })
+      );
+  }
+
+  private put<T>(url: string, body: any): Observable<T> {
+    return this.http.put<BackendResponse<T>>(url, body)
+      .pipe(
+        map(x => {
+          if (x.error) {
+            throw new Error('transaction with this identifier doesn\'t exist');
+          }
+          return x.result;
+        })
+      );
   }
 }
 

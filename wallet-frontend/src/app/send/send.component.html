@@ -6,4 +6,7 @@
 <label for="pass"></label><input id="pass" [(ngModel)]="password" type="password" width="200px">
 <br>
 <app-qr-code (messageEvent)="receiveQrCodeData($event)"></app-qr-code>
+<br>
+<br>
+<p>Hash: {{hash}}</p>
 

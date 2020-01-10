@@ -13,7 +13,7 @@ export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = EthereumClassic.Instance();
   if (typeof opt.secret === 'string') {
     return handleMnemonicVersion(currency, utils, opt);
-  } else if ((opt.secret as PrivateKeys).ethereumClassic) {
+  } else if ((opt.secret as PrivateKeys).EthereumClassic) {
     return handlePrivateKeysVersion(currency, utils, opt);
   } else {
     // todo: handle error: this currency doesn't exist in privateKeys object
@@ -27,7 +27,7 @@ function handleMnemonicVersion(currency: EthereumClassic, utils: NodeApiProvider
 }
 
 function handlePrivateKeysVersion(currency: EthereumClassic, utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
-  return new EthereumUtils((opt.secret as PrivateKeys).ethereumClassic, utils, currency);
+  return new EthereumUtils((opt.secret as PrivateKeys).EthereumClassic, utils, currency);
 }
 
 @NgModule({

@@ -13,7 +13,7 @@ export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = BitcoinCash.Instance();
   if (typeof opt.secret === 'string') {
     return handleMnemonicVersion(currency, utils, opt);
-  } else if ((opt.secret as PrivateKeys).bitcoinCash) {
+  } else if ((opt.secret as PrivateKeys).BitcoinCash) {
     return handlePrivateKeysVersion(currency, utils, opt);
   } else {
     // todo: handle error: this currency doesn't exist in privateKeys object
@@ -27,7 +27,7 @@ function handleMnemonicVersion(currency: BitcoinCash, utils: NodeApiProvider, op
 }
 
 function handlePrivateKeysVersion(currency: BitcoinCash, utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
-  return new UtxoBasedUtils((opt.secret as PrivateKeys).bitcoinCash, utils, currency);
+  return new UtxoBasedUtils((opt.secret as PrivateKeys).BitcoinCash, utils, currency);
 }
 
 @NgModule({

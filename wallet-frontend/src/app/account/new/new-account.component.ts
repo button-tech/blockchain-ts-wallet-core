@@ -3,9 +3,9 @@ import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '
 import { ErrorStateMatcher } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { HdWallet } from '../../shared/services/hd-wallet/hd-wallet.service';
-import {StorageService} from '../../shared/services/storage/storage.service';
-import {Security} from '../../shared/services/security/security.service';
-import {Options, QrCode} from '../../shared/components/qrcode/qrcode.service';
+import { StorageService } from '../../shared/services/storage/storage.service';
+import { Security } from '../../shared/services/security/security.service';
+import { Options, QrCode } from '../../shared/components/qrcode/qrcode.service';
 import { environment } from '../../../environments/environment';
 import { QrCodeData } from '../../shared/shared.module';
 
@@ -55,6 +55,7 @@ interface IRow {
 export class NewAccountComponent {
   constructor(private http: HttpClient) {
   }
+
   data: Array<IRow> = [];
   words: string;
   password = '';

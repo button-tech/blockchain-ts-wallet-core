@@ -14,7 +14,7 @@ export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = Stellar.Instance();
   if (typeof opt.secret === 'string') {
     return handleMnemonicVersion(currency, utils, opt);
-  } else if ((opt.secret as PrivateKeys).stellar) {
+  } else if ((opt.secret as PrivateKeys).Stellar) {
     return handlePrivateKeysVersion(utils, opt);
   } else {
     // todo: handle error: this currency doesn't exist in privateKeys object
@@ -28,7 +28,7 @@ function handleMnemonicVersion(currency: Stellar, utils: NodeApiProvider, opt: C
 }
 
 function handlePrivateKeysVersion(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
-  return new StellarUtils((opt.secret as PrivateKeys).stellar, utils);
+  return new StellarUtils((opt.secret as PrivateKeys).Stellar, utils);
 }
 
 @NgModule({

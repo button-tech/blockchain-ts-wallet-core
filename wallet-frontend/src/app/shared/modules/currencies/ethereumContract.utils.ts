@@ -5,8 +5,9 @@ import { Contract } from 'web3-eth-contract';
 import { EthereumUtils } from './ethereum.utils';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
 import { NodeApiProvider } from '../../providers/node-api.provider';
-import { ContractCall, IContractService, SignTransactionParams } from '../../shared.module';
-import { Observable } from 'rxjs';
+import { ContractCall, IContractService, SignTransactionParams, Tbn } from '../../shared.module';
+import { combineLatest, from, Observable, of } from 'rxjs';
+import { map, mergeAll, mergeMap } from 'rxjs/operators';
 
 export interface TxConfig {
   to: string;
@@ -38,7 +39,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
     return params.contractInstance.methods[params.methodName](...params.executionParameters).encodeABI();
   }
 
-  estimateGasRawData$(params: TxConfig): Promise<number> {
+  estimateGasRawData$(params: TxConfig): Observable<number> {
     const txConfig: TransactionConfig = {
       to: params.to,
       data: params.data,
@@ -47,36 +48,48 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
       gasPrice: !params.gasPrice ? '0xB2D05E00' : this.decimalToHex(params.gasPrice), // 3_000_000_000
       value: !params.value ? '0' : this.decimalToHex(params.value)
     };
-    return this.web3.eth.estimateGas(txConfig);
+    return from(this.web3.eth.estimateGas(txConfig));
   }
 
   callMethod$(params: ContractCall): Observable<any> {
-    return params.contractInstance.methods[params.methodName](...params.executionParameters).call({ from: params.addressFrom });
+    return from(params.contractInstance.methods[params.methodName](...params.executionParameters).call({ from: params.addressFrom }));
   }
 
-  async setValue$(params: ContractCall, guid: string, isSync: boolean = false): Promise<string> {
+  setValue$(params: ContractCall, guid: string, isSync: boolean = false): Observable<string> {
     const data = this.getCallData(params);
-    const gasPrice = !params.gasPrice ? await this.blockchainUtils.getGasPrice$(this.currency, guid).toPromise() : params.gasPrice;
-    const gasLimit = !params.gasLimit
-      ? await this.blockchainUtils.getGasLimit$(this.currency, params.contractAddress, data.substring(2), guid).toPromise()
-      : params.gasLimit;
+    const gasPrice$ = !params.gasPrice
+      ? this.blockchainUtils.getGasPrice$(this.currency, guid)
+      : of(params.gasPrice);
+    const gasLimit$ = !params.gasLimit
+      ? this.blockchainUtils.getGasLimit$(this.currency, params.contractAddress, data.substring(2), guid)
+      : of(params.gasLimit);
 
-    const signingData: SignTransactionParams = {
-      toAddress: params.contractAddress,
-      amount: !params.amount ? '0' : params.amount,
-      gasLimit,
-      gasPrice,
-      data
-    };
+    return combineLatest(gasPrice$, gasLimit$)
+      .pipe(
+        mergeMap(([gasPrice, gasLimit]: [number, number]) => {
+          const signingData: SignTransactionParams = {
+            toAddress: params.contractAddress,
+            amount: !params.amount ? '0' : params.amount,
+            gasLimit,
+            gasPrice,
+            data
+          };
 
-    const signedTx = await this.signTransaction$(signingData, guid);
-    const hash = await this.sendTransaction$(signedTx, guid).toPromise();
-    if (isSync) {
-      await this.awaitTx$(hash);
-    }
-    return hash;
+          return this.signTransaction$(signingData, guid);
+        }),
+        mergeMap((signedTx: string) => {
+          return this.sendTransaction$(signedTx, guid);
+        }),
+        map((hash: string) => {
+          // if (isSync) {
+          //   await this.awaitTx$(hash);
+          // }
+          return hash;
+        })
+      );
   }
 
+  // todo: make it observable
   awaitTx$(txnHash: Array<string> | string): Promise<any> | Promise<any[]> {
     if (Array.isArray(txnHash)) {
       const promises = [];
@@ -91,6 +104,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
     }
   }
 
+  // todo: make it observable
   private async transactionReceiptAsync(txnHash: string, resolve, reject): Promise<void> {
     const interval = 2000;
     const blocksToWait = 1;
@@ -154,7 +168,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
   }
 
   decimalToHex(d: number | string): string {
-    let hex = this.blockchainUtils.tbn(d).toString(16);
+    let hex = Tbn(d).toString(16);
     if (hex.length % 2 !== 0) {
       hex = '0' + hex;
     }

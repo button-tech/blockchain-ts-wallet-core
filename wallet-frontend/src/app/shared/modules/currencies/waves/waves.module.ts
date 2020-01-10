@@ -1,11 +1,11 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {WavesRoutingModule} from './waves-routing.module';
-import {SendModule} from '../../../../send/send.module';
-import {NodeApiProvider} from '../../../providers/node-api.provider';
-import {WavesUtils} from './waves.utils';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { WavesRoutingModule } from './waves-routing.module';
+import { SendModule } from '../../../../send/send.module';
+import { NodeApiProvider } from '../../../providers/node-api.provider';
+import { WavesUtils } from './waves.utils';
 import { CurrencyFactoryOptions, PrivateKeys, SharedModule } from '../../../shared.module';
-import { Bitcoin, Ethereum, Waves } from '../../../DomainCurrency';
+import { Waves } from '../../../DomainCurrency';
 import { HdWallet } from '../../../services/hd-wallet/hd-wallet.service';
 
 export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
@@ -13,7 +13,7 @@ export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = Waves.Instance();
   if (typeof opt.secret === 'string') {
     return handleMnemonicVersion(currency, utils, opt);
-  } else if ((opt.secret as PrivateKeys).waves) {
+  } else if ((opt.secret as PrivateKeys).Waves) {
     return handlePrivateKeysVersion(utils, opt);
   } else {
     // todo: handle error: this currency doesn't exist in privateKeys object
@@ -27,7 +27,7 @@ function handleMnemonicVersion(currency: Waves, utils: NodeApiProvider, opt: Cur
 }
 
 function handlePrivateKeysVersion(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
-  return new WavesUtils((opt.secret as PrivateKeys).waves, utils);
+  return new WavesUtils((opt.secret as PrivateKeys).Waves, utils);
 }
 
 @NgModule({
@@ -35,7 +35,7 @@ function handlePrivateKeysVersion(utils: NodeApiProvider, opt: CurrencyFactoryOp
   imports: [
     SharedModule,
     SendModule.forChild({
-      init
+        init
       },
     ),
     CommonModule,

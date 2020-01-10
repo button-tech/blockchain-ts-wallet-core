@@ -3,15 +3,17 @@ import { NodeApiProvider } from '../shared/providers/node-api.provider';
 import { BotBackendProvider } from '../shared/providers/bot-backend.provider';
 import { StorageService, Storage, CypherParams } from '../shared/services/storage/storage.service';
 import {
-  CurrencyFactoryOptions,
+  CurrencyFactoryOptions, GetGuid,
   IBlockchainService,
-  ICurrencyFactory,
+  ICurrencyFactory, IsJson,
   PrivateKeys,
-  QrCodeData
+  QrCodeData, SignTransactionParams, TryParse
 } from '../shared/shared.module';
 import { Security } from '../shared/services/security/security.service';
-
-type SendingMode = 'fast' | 'qrcode';
+import { TransactionResponse } from '../shared/dto/bot-backend.dto';
+import { ActivatedRoute } from '@angular/router';
+import { catchError, delay, map, retry, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-send',
@@ -24,6 +26,10 @@ export class SendComponent implements OnInit {
   password = '';
   amount = 0;
   toAddress = '';
+  hash = '';
+
+  guid: string;
+  transactionData: TransactionResponse;
 
   private bcs: IBlockchainService;
 
@@ -33,47 +39,72 @@ export class SendComponent implements OnInit {
   constructor(@Inject('SuperService') private currencyFactory: ICurrencyFactory,
               private utils: NodeApiProvider,
               private botApi: BotBackendProvider,
-              private s: StorageService) {
+              private s: StorageService,
+              private route: ActivatedRoute) {
     this.storage = s.storage;
     this.cypherParams = s.cypherParams;
   }
 
   ngOnInit() {
-    const sendingMode = this.getSendingMode();
-    if (sendingMode === 'fast') {
+    this.guid = GetGuid(this.route, 'tx');
 
-    } else if (sendingMode === 'qrcode') {
-      // render upload qr code template
-    }
+    this.botApi.getTransactionData$(this.guid).pipe(
+      tap((txData: TransactionResponse) => {
+        this.transactionData = txData;
+        const sendingMode = this.getSendingMode();
+        if (sendingMode === 'fast') {
+
+        } else if (sendingMode === 'qrcode') {
+          // render upload qr code template
+        }
+      }),
+      catchError((e) => {
+        console.log('Find error: ', e);
+        return of(e);
+      })
+    ).subscribe((res) => {
+      if (!(res instanceof Error)) {
+        console.log('Result: ', res);
+      }
+    });
   }
 
-  receiveQrCodeData(qrRawData: string) {
+  async receiveQrCodeData(qrRawData: string) {
     if (this.password === '') {
       // todo: handle user doesn't entered password
-      console.log('empty password'); return;
+      console.log('empty password');
+      return;
     }
     const decryptedText = this.decryptQrCodeData(qrRawData);
     if (decryptedText instanceof Error) {
       // todo: handle error: from decryption + if the error was thrown
-      console.log(decryptedText); return;
+      console.log(decryptedText);
+      return;
     }
     console.log(decryptedText);
     // todo: get derivationPath from backend
     const opt: CurrencyFactoryOptions = { secret: decryptedText, password: '', derivationPath: 0 };
     this.bcs = this.currencyFactory.init(this.utils, opt);
+    const transactionParams: SignTransactionParams = {
+      toAddress: this.transactionData.to,
+      amount: this.transactionData.value
+    };
+    const signedTx = await this.bcs.signTransaction$(transactionParams, this.guid).toPromise();
+    this.hash = await this.bcs.sendTransaction$(signedTx, this.guid).toPromise();
+    this.botApi.sendTransactionData$(this.hash, this.guid).subscribe();
   }
 
   private decryptQrCodeData(qrRawData: string): string | PrivateKeys | Error {
-    if (this.isJson(qrRawData)) {
+    if (IsJson(qrRawData)) {
       return this.decryptMnemonicVersion(qrRawData);
     }
     return this.decryptPrivateKeysVersion(qrRawData);
   }
 
   private decryptMnemonicVersion(qrRawData: string): string | Error {
-    const qrData = JSON.parse(qrRawData);
-    if (!((qrData as QrCodeData).mnemonic)) {
-      return new Error('qr code doesn\'t contain secret keys');
+    const [ok, qrData] = TryParse<QrCodeData>(qrRawData);
+    if (!ok || !qrData.mnemonic) {
+      return Error('qr code doesn\'t contain secret keys');
     }
     try {
       return Security.decryptSecret(qrData.mnemonic, this.password, qrData.salt, qrData.iv);
@@ -85,12 +116,9 @@ export class SendComponent implements OnInit {
   private decryptPrivateKeysVersion(qrRawData: string): PrivateKeys | Error {
     try {
       const privateKeysJson = Security.decryptSecret(qrRawData.toString(), this.password);
-      if (!this.isJson(privateKeysJson)) {
-        return new Error('qr code doesn\'t contain secret keys');
-      }
-      const privateKeys = JSON.parse(privateKeysJson);
-      if ((privateKeys as PrivateKeys).ethereum) {
-        return new Error('qr code doesn\'t contain secret keys');
+      const [ok, privateKeys] = TryParse<PrivateKeys>(privateKeysJson);
+      if (!ok || !privateKeys.Ethereum) {
+        return Error('qr code doesn\'t contain secret keys');
       }
       return privateKeys;
     } catch (e) {
@@ -98,18 +126,10 @@ export class SendComponent implements OnInit {
     }
   }
 
-  private getSendingMode(): SendingMode {
+  private getSendingMode(): string {
     if (this.storage.secret) {
       return 'fast';
     }
     return 'qrcode';
-  }
-
-  private isJson(text: string): boolean {
-    return /^[\],:{}\s]*$/.test(
-      text.replace(
-        /\\["\\\/bfnrtu]/g, '@')
-        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''));
   }
 }
