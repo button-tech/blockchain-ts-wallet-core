@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, retryWhen } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { BigNumber } from 'bignumber.js';
 import { IDomainCurrency } from '../DomainCurrency';
 import {
   BalanceResponse, CustomFeeRequest, CustomFeeResponse, GasLimitRequest, GasLimitResponse,
@@ -12,6 +11,7 @@ import {
 } from '../dto/node-api.dto';
 import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
+import { delayedRetry } from './provider.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +29,7 @@ export class NodeApiProvider {
     };
 
     return this.http.post<SendRawTxResponse>(url, body).pipe(
+      delayedRetry(1000),
       map(response => {
         return response.hash;
       }),
@@ -39,9 +40,10 @@ export class NodeApiProvider {
     const url = this.makeBalanceUrl(currency, address, guid);
 
     return this.http.get<BalanceResponse>(url).pipe(
+      delayedRetry(1000),
       map(response => {
         return response.balance;
-      }),
+      })
     );
   }
 
@@ -49,6 +51,7 @@ export class NodeApiProvider {
     const url = `${environment.nodeEndpoint}/${currency.short}/nonce/${address}/${guid}`;
 
     return this.http.get<NonceResponse>(url).pipe(
+      delayedRetry(1000),
       map(response => {
         return response.nonce;
       }),
@@ -59,6 +62,7 @@ export class NodeApiProvider {
     const url = `${environment.nodeEndpoint}/${currency.short}/gasPrice/${guid}`;
 
     return this.http.get<GasPriceResponse>(url).pipe(
+      delayedRetry(1000),
       map(response => {
         return response.gasPrice;
       }),
@@ -73,6 +77,7 @@ export class NodeApiProvider {
     };
 
     return this.http.post<GasLimitResponse>(url, body).pipe(
+      delayedRetry(1000),
       map(response => {
         return response.gasLimit;
       }),
@@ -87,6 +92,7 @@ export class NodeApiProvider {
     };
 
     return this.http.post<CustomFeeResponse>(url, body).pipe(
+      delayedRetry(1000),
       map(response => {
         return response;
       }),
@@ -97,6 +103,7 @@ export class NodeApiProvider {
     const url = `${environment.nodeEndpoint}/${currency.short}/utxo/${address}/${guid}`;
 
     return this.http.get<UTXOResponse>(url).pipe(
+      delayedRetry(1000),
       map(response => {
         return response.utxo;
       }),
