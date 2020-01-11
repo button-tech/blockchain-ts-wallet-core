@@ -3,11 +3,12 @@ import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '
 import { ErrorStateMatcher } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { HdWallet } from '../../shared/services/hd-wallet/hd-wallet.service';
-import { StorageService } from '../../shared/services/storage/storage.service';
 import { Security } from '../../shared/services/security/security.service';
-import { Options, QrCode } from '../../shared/components/qrcode/qrcode.service';
-import { environment } from '../../../environments/environment';
-import { QrCodeData } from '../../shared/shared.module';
+import { GetGuid } from '../../shared/shared.module';
+import { BotBackendProvider } from '../../shared/providers/bot-backend.provider';
+import { ActivatedRoute } from '@angular/router';
+import { CreateAccountRequest } from '../../shared/dto/bot-backend.dto';
+import { AccountService } from '../../shared/services/account/account.service';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -53,11 +54,11 @@ interface IRow {
 
 
 export class NewAccountComponent {
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private botApi: BotBackendProvider,
+              private router: ActivatedRoute) {
   }
 
-  data: Array<IRow> = [];
-  words: string;
   checked = false;
   display = true;
   href: string;
@@ -78,67 +79,45 @@ export class NewAccountComponent {
 
   matcher = new MyErrorStateMatcher();
 
+  createNewAccount() {
+    const guid = GetGuid(this.router, 'create');
+
+    const newMnemonic = HdWallet.generateMnemonic();
+    const cipher = Security.encryptSecret(newMnemonic, this.password);
+
+    document.querySelector('div#qrcode').innerHTML = '';
+    AccountService.generateQrCode(this.qrcode, cipher);
+    AccountService.saveAccount(newMnemonic);
+
+    const addresses = AccountService.generateKeyPairs(newMnemonic, this.password);
+
+    if (this.checked) {
+      const req: CreateAccountRequest = {
+        bitcoinAddress: addresses.Bitcoin,
+        bitcoinCashAddress: addresses.BitcoinCash,
+        litecoinAddress: addresses.Litecoin,
+        ethereumAddress: addresses.Ethereum,
+        ethereumClassicAddress: addresses.EthereumClassic,
+        wavesAddress: addresses.Waves,
+        stellarAddress: addresses.Stellar,
+        // mail: this.email
+      };
+      this.botApi.registerAccount$(req, guid).subscribe();
+    }
+    this.display = false;
+  }
+
   get email() {
     return this.newAccountForm.get('email');
   }
-  get password() {
+
+  get password(): string {
     return this.newAccountForm.value.password;
-  }
-
-  generateMnemonic() {
-    const newMnemonic = HdWallet.generateMnemonic();
-
-    const s = new StorageService();
-
-    document.querySelector('div#qrcode').innerHTML = '';
-
-    const cypher = Security.encryptSecret(newMnemonic, this.password);
-    s.cypherParams = { salt: cypher.salt, iv: cypher.iv };
-    s.storage = { secret: cypher.text, expired: false };
-
-    const qrData: QrCodeData = {
-      mnemonic: cypher.text,
-      iv: cypher.iv,
-      salt: cypher.salt
-    };
-    const opt: Options = { text: JSON.stringify(qrData) };
-    const qr = new QrCode();
-    qr.render(opt, this.qrcode);
-
-    this.words = newMnemonic;
-    const mnemonic = Security.decryptSecret(cypher.text, this.password, cypher.salt, cypher.iv);
-    console.log(mnemonic);
-  }
-
-  generateKeyPairs() {
-    const hdWallet = new HdWallet(this.words, this.password);
-    const { btc, ltc, eth, bch, etc, waves, xlm } = hdWallet.generateAllKeyPairs(0);
-    this.data = [
-      { label: 'BTC', address: btc.address, privateKey: btc.privateKey },
-      { label: 'LTC', address: ltc.address, privateKey: ltc.privateKey },
-      { label: 'BCH', address: bch.address, privateKey: bch.privateKey },
-      { label: 'ETH', address: eth.address, privateKey: eth.privateKey },
-      { label: 'ETC', address: etc.address, privateKey: etc.privateKey },
-      { label: 'XLM', address: xlm.address, privateKey: xlm.privateKey },
-      { label: 'Waves', address: waves.address, privateKey: waves.privateKey },
-    ];
   }
 
   downloadImage() {
     this.href = document.getElementsByTagName('img')[0].src;
   }
 
-  createNewAccount() {
-    this.generateMnemonic();
-    this.generateKeyPairs();
-    console.log(this.password);
-    this.display = false;
-    if (this.checked) {
-      const body = {
-        src: this.href,
-        email: this.email
-      };
-      this.http.post(environment.backendUrl, body);
-    }
-  }
 }
+

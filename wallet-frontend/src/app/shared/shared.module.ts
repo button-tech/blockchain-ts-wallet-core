@@ -16,6 +16,8 @@ import { AbiItem } from 'web3-utils';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { BigNumber } from 'bignumber.js';
+import { QRCode } from 'jsqr';
+import { QrcodeComponent } from './components/qrcode/qrcode.component';
 
 export interface QrCodeData {
   mnemonic: string;
@@ -31,6 +33,16 @@ export interface CurrencyFactoryOptions {
   secret: string | PrivateKeys;
   password: string;
   derivationPath: number;
+}
+
+export interface Addresses {
+  Waves: string;
+  Ethereum: string;
+  Bitcoin: string;
+  BitcoinCash: string;
+  Litecoin: string;
+  EthereumClassic: string;
+  Stellar: string;
 }
 
 export interface PrivateKeys {

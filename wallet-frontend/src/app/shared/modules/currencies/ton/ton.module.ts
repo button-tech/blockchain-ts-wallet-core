@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { TonRoutingModule } from './ton-routing.module';
 import { SendModule } from '../../../../send/send.module';
 import { NodeApiProvider } from '../../../providers/node-api.provider';
-import { UtxoBasedUtils } from '../utxoBased.utils';
 import { CurrencyFactoryOptions, PrivateKeys, SharedModule } from '../../../shared.module';
-import {Bitcoin, TON} from '../../../DomainCurrency';
+import { TON } from '../../../DomainCurrency';
 import { HdWallet } from '../../../services/hd-wallet/hd-wallet.service';
-import {TonUtils} from '../ton.utils';
+import { TonUtils } from '../ton.utils';
 
 // todo: брать вейвзовый мнемоник в случае, если стырй QR
 export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
@@ -15,8 +14,13 @@ export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = TON.Instance();
   if (typeof opt.secret === 'string') {
     return handleMnemonicVersion(currency, utils, opt);
-  } else if ((opt.secret as PrivateKeys).bitcoin) {
-    return handlePrivateKeysVersion(currency, utils, opt);
+  } else if ((opt.secret as PrivateKeys).Bitcoin) {
+    if (opt.derivationPath === 0) {
+      return handlePrivateKeysVersion(currency, utils, opt);
+    } else {
+      opt.secret = opt.secret.Waves;
+      return handleMnemonicVersion(currency, utils, opt);
+    }
   } else {
     // todo: handle error: this currency doesn't exist in privateKeys object
   }
@@ -29,7 +33,7 @@ function handleMnemonicVersion(currency: TON, utils: NodeApiProvider, opt: Curre
 }
 
 function handlePrivateKeysVersion(currency: TON, utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
-  const hdWallet = new HdWallet((opt.secret as PrivateKeys).waves, opt.password);
+  const hdWallet = new HdWallet((opt.secret as PrivateKeys).Waves, opt.password);
   const keys = hdWallet.generateKeyPair(currency, opt.derivationPath);
   return new TonUtils(keys.privateKey, utils, currency);
 }

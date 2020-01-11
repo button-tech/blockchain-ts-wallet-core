@@ -1,5 +1,7 @@
+import { PrivateKeys } from '../../shared.module';
+
 export interface Storage {
-  secret: string;
+  secret: string | PrivateKeys;
   expired: boolean; // false - mnemonic; true - privateKeys
 }
 
@@ -13,12 +15,15 @@ export class StorageService {
   private secretStorage: Storage;
   private cp: CypherParams;
 
+  private readonly secretFieldName = 'secret';
+
   constructor() {
     this.readSecret();
     this.readCypherParams();
   }
 
   get storage(): Storage {
+    console.log(this.secretStorage);
     return this.secretStorage;
   }
 
@@ -43,20 +48,21 @@ export class StorageService {
   }
 
   private readSecret(): void {
-    const mnemonic = localStorage.getItem('mnemonic');
-    if (mnemonic) {
-      this.storage = {
-        secret: mnemonic,
-        expired: false
+    const secret = localStorage.getItem(this.secretFieldName);
+    const [expired, secretData] = this.tryParseSecret(secret);
+    if (secret) {
+      this.secretStorage = {
+        secret: secretData,
+        expired
       };
       return;
     }
 
+    // for old version
     const privateKeys = localStorage.getItem('privateKeys');
     if (privateKeys) {
-      const secret = privateKeys ? JSON.parse(privateKeys) : null;
       this.secretStorage = {
-        secret,
+        secret: privateKeys ? JSON.parse(privateKeys) : null,
         expired: true
       };
       return;
@@ -76,10 +82,16 @@ export class StorageService {
 
   private writeSecret(storage: Storage): void {
     if (storage.expired) {
-      const privateKeys = JSON.stringify(storage.secret);
-      localStorage.setItem('privateKeys', privateKeys);
-    } else {
-      localStorage.setItem('mnemonic', storage.secret.toString());
+      storage.secret = JSON.stringify(storage.secret);
+    }
+    localStorage.setItem(this.secretFieldName, storage.secret.toString());
+  }
+
+  private tryParseSecret(secret: string): [boolean, string | PrivateKeys] {
+    try {
+      return [true, JSON.parse(secret)];
+    } catch (e) {
+      return [false, secret];
     }
   }
 

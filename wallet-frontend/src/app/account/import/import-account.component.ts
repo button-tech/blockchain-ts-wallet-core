@@ -3,10 +3,14 @@ import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '
 import { ErrorStateMatcher } from '@angular/material/core';
 import { StorageService } from '../../shared/services/storage/storage.service';
 import { Security } from '../../shared/services/security/security.service';
-import { QrCodeData } from '../../shared/shared.module';
+import { GetGuid, QrCodeData } from '../../shared/shared.module';
 import { Options, QrCode } from '../../shared/components/qrcode/qrcode.service';
 import { NodeApiProvider } from '../../shared/providers/node-api.provider';
 import { Decryption } from '../../shared/services/send/send.service';
+import { AccountService } from '../../shared/services/account/account.service';
+import { CreateAccountRequest } from '../../shared/dto/bot-backend.dto';
+import { BotBackendProvider } from '../../shared/providers/bot-backend.provider';
+import { ActivatedRoute } from '@angular/router';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -35,7 +39,10 @@ export class ImportAccountComponent {
     password_second: new FormControl('', Validators.required)
   });
 
-  constructor() {
+  constructor(private storageService: StorageService,
+              private decryption: Decryption,
+              private botApi: BotBackendProvider,
+              private router: ActivatedRoute) {
   }
 
   downloadImage() {
@@ -55,19 +62,25 @@ export class ImportAccountComponent {
   }
 
   importByMnemonic() {
+    const guid = GetGuid(this.router, 'create');
+
     // todo: check mnemonic
-    const s = new StorageService();
-    const cypher = Security.encryptSecret(this.mnemonic, this.password);
-    s.cypherParams = { salt: cypher.salt, iv: cypher.iv };
-    s.storage = { secret: cypher.text, expired: false };
-    const qrData: QrCodeData = {
-      mnemonic: cypher.text,
-      iv: cypher.iv,
-      salt: cypher.salt
+    const cipher = Security.encryptSecret(this.mnemonic, this.password);
+    AccountService.generateQrCode(this.qrcode, cipher);
+    AccountService.saveAccount(this.mnemonic);
+
+    const addresses = AccountService.generateKeyPairs(this.mnemonic, this.password);
+
+    const req: CreateAccountRequest = {
+      bitcoinAddress: addresses.Bitcoin,
+      bitcoinCashAddress: addresses.BitcoinCash,
+      litecoinAddress: addresses.Litecoin,
+      ethereumAddress: addresses.Ethereum,
+      ethereumClassicAddress: addresses.EthereumClassic,
+      wavesAddress: addresses.Waves,
+      stellarAddress: addresses.Stellar
     };
-    const opt: Options = { text: JSON.stringify(qrData) };
-    const qr = new QrCode();
-    qr.render(opt, this.qrcode);
+    // this.botApi.registerAccount$(req, guid).subscribe();
     this.display = false;
   }
 
@@ -76,14 +89,15 @@ export class ImportAccountComponent {
       console.log('empty password');
       return;
     }
-    const decryption = new Decryption();
-    const decryptedText = decryption.decryptQrCodeData(qrRawData, this.password_second);
+    const decryptedText = this.decryption.decryptQrCodeData(qrRawData, this.password_second);
     if (decryptedText instanceof Error) {
       // todo: handle error: from decryption + if the error was thrown
       console.log(decryptedText);
       return;
     }
     console.log(decryptedText);
+
+    AccountService.saveAccount(decryptedText);
   }
 
 }

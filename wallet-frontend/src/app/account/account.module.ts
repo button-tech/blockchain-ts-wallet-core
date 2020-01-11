@@ -7,14 +7,17 @@ import { MatButtonModule, MatCardModule, MatCheckboxModule, MatInputModule, MatS
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImportAccountComponent } from './import/import-account.component';
 import { HttpClientModule } from '@angular/common/http';
-import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
+import { BotBackendProvider } from '../shared/providers/bot-backend.provider';
+import { Decryption } from '../shared/services/send/send.service';
+import { AccountService } from '../shared/services/account/account.service';
+import { StorageService } from '../shared/services/storage/storage.service';
+import { QrcodeModule } from '../shared/components/qrcode/qrcode.module';
 
 
 @NgModule({
   declarations: [
     NewAccountComponent,
     ImportAccountComponent,
-    QrcodeComponent
   ],
   imports: [
     HttpClientModule,
@@ -27,7 +30,14 @@ import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
     MatButtonModule,
     AccountRoutingModule,
     MatCardModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    QrcodeModule
+  ],
+  providers: [
+    BotBackendProvider,
+    Decryption,
+    AccountService,
+    StorageService
   ]
 })
 export class AccountModule {
