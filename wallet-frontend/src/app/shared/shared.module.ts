@@ -79,7 +79,7 @@ export interface ContractCall {
 }
 
 export interface IBlockchainService {
-  getAddress(privateKey: string): string;
+  getAddress(privateKey: string): string | Observable<string>;
 
   getBalance$(address: string, guid: string): Observable<number>;
 

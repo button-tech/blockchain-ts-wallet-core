@@ -61,6 +61,18 @@ export interface UTXO {
   cashAddress?: string;
 }
 
+export interface TonAccountInfo {
+  workChainId: string;
+  bounce: boolean;
+  fullAddress: string;
+  nonBounceableAddress: string;
+  shortAddress: string;
+}
+
+export interface TonAccountSeqno {
+  seqno: string;
+}
+
 export interface UTXOResponse {
   utxo: Array<UTXO>;
 }
