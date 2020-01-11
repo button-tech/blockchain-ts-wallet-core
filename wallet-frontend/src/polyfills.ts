@@ -59,12 +59,13 @@
  */
 import 'zone.js/dist/zone';
 import * as process from 'process';
+import { environment } from './environments/environment.prod';
 
 window['process'] = process;
 (window as any).global = window;
 
 // @ts-ignore
-(window as any).global.Buffer = (window as any).global.Buffer || require('buffer').Buffer
+(window as any).global.Buffer = (window as any).global.Buffer || require('buffer').Buffer;
 
 export interface AnyProperties {
   [prop: string]: any;
@@ -73,15 +74,14 @@ export interface AnyProperties {
 
 declare global {
 
-  class Mnemonic implements AnyProperties {
-    constructor(lang: string);
+  interface Window {
+    wallet_creation_generate_external_message(keyPair: any, workChain: any): any;
 
-    public toMnemonic(Uint8Array): string;
+    nacl(): any;
 
-    public toSeed(mnemonic: string, passphrase: string): string;
-
-    [prop: string]: any;
+    sign(privateKey: any, toAddress: any, amount: any, workChain: any, nodeEndpoint: any): string;
   }
+
 
   // TODO: declare mnemonic interface in Windows
 }

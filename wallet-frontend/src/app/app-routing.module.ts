@@ -32,6 +32,10 @@ const routes: Routes = [
   {
     path: 'etc',
     loadChildren: () => import('./shared/modules/currencies/ethereumClassic/ethereumClassic.module').then(m => m.EthereumClassicModule)
+  },
+  {
+    path: 'ton',
+    loadChildren: () => import('./shared/modules/currencies/ton/ton.module').then(m => m.TonModule)
   }
 
   // {path: 'eth/send', loadChildren: () => import('./xlm/xlm.module').then(m => m.XlmModule)}

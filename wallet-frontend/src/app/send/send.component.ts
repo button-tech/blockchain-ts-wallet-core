@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Inject, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { NodeApiProvider } from '../shared/providers/node-api.provider';
 import { BotBackendProvider } from '../shared/providers/bot-backend.provider';
 import { StorageService, Storage, CypherParams } from '../shared/services/storage/storage.service';
@@ -21,6 +21,8 @@ import { AccountService } from '../shared/services/account/account.service';
   encapsulation: ViewEncapsulation.None
 })
 export class SendComponent implements OnInit {
+
+  @Output() errorEvent = new EventEmitter<string>();
 
   qrCodeMode = false;
   fastMode = false;
@@ -53,7 +55,17 @@ export class SendComponent implements OnInit {
 
     this.botApi.getTransactionData$(this.guid).pipe(
       tap(async (txData: TransactionResponse) => {
-        this.transactionData = txData;
+        this.transactionData = {
+          currency: 'Waves',
+          from: '3PDn2Sqwdz7Zbj6PJcNniRYKdLR3U3DJabR',
+          to: '3PDn2Sqwdz7Zbj6PJcNniRYKdLR3U3DJabR',
+          nickname: 'krboktv',
+          fromNickName: 'krboktv',
+          value: '0.11813349',
+          valueInUsd: '0.1000000000000000000000000000',
+          fromChatId: 302115726,
+          toChatId: 302115726
+        };
         this.setSendingMode();
         if (this.fastMode) {
           await this.executeTransaction(this.storage.secret, 0);
@@ -110,4 +122,6 @@ export class SendComponent implements OnInit {
       this.qrCodeMode = true;
     }
   }
+
+  private se
 }
