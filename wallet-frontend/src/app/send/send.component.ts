@@ -14,6 +14,7 @@ import { TransactionResponse } from '../shared/dto/bot-backend.dto';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, delay, map, retry, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { Decryption } from '../shared/services/send/send.service';
 
 @Component({
   selector: 'app-send',
@@ -75,7 +76,8 @@ export class SendComponent implements OnInit {
       console.log('empty password');
       return;
     }
-    const decryptedText = this.decryptQrCodeData(qrRawData);
+    const decryption = new Decryption();
+    const decryptedText = decryption.decryptQrCodeData(qrRawData, this.password);
     if (decryptedText instanceof Error) {
       // todo: handle error: from decryption + if the error was thrown
       console.log(decryptedText);
@@ -92,38 +94,6 @@ export class SendComponent implements OnInit {
     const signedTx = await this.bcs.signTransaction$(transactionParams, this.guid).toPromise();
     this.hash = await this.bcs.sendTransaction$(signedTx, this.guid).toPromise();
     this.botApi.sendTransactionData$(this.hash, this.guid).subscribe();
-  }
-
-  private decryptQrCodeData(qrRawData: string): string | PrivateKeys | Error {
-    if (IsJson(qrRawData)) {
-      return this.decryptMnemonicVersion(qrRawData);
-    }
-    return this.decryptPrivateKeysVersion(qrRawData);
-  }
-
-  private decryptMnemonicVersion(qrRawData: string): string | Error {
-    const [ok, qrData] = TryParse<QrCodeData>(qrRawData);
-    if (!ok || !qrData.mnemonic) {
-      return Error('qr code doesn\'t contain secret keys');
-    }
-    try {
-      return Security.decryptSecret(qrData.mnemonic, this.password, qrData.salt, qrData.iv);
-    } catch (e) {
-      return new Error('wrong password or qr code');
-    }
-  }
-
-  private decryptPrivateKeysVersion(qrRawData: string): PrivateKeys | Error {
-    try {
-      const privateKeysJson = Security.decryptSecret(qrRawData.toString(), this.password);
-      const [ok, privateKeys] = TryParse<PrivateKeys>(privateKeysJson);
-      if (!ok || !privateKeys.Ethereum) {
-        return Error('qr code doesn\'t contain secret keys');
-      }
-      return privateKeys;
-    } catch (e) {
-      return new Error('wrong password or qr code');
-    }
   }
 
   private getSendingMode(): string {

@@ -92,7 +92,6 @@ export class HdWallet {
     keyPairsObject[litecoin.short] = this.generateKeyPair(litecoin, index);
     keyPairsObject[waves.short] = this.generateKeyPair(waves, index);
     keyPairsObject[stellar.short] = this.generateKeyPair(stellar, index);
-    debugger
     keyPairsObject[ton.short] = this.generateKeyPair(ton, index);
 
     return keyPairsObject;
