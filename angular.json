@@ -42,11 +42,10 @@
               "wallet-frontend/src/styles.scss"
             ],
             "scripts": [
-              {
-                "input": "wallet-frontend/src/assets/example.js",
-                "bundleName": "exampleBundle",
-                "lazy": true
-              }
+              "wallet-frontend/src/assets/ton/nacl.min.js",
+              "wallet-frontend/src/assets/ton/fift_lib.js",
+              "wallet-frontend/src/assets/ton/bn.js",
+              "wallet-frontend/src/assets/ton/index.js"
             ]
           },
           "configurations": {
