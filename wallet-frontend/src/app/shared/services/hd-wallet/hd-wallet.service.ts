@@ -141,9 +141,10 @@ export class HdWallet {
       case 'ton':
         const tonKeyPair = this.generateEd25519KeyPair(hdPath.ton, index);
         const pvk = tonKeyPair.key.toString('hex');
+        const keyPair = (window as any).nacl.sign.keyPair.fromSeed(tonKeyPair.key);
         return {
           privateKey: pvk,
-          address: '123'
+          address: (window as any).wallet_creation_generate_external_message(keyPair, '-1')
         };
     }
   }

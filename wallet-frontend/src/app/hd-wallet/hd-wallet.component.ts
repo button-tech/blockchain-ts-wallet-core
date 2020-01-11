@@ -4,11 +4,12 @@ import {
   ViewChild,
   AfterViewInit
 } from '@angular/core';
-import { HdWallet } from '../shared/services/hd-wallet/hd-wallet.service';
-import { Options, QrCode } from '../shared/components/qrcode/qrcode.service';
-import { StorageService } from '../shared/services/storage/storage.service';
-import { Security } from '../shared/services/security/security.service';
-import { QrCodeData } from '../shared/shared.module';
+import {HdWallet} from '../shared/services/hd-wallet/hd-wallet.service';
+import {Options, QrCode} from '../shared/components/qrcode/qrcode.service';
+import {StorageService} from '../shared/services/storage/storage.service';
+import {Security} from '../shared/services/security/security.service';
+import {QrCodeData} from '../shared/shared.module';
+import {NodeApiProvider} from "../shared/providers/node-api.provider";
 
 interface IRow {
   label: string;
@@ -37,7 +38,10 @@ export class HdWalletComponent implements AfterViewInit {
   words: string;
   password = '';
 
-  @ViewChild('qrcode', { static: false }) qrcode: ElementRef;
+  @ViewChild('qrcode', {static: false}) qrcode: ElementRef;
+
+  constructor(private nodeApi: NodeApiProvider) {
+  }
 
   generateMnemonic() {
     const newMnemonic = HdWallet.generateMnemonic();
@@ -47,8 +51,8 @@ export class HdWalletComponent implements AfterViewInit {
     document.querySelector('div#qrcode').innerHTML = '';
 
     const cypher = Security.encryptSecret(newMnemonic, this.password);
-    s.cypherParams = { salt: cypher.salt, iv: cypher.iv };
-    s.storage = { secret: cypher.text, expired: false };
+    s.cypherParams = {salt: cypher.salt, iv: cypher.iv};
+    s.storage = {secret: cypher.text, expired: false};
 
     const qrData: QrCodeData = {
       mnemonic: cypher.text,
@@ -56,28 +60,29 @@ export class HdWalletComponent implements AfterViewInit {
       salt: cypher.salt
     };
 
-    const opt: Options = { text: JSON.stringify(qrData) };
+    const opt: Options = {text: JSON.stringify(qrData)};
     const qr = new QrCode();
     qr.render(opt, this.qrcode);
 
     this.words = newMnemonic;
 
-    const mnemonic = Security.decryptSecret(cypher.text, this.password, cypher.salt,  cypher.iv);
+    const mnemonic = Security.decryptSecret(cypher.text, this.password, cypher.salt, cypher.iv);
     console.log(mnemonic);
   }
 
-  generateKeyPairs() {
+  async generateKeyPairs() {
     const hdWallet = new HdWallet(this.words, this.password);
-    const { btc, ltc, eth, bch, etc, waves, xlm, ton } = hdWallet.generateAllKeyPairs(0);
+    const {btc, ltc, eth, bch, etc, waves, xlm, ton} = hdWallet.generateAllKeyPairs(0);
+
     this.data = [
-      { label: 'BTC', address: btc.address, privateKey: btc.privateKey },
-      { label: 'LTC', address: ltc.address, privateKey: ltc.privateKey },
-      { label: 'BCH', address: bch.address, privateKey: bch.privateKey },
-      { label: 'ETH', address: eth.address, privateKey: eth.privateKey },
-      { label: 'ETC', address: etc.address, privateKey: etc.privateKey },
-      { label: 'XLM', address: xlm.address, privateKey: xlm.privateKey },
-      { label: 'Waves', address: waves.address, privateKey: waves.privateKey },
-      { label: 'TON', address: ton.address, privateKey: ton.privateKey },
+      {label: 'BTC', address: btc.address, privateKey: btc.privateKey},
+      {label: 'LTC', address: ltc.address, privateKey: ltc.privateKey},
+      {label: 'BCH', address: bch.address, privateKey: bch.privateKey},
+      {label: 'ETH', address: eth.address, privateKey: eth.privateKey},
+      {label: 'ETC', address: etc.address, privateKey: etc.privateKey},
+      {label: 'XLM', address: xlm.address, privateKey: xlm.privateKey},
+      {label: 'Waves', address: waves.address, privateKey: waves.privateKey},
+      {label: 'TON', address: (await ton.address)[0], privateKey: ton.privateKey},
     ];
   }
 

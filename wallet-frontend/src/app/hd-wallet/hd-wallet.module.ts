@@ -1,10 +1,11 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { HdWalletRoutingModule } from './hd-wallet-routing.module';
-import { HdWalletComponent } from './hd-wallet.component';
-import { HttpClientModule } from '@angular/common/http';
-import { SharedModule } from '../shared/shared.module';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {HdWalletRoutingModule} from './hd-wallet-routing.module';
+import {HdWalletComponent} from './hd-wallet.component';
+import {HttpClientModule} from '@angular/common/http';
+import {SharedModule} from '../shared/shared.module';
+import {NodeApiProvider} from '../shared/providers/node-api.provider';
 
 @NgModule({
   declarations: [HdWalletComponent],
@@ -14,6 +15,9 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
     HdWalletRoutingModule,
     FormsModule
+  ],
+  providers: [
+    NodeApiProvider
   ]
 })
 export class HdWalletModule {
