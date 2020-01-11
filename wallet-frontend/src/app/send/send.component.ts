@@ -22,6 +22,9 @@ import { AccountService } from '../shared/services/account/account.service';
 })
 export class SendComponent implements OnInit {
 
+  qrCodeMode = false;
+  fastMode = false;
+
   password = '';
   amount = 0;
   toAddress = '';
@@ -51,10 +54,10 @@ export class SendComponent implements OnInit {
     this.botApi.getTransactionData$(this.guid).pipe(
       tap(async (txData: TransactionResponse) => {
         this.transactionData = txData;
-        const sendingMode = this.getSendingMode();
-        if (sendingMode === 'fast') {
+        this.setSendingMode();
+        if (this.fastMode) {
           await this.executeTransaction(this.storage.secret, 0);
-        } else if (sendingMode === 'qrcode') {
+        } else if (this.qrCodeMode) {
           // render upload qr code template
         }
       }),
@@ -100,10 +103,11 @@ export class SendComponent implements OnInit {
     this.botApi.sendTransactionData$(this.hash, this.guid).subscribe();
   }
 
-  private getSendingMode(): string {
-    if (this.storage.secret) {
-      return 'fast';
+  private setSendingMode(): void {
+    if (this.storage && this.storage.secret) {
+      this.fastMode = true;
+    } else {
+      this.qrCodeMode = true;
     }
-    return 'qrcode';
   }
 }
