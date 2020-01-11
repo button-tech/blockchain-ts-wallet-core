@@ -7,7 +7,8 @@ import {
   GasPriceResponse,
   NonceResponse,
   SendRawTxRequest,
-  SendRawTxResponse, UTXO, UTXOResponse
+  SendRawTxResponse, UTXO, UTXOResponse,
+  TonAccountInfo, TonAccountSeqno
 } from '../dto/node-api.dto';
 import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
@@ -106,6 +107,26 @@ export class NodeApiProvider {
       delayedRetry(1000),
       map(response => {
         return response.utxo;
+      }),
+    );
+  }
+
+  getTonAddressInfo$(address: string, guid: string): Observable<TonAccountInfo> {
+    const url = `${environment.nodeEndpoint}/ton/getAccount/${address}/${guid}`;
+    return this.http.get<TonAccountInfo>(url).pipe(
+      delayedRetry(1000),
+      map(response => {
+        return response;
+      }),
+    );
+  }
+
+  getTonAccountSeqno$(address: string, guid: string): Observable<TonAccountSeqno> {
+    const url = `${environment.nodeEndpoint}/ton/seqno/${address}/${guid}`;
+    return this.http.get<TonAccountSeqno>(url).pipe(
+      delayedRetry(1000),
+      map(response => {
+        return response.seqno;
       }),
     );
   }
