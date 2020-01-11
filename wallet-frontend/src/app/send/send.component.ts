@@ -40,10 +40,11 @@ export class SendComponent implements OnInit {
   constructor(@Inject('SuperService') private currencyFactory: ICurrencyFactory,
               private utils: NodeApiProvider,
               private botApi: BotBackendProvider,
-              private s: StorageService,
-              private route: ActivatedRoute) {
-    this.storage = s.storage;
-    this.cypherParams = s.cypherParams;
+              private storageService: StorageService,
+              private route: ActivatedRoute,
+              private decryption: Decryption) {
+    this.storage = storageService.storage;
+    this.cypherParams = storageService.cypherParams;
   }
 
   ngOnInit() {
@@ -76,8 +77,7 @@ export class SendComponent implements OnInit {
       console.log('empty password');
       return;
     }
-    const decryption = new Decryption();
-    const decryptedText = decryption.decryptQrCodeData(qrRawData, this.password);
+    const decryptedText = this.decryption.decryptQrCodeData(qrRawData, this.password);
     if (decryptedText instanceof Error) {
       // todo: handle error: from decryption + if the error was thrown
       console.log(decryptedText);

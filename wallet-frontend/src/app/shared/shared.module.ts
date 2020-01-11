@@ -33,6 +33,16 @@ export interface CurrencyFactoryOptions {
   derivationPath: number;
 }
 
+export interface Addresses {
+  Waves: string;
+  Ethereum: string;
+  Bitcoin: string;
+  BitcoinCash: string;
+  Litecoin: string;
+  EthereumClassic: string;
+  Stellar: string;
+}
+
 export interface PrivateKeys {
   Waves: string;
   Ethereum: string;
