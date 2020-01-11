@@ -67,7 +67,7 @@ export class ImportAccountComponent {
     // todo: check mnemonic
     const cipher = Security.encryptSecret(this.mnemonic, this.password);
     AccountService.generateQrCode(this.qrcode, cipher);
-    AccountService.saveAccount(cipher);
+    AccountService.saveAccount(this.mnemonic);
 
     const addresses = AccountService.generateKeyPairs(this.mnemonic, this.password);
 
@@ -96,6 +96,8 @@ export class ImportAccountComponent {
       return;
     }
     console.log(decryptedText);
+
+    AccountService.saveAccount(decryptedText);
   }
 
 }

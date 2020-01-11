@@ -9,7 +9,7 @@
   </mat-form-field>
   <br>
   <mat-form-field class="example-full-width">
-    <input matInput placeholder="Password" formControlName="password">
+    <input matInput placeholder="Password" type="password" formControlName="password">
   </mat-form-field>
   <br>
   <button (click)="importByMnemonic()">Import</button>
@@ -18,7 +18,7 @@
   </h1>
   <br>
   <mat-form-field class="example-full-width">
-    <input matInput placeholder="Password" formControlName="password_second">
+    <input matInput placeholder="Password" type="password" formControlName="password_second">
   </mat-form-field>
   <br>
   <app-qr-code (messageEvent)="importByQR($event)"></app-qr-code>

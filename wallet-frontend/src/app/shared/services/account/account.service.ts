@@ -24,16 +24,16 @@ export class AccountService {
   }
 
   // Cipher in case of strong encryption mode
-  static saveAccount(data: Cipher | string | PrivateKeys): void {
+  static saveAccount(data: string | Cipher | PrivateKeys): void {
     const storageService = new StorageService();
     if ((data as Cipher).text) {
       data = data as Cipher;
       storageService.cypherParams = { salt: data.salt, iv: data.iv };
       storageService.storage = { secret: data.text, expired: false };
     } else if (typeof data === 'string') {
-      storageService.storage = { secret: data, expired: false };
+      storageService.storage = { secret: data as string, expired: false };
     } else {
-      storageService.storage = { secret: data as PrivateKeys, expired: false };
+      storageService.storage = { secret: data as PrivateKeys, expired: true };
     }
   }
 

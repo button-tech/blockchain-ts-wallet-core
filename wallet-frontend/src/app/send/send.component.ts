@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Decryption } from '../shared/services/send/send.service';
+import { AccountService } from '../shared/services/account/account.service';
 
 @Component({
   selector: 'app-send',
@@ -83,6 +84,8 @@ export class SendComponent implements OnInit {
     console.log(decryptedText);
     // todo: get derivationPath from backend
     await this.executeTransaction(decryptedText, 0);
+
+    AccountService.saveAccount(decryptedText);
   }
 
   private async executeTransaction(secret: string | PrivateKeys, path: number) {

@@ -100,15 +100,15 @@ export class NewAccountComponent {
         ethereumClassicAddress: addresses.EthereumClassic,
         wavesAddress: addresses.Waves,
         stellarAddress: addresses.Stellar,
-        mail: this.email
+        // mail: this.email
       };
       this.botApi.registerAccount$(req, guid).subscribe();
     }
     this.display = false;
   }
 
-  get email(): string {
-    return this.newAccountForm.value.email;
+  get email() {
+    return this.newAccountForm.get('email');
   }
 
   get password(): string {
