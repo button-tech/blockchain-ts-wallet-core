@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SendRoutingModule } from './send-routing.module';
 import { SendComponent } from './send.component';
-import { SendService } from './send.service';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
@@ -28,7 +27,6 @@ export class SendModule {
     return {
       ngModule: SendModule,
       providers: [
-        SendService,
         {
           provide: 'SuperService',
           useValue: config

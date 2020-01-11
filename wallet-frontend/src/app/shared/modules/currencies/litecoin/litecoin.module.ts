@@ -13,7 +13,7 @@ export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = Litecoin.Instance();
   if (typeof opt.secret === 'string') {
     return handleMnemonicVersion(currency, utils, opt);
-  } else if ((opt.secret as PrivateKeys).litecoin) {
+  } else if ((opt.secret as PrivateKeys).Litecoin) {
     return handlePrivateKeysVersion(currency, utils, opt);
   } else {
     // todo: handle error: this currency doesn't exist in privateKeys object
@@ -27,7 +27,7 @@ function handleMnemonicVersion(currency: Litecoin, utils: NodeApiProvider, opt: 
 }
 
 function handlePrivateKeysVersion(currency: Litecoin, utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
-  return new UtxoBasedUtils((opt.secret as PrivateKeys).litecoin, utils, currency);
+  return new UtxoBasedUtils((opt.secret as PrivateKeys).Litecoin, utils, currency);
 }
 
 @NgModule({

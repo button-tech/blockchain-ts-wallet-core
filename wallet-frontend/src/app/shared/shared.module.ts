@@ -14,8 +14,8 @@ import { TxConfig } from './modules/currencies/ethereumContract.utils';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { Observable } from 'rxjs';
-
-// TODO: make IBlockchainService.signTransaction$ template method, and move classes interfaces to shared
+import { ActivatedRoute } from '@angular/router';
+import { BigNumber } from 'bignumber.js';
 
 export interface QrCodeData {
   mnemonic: string;
@@ -34,13 +34,13 @@ export interface CurrencyFactoryOptions {
 }
 
 export interface PrivateKeys {
-  waves: string;
-  ethereum: string;
-  bitcoin: string;
-  bitcoinCash: string;
-  litecoin: string;
-  ethereumClassic: string;
-  stellar: string;
+  Waves: string;
+  Ethereum: string;
+  Bitcoin: string;
+  BitcoinCash: string;
+  Litecoin: string;
+  EthereumClassic: string;
+  Stellar: string;
 }
 
 export interface SignTransactionParams {
@@ -71,18 +71,53 @@ export interface IBlockchainService {
 
   getBalance$(address: string, guid: string): Observable<number>;
 
-  signTransaction$(params: SignTransactionParams, guid?: string): Promise<string | ITransferTransaction | Transaction>;
+  signTransaction$(params: SignTransactionParams, guid?: string): Observable<string | ITransferTransaction | Transaction>;
 
-  sendTransaction$(rawTransaction: string, guid: string): Observable<string>;
+  sendTransaction$(rawTransaction: string | ITransferTransaction | Transaction, guid: string): Observable<string>;
 }
 
 export interface IContractService extends IBlockchainService {
   awaitTx$?(txnHash: Array<string> | string): Promise<any> | Promise<any[]>;
+
   getInstance?(abi: AbiItem[], contractAddress: string): Contract;
+
   callMethod$?(params: ContractCall): Observable<any>;
-  setValue$?(params: ContractCall, guid: string, isSync?: boolean): Promise<string>;
-  estimateGasRawData$?(params: TxConfig): Promise<number>;
+
+  setValue$?(params: ContractCall, guid: string, isSync?: boolean): Observable<string>;
+
+  estimateGasRawData$?(params: TxConfig): Observable<number>;
+
   decimalToHex?(d: number | string): string;
+}
+
+export function TryParse<T>(text: string): [boolean, T] {
+  try {
+    return [true, JSON.parse(text) as T];
+  } catch (e) {
+    return [false, null];
+  }
+}
+
+export function IsJson(text: string): boolean {
+  return /^[\],:{}\s]*$/.test(
+    text.replace(
+      /\\["\\\/bfnrtu]/g, '@')
+      .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+      .replace(/(?:^|:|,)(?:\s*\[)+/g, ''));
+}
+
+export function GetGuid(route: ActivatedRoute, param: string) {
+  return route.snapshot.queryParamMap.get(param);
+}
+
+export const Tbn = (x: string | number): BigNumber => new BigNumber(x);
+
+export function FromDecimal(x: string | number | BigNumber, n: number): BigNumber {
+  return BigNumber.isBigNumber(x) ? x.times(10 ** n).integerValue() : Tbn(x).times(10 ** n).integerValue();
+}
+
+export function ToDecimal(x: string | number | BigNumber, n: number): BigNumber {
+  return BigNumber.isBigNumber(x) ? x.div(10 ** n) : Tbn(x).div(10 ** n);
 }
 
 

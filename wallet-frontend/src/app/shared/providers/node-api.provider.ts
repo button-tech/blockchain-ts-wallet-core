@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, retryWhen } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { BigNumber } from 'bignumber.js';
 import { IDomainCurrency } from '../DomainCurrency';
 import {
   BalanceResponse, CustomFeeRequest, CustomFeeResponse, GasLimitRequest, GasLimitResponse,
@@ -12,6 +11,7 @@ import {
 } from '../dto/node-api.dto';
 import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
+import { delayedRetry } from './provider.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -28,8 +28,9 @@ export class NodeApiProvider {
       data
     };
 
-    return this.http.post(url, body).pipe(
-      map((response: SendRawTxResponse) => {
+    return this.http.post<SendRawTxResponse>(url, body).pipe(
+      delayedRetry(1000),
+      map(response => {
         return response.hash;
       }),
     );
@@ -38,18 +39,20 @@ export class NodeApiProvider {
   getBalance$(currency: IDomainCurrency, address: string, guid: string): Observable<string> {
     const url = this.makeBalanceUrl(currency, address, guid);
 
-    return this.http.get(url).pipe(
-      map((response: BalanceResponse) => {
+    return this.http.get<BalanceResponse>(url).pipe(
+      delayedRetry(1000),
+      map(response => {
         return response.balance;
-      }),
+      })
     );
   }
 
   getNonce$(currency: IDomainCurrency, address: string, guid: string): Observable<number> {
     const url = `${environment.nodeEndpoint}/${currency.short}/nonce/${address}/${guid}`;
 
-    return this.http.get(url).pipe(
-      map((response: NonceResponse) => {
+    return this.http.get<NonceResponse>(url).pipe(
+      delayedRetry(1000),
+      map(response => {
         return response.nonce;
       }),
     );
@@ -58,8 +61,9 @@ export class NodeApiProvider {
   getGasPrice$(currency: IDomainCurrency, guid: string): Observable<number> {
     const url = `${environment.nodeEndpoint}/${currency.short}/gasPrice/${guid}`;
 
-    return this.http.get(url).pipe(
-      map((response: GasPriceResponse) => {
+    return this.http.get<GasPriceResponse>(url).pipe(
+      delayedRetry(1000),
+      map(response => {
         return response.gasPrice;
       }),
     );
@@ -72,8 +76,9 @@ export class NodeApiProvider {
       data
     };
 
-    return this.http.post(url, body).pipe(
-      map((response: GasLimitResponse) => {
+    return this.http.post<GasLimitResponse>(url, body).pipe(
+      delayedRetry(1000),
+      map(response => {
         return response.gasLimit;
       }),
     );
@@ -86,8 +91,9 @@ export class NodeApiProvider {
       amount
     };
 
-    return this.http.post(url, body).pipe(
-      map((response: CustomFeeResponse) => {
+    return this.http.post<CustomFeeResponse>(url, body).pipe(
+      delayedRetry(1000),
+      map(response => {
         return response;
       }),
     );
@@ -96,21 +102,12 @@ export class NodeApiProvider {
   getUtxo$(currency: IDomainCurrency, address: string, guid: string): Observable<Array<UTXO>> {
     const url = `${environment.nodeEndpoint}/${currency.short}/utxo/${address}/${guid}`;
 
-    return this.http.get(url).pipe(
-      map((response: UTXOResponse) => {
+    return this.http.get<UTXOResponse>(url).pipe(
+      delayedRetry(1000),
+      map(response => {
         return response.utxo;
       }),
     );
-  }
-
-  tbn = (x: string | number): BigNumber => new BigNumber(x);
-
-  fromDecimal(x: string | number | BigNumber, n: number): BigNumber {
-    return BigNumber.isBigNumber(x) ? x.times(10 ** n).integerValue() : this.tbn(x).times(10 ** n).integerValue();
-  }
-
-  toDecimal(x: string | number | BigNumber, n: number): BigNumber {
-    return BigNumber.isBigNumber(x) ? x.div(10 ** n) : this.tbn(x).div(10 ** n);
   }
 
   private makeBalanceUrl(currency: IDomainCurrency, address: string, guid: string): string {

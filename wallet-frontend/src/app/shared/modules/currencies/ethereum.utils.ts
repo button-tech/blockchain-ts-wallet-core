@@ -1,12 +1,21 @@
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Transaction, TransactionOptions, TxData } from 'ethereumjs-tx';
 import { privateToAddress } from 'ethereumjs-util';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
-import { IBlockchainService, SignTransactionParams } from '../../shared.module';
+import { FromDecimal, IBlockchainService, SignTransactionParams, Tbn, ToDecimal } from '../../shared.module';
 import { NodeApiProvider } from '../../providers/node-api.provider';
+import { CustomFeeResponse } from '../../dto/node-api.dto';
 
 export const EthereumDecimals = 18;
+
+function decimalToHex(d: number | string): string {
+  let hex = Tbn(d).toString(16);
+  if (hex.length % 2 !== 0) {
+    hex = '0' + hex;
+  }
+  return '0x' + hex;
+}
 
 export class EthereumUtils implements IBlockchainService {
 
@@ -32,28 +41,37 @@ export class EthereumUtils implements IBlockchainService {
       }));
   }
 
-  async signTransaction$(params: SignTransactionParams, guid: string): Promise<string> {
+  signTransaction$(params: SignTransactionParams, guid: string): Observable<string> {
     const fromAddress = this.getAddress(this.privateKey);
 
-    const value = this.blockchainUtils.toDecimal(params.amount, EthereumDecimals).toString();
-    const nonce = !params.nonce ? await this.blockchainUtils.getNonce$(this.currency, fromAddress, guid).toPromise() : params.nonce;
+    const decimalValue = ToDecimal(params.amount, EthereumDecimals).toString();
+    const value = FromDecimal(params.amount, EthereumDecimals).toNumber();
+    const nonce$ = !params.nonce
+      ? this.blockchainUtils.getNonce$(this.currency, fromAddress, guid)
+      : of(params.nonce);
 
-    const feeObj = await this.blockchainUtils.getCustomFee$(this.currency, fromAddress, value, guid).toPromise();
+    const feeObj$ = this.blockchainUtils.getCustomFee$(this.currency, fromAddress, decimalValue, guid).pipe(
+      tap((feeObj) => {
+        if (!feeObj.isEnough) {
+          throw new Error('Not enough crypto for sending');
+        }
+      })
+    );
 
-    if (!feeObj.isEnough) {
-      throw new Error('Not enough crypto for sending');
-    }
+    return combineLatest(nonce$, feeObj$).pipe(
+      map(([nonce, feeObj]: [number, CustomFeeResponse]) => {
+        const txParam: TxData = {
+          nonce: decimalToHex(nonce),
+          gasPrice: decimalToHex(!params.gasPrice ? feeObj.gasPrice : params.gasPrice),
+          gasLimit: decimalToHex(!params.gasLimit ? feeObj.gas : params.gasLimit),
+          to: params.toAddress,
+          value: decimalToHex(value),
+          data: params.data || '0x'
+        };
 
-    const txParam: TxData = {
-      nonce: this.decimalToHex(nonce),
-      gasPrice: this.decimalToHex(!params.gasPrice ? feeObj.gasPrice : params.gasPrice),
-      gasLimit: this.decimalToHex(!params.gasLimit ? feeObj.gas : params.gasLimit),
-      to: params.toAddress,
-      value: this.decimalToHex(params.amount),
-      data: params.data || '0x'
-    };
-
-    return this.sign(txParam, this.privateKey);
+        return this.sign(txParam, this.privateKey);
+      })
+    );
   }
 
   sendTransaction$(rawTransaction: string, guid: string): Observable<string> {
@@ -64,7 +82,6 @@ export class EthereumUtils implements IBlockchainService {
     if (privateKey.indexOf('0x') === 0) {
       privateKey = privateKey.substring(2);
     }
-
     const tx = new Transaction(txParam, this.getTransactionOptions());
     const privateKeyBuffer = (window as any).global.Buffer.from(privateKey, 'hex');
     tx.sign(privateKeyBuffer);
@@ -81,11 +98,4 @@ export class EthereumUtils implements IBlockchainService {
     }
   }
 
-  decimalToHex(d: number | string): string {
-    let hex = this.blockchainUtils.tbn(d).toString(16);
-    if (hex.length % 2 !== 0) {
-      hex = '0' + hex;
-    }
-    return '0x' + hex;
-  }
 }

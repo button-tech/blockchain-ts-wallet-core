@@ -1,10 +1,11 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { IBlockchainService, SignTransactionParams } from '../../shared.module';
+import { from, Observable } from 'rxjs';
+import { map, mergeMap, tap } from 'rxjs/operators';
+import { FromDecimal, IBlockchainService, SignTransactionParams, Tbn, ToDecimal } from '../../shared.module';
 import { ECPair, payments, TransactionBuilder, Network, Transaction, Signer } from 'bitcoinjs-lib-cash';
 import { Bitcoin, BitcoinCash, Litecoin } from '../../DomainCurrency';
 import { NodeApiProvider } from '../../providers/node-api.provider';
-import { toCashAddress } from 'bchaddrjs';
+import { toCashAddress, toLegacyAddress } from 'bchaddrjs';
+import { EthereumDecimals } from './ethereum.utils';
 
 export const UtxoDecimals = 8;
 
@@ -33,10 +34,22 @@ const BitcoinCashConfig: Network = {
   wif: 0x80,
 };
 
+function dynamicSort(property: string) {
+  let sortOrder = 1;
+  if (property[0] === '-') {
+    sortOrder = -1;
+    property = property.substr(1);
+  }
+  return (a, b) => {
+    const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+    return result * sortOrder;
+  };
+}
+
 export class UtxoBasedUtils implements IBlockchainService {
 
   constructor(private readonly privateKey: string,
-              private blockchainUtils: NodeApiProvider, private currency: Bitcoin | BitcoinCash | Litecoin) {
+              private nodeApiProvider: NodeApiProvider, private currency: Bitcoin | BitcoinCash | Litecoin) {
   }
 
   getAddress(privateKey: string): string {
@@ -56,52 +69,59 @@ export class UtxoBasedUtils implements IBlockchainService {
   }
 
   getBalance$(address: string, guid: string): Observable<number> {
-    return this.blockchainUtils.getBalance$(this.currency, address, guid)
+    return this.nodeApiProvider.getBalance$(this.currency, address, guid)
       .pipe(map(x => {
-        return this.blockchainUtils.fromDecimal(x, UtxoDecimals).toNumber();
+        return FromDecimal(x, UtxoDecimals).toNumber();
       }));
   }
 
-  async signTransaction$(params: SignTransactionParams, guid: string): Promise<string> {
+  signTransaction$(params: SignTransactionParams, guid: string): Observable<string> {
     const fromAddress = this.getAddress(this.privateKey);
-    const value = this.blockchainUtils.toDecimal(params.amount, UtxoDecimals).toString();
 
-    const utxosAddress = this.currency.short === 'bch'
-      ? toCashAddress(fromAddress)
-      : fromAddress;
-    const feeObj = await this.blockchainUtils.getCustomFee$(this.currency, utxosAddress, value, guid).toPromise();
+    const value = FromDecimal(params.amount, UtxoDecimals).toNumber();
 
-    if (!feeObj.isEnough) {
-      throw new Error('Not enough crypto for sending');
+    let utxosAddress = fromAddress;
+    let hashType = Transaction.SIGHASH_ALL;
+    if (this.currency.short === 'bch') {
+      utxosAddress = toCashAddress(fromAddress);
+      params.toAddress = toLegacyAddress(params.toAddress);
+      hashType = hashType | Transaction.SIGHASH_BITCOINCASHBIP143;
     }
+    return this.nodeApiProvider.getCustomFee$(this.currency, utxosAddress, params.amount, guid)
+      .pipe(
+        mergeMap(async (feeObj) => {
+          if (!feeObj.isEnough) {
+            throw new Error('Not enough crypto for sending');
+          }
 
-    const utxos = (feeObj.inputs).sort(this.dynamicSort('-amount'));
-    const tx = this.getTransactionBuilder();
-    tx.setVersion(1);
+          const utxos = (feeObj.inputs).sort(dynamicSort('-amount'));
+          const tx = this.getTransactionBuilder();
+          tx.setVersion(1);
 
-    for (let i = 0; i < utxos.length; i++) {
-      const currentInput = utxos[i];
-      tx.addInput(currentInput.txid, currentInput.vout, currentInput.confirmations, new Buffer(currentInput.scriptPubKey, 'hex'));
-    }
+          for (let i = 0; i < utxos.length; i++) {
+            const currentInput = utxos[i];
+            tx.addInput(currentInput.txid, currentInput.vout, currentInput.confirmations, new Buffer(currentInput.scriptPubKey, 'hex'));
+          }
 
-    const inputsAmount = this.getInputsTotalAmount(feeObj.inputs);
-    const balanceWithoutFeeAndSendingAmount = this.blockchainUtils.tbn(inputsAmount)
-      .minus(params.amount).minus(feeObj.fee).toNumber();
-    tx.addOutput(params.toAddress, +params.amount);
-    if (balanceWithoutFeeAndSendingAmount > 0) {
-      tx.addOutput(fromAddress, balanceWithoutFeeAndSendingAmount);
-    }
+          const inputsAmount = this.getInputsTotalAmount(feeObj.inputs);
+          const balanceWithoutFeeAndSendingAmount = Tbn(inputsAmount)
+            .minus(value).minus(feeObj.fee).toNumber();
+          tx.addOutput(params.toAddress, value);
+          if (balanceWithoutFeeAndSendingAmount > 0) {
+            tx.addOutput(fromAddress, balanceWithoutFeeAndSendingAmount);
+          }
+          for (let i = 0; i < utxos.length; i++) {
+            tx.sign(i, this.getPrivateKey(this.privateKey),
+              null, hashType, utxos[i].satoshis);
+          }
 
-    for (let i = 0; i < utxos.length; i++) {
-      tx.sign(0, this.getPrivateKey(this.privateKey),
-        null, Transaction.SIGHASH_ALL | Transaction.SIGHASH_BITCOINCASHBIP143, utxos[i].satoshis);
-    }
-
-    return await tx.build().toHex();
+          return await tx.build().toHex();
+        })
+      );
   }
 
   sendTransaction$(rawTransaction: string, guid: string): Observable<string> {
-    return this.blockchainUtils.sendTx$(this.currency, rawTransaction, guid);
+    return this.nodeApiProvider.sendTx$(this.currency, rawTransaction, guid);
   }
 
   private getTransactionBuilder(): TransactionBuilder {
@@ -134,23 +154,11 @@ export class UtxoBasedUtils implements IBlockchainService {
     return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'));
   }
 
-  private dynamicSort(property: string) {
-    let sortOrder = 1;
-    if (property[0] === '-') {
-      sortOrder = -1;
-      property = property.substr(1);
-    }
-    return (a, b) => {
-      const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-      return result * sortOrder;
-    };
-  }
-
   private getInputsTotalAmount(inputs) {
     return inputs
-      .map(x => this.blockchainUtils.fromDecimal(x.amount, UtxoDecimals))
+      .map(x => FromDecimal(x.amount, UtxoDecimals))
       .reduce((acc, n) => {
-        return this.blockchainUtils.tbn(acc).plus(n).toNumber();
+        return Tbn(acc).plus(n).toNumber();
       });
   }
 }
