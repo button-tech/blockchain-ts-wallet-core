@@ -4,24 +4,27 @@ import { SendRoutingModule } from './send-routing.module';
 import { SendComponent } from './send.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
-import { QrcodeComponent } from '../shared/components/qrcode/qrcode.component';
 import { FormsModule } from '@angular/forms';
 import { StorageService } from '../shared/services/storage/storage.service';
 import { Decryption } from '../shared/services/send/send.service';
+import { QrcodeModule } from '../shared/components/qrcode/qrcode.module';
 
 @NgModule({
-  declarations: [SendComponent, QrcodeComponent],
+  declarations: [
+    SendComponent,
+  ],
   imports: [
     HttpClientModule,
     CommonModule,
     SharedModule,
     SendRoutingModule,
-    FormsModule
+    FormsModule,
+    QrcodeModule
   ],
   providers: [
     StorageService,
     Decryption
-  ]
+  ],
 })
 export class SendModule {
 

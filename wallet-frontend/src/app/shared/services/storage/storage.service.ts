@@ -23,6 +23,7 @@ export class StorageService {
   }
 
   get storage(): Storage {
+    console.log(this.secretStorage);
     return this.secretStorage;
   }
 
@@ -48,10 +49,11 @@ export class StorageService {
 
   private readSecret(): void {
     const secret = localStorage.getItem(this.secretFieldName);
+    const [expired, secretData] = this.tryParseSecret(secret);
     if (secret) {
-      this.storage = {
-        secret: this.tryParseSecret(secret),
-        expired: false
+      this.secretStorage = {
+        secret: secretData,
+        expired
       };
       return;
     }
@@ -85,11 +87,11 @@ export class StorageService {
     localStorage.setItem(this.secretFieldName, storage.secret.toString());
   }
 
-  private tryParseSecret(secret: string): string | PrivateKeys {
+  private tryParseSecret(secret: string): [boolean, string | PrivateKeys] {
     try {
-      return JSON.parse(secret);
+      return [true, JSON.parse(secret)];
     } catch (e) {
-      return secret;
+      return [false, secret];
     }
   }
 
