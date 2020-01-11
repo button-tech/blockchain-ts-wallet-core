@@ -1,5 +1,7 @@
+import { PrivateKeys } from '../../shared.module';
+
 export interface Storage {
-  secret: string;
+  secret: string | PrivateKeys;
   expired: boolean; // false - mnemonic; true - privateKeys
 }
 

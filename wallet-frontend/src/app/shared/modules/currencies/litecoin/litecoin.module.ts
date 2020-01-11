@@ -14,7 +14,12 @@ export function init(utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
   if (typeof opt.secret === 'string') {
     return handleMnemonicVersion(currency, utils, opt);
   } else if ((opt.secret as PrivateKeys).Litecoin) {
-    return handlePrivateKeysVersion(currency, utils, opt);
+    if (opt.derivationPath === 0) {
+      return handlePrivateKeysVersion(currency, utils, opt);
+    } else {
+      opt.secret = opt.secret.Waves;
+      return handleMnemonicVersion(currency, utils, opt);
+    }
   } else {
     // todo: handle error: this currency doesn't exist in privateKeys object
   }

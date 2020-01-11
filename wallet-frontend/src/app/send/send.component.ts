@@ -1,18 +1,15 @@
-import { Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { NodeApiProvider } from '../shared/providers/node-api.provider';
 import { BotBackendProvider } from '../shared/providers/bot-backend.provider';
 import { StorageService, Storage, CypherParams } from '../shared/services/storage/storage.service';
 import {
   CurrencyFactoryOptions, GetGuid,
   IBlockchainService,
-  ICurrencyFactory, IsJson,
-  PrivateKeys,
-  QrCodeData, SignTransactionParams, TryParse
+  ICurrencyFactory, PrivateKeys, SignTransactionParams
 } from '../shared/shared.module';
-import { Security } from '../shared/services/security/security.service';
 import { TransactionResponse } from '../shared/dto/bot-backend.dto';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, delay, map, retry, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Decryption } from '../shared/services/send/send.service';
 
@@ -47,15 +44,15 @@ export class SendComponent implements OnInit {
     this.cypherParams = storageService.cypherParams;
   }
 
-  ngOnInit() {
+  asngOnInit() {
     this.guid = GetGuid(this.route, 'tx');
 
     this.botApi.getTransactionData$(this.guid).pipe(
-      tap((txData: TransactionResponse) => {
+      tap(async (txData: TransactionResponse) => {
         this.transactionData = txData;
         const sendingMode = this.getSendingMode();
         if (sendingMode === 'fast') {
-
+          await this.executeTransaction(this.storage.secret, 0);
         } else if (sendingMode === 'qrcode') {
           // render upload qr code template
         }
@@ -85,7 +82,11 @@ export class SendComponent implements OnInit {
     }
     console.log(decryptedText);
     // todo: get derivationPath from backend
-    const opt: CurrencyFactoryOptions = { secret: decryptedText, password: '', derivationPath: 0 };
+    await this.executeTransaction(decryptedText, 0);
+  }
+
+  private async executeTransaction(secret: string | PrivateKeys, path: number) {
+    const opt: CurrencyFactoryOptions = { secret, password: '', derivationPath: path };
     this.bcs = this.currencyFactory.init(this.utils, opt);
     const transactionParams: SignTransactionParams = {
       toAddress: this.transactionData.to,

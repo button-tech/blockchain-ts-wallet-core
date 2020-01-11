@@ -59,7 +59,6 @@ export class NewAccountComponent {
               private router: ActivatedRoute) {
   }
 
-  data: Array<IRow> = [];
   checked = false;
   display = true;
   href: string;
@@ -88,12 +87,11 @@ export class NewAccountComponent {
 
     document.querySelector('div#qrcode').innerHTML = '';
     AccountService.generateQrCode(this.qrcode, cipher);
-    AccountService.saveAccount(cipher);
+    AccountService.saveAccount(newMnemonic);
 
     const addresses = AccountService.generateKeyPairs(newMnemonic, this.password);
 
     if (this.checked) {
-      // todo: add email
       const req: CreateAccountRequest = {
         bitcoinAddress: addresses.Bitcoin,
         bitcoinCashAddress: addresses.BitcoinCash,
@@ -101,18 +99,19 @@ export class NewAccountComponent {
         ethereumAddress: addresses.Ethereum,
         ethereumClassicAddress: addresses.EthereumClassic,
         wavesAddress: addresses.Waves,
-        stellarAddress: addresses.Stellar
+        stellarAddress: addresses.Stellar,
+        mail: this.email
       };
       this.botApi.registerAccount$(req, guid).subscribe();
     }
     this.display = false;
   }
 
-  get email() {
-    return this.newAccountForm.get('email');
+  get email(): string {
+    return this.newAccountForm.value.email;
   }
 
-  get password() {
+  get password(): string {
     return this.newAccountForm.value.password;
   }
 

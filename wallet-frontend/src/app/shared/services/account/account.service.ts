@@ -1,5 +1,5 @@
 import { Cipher } from '../security/security.service';
-import { Addresses, QrCodeData } from '../../shared.module';
+import { Addresses, PrivateKeys, QrCodeData } from '../../shared.module';
 import { Options, QrCode } from '../../components/qrcode/qrcode.service';
 import { ElementRef } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
@@ -23,10 +23,18 @@ export class AccountService {
     qr.render(qrCodeData, elem);
   }
 
-  static saveAccount(cipher: Cipher): void {
+  // Cipher in case of strong encryption mode
+  static saveAccount(data: Cipher | string | PrivateKeys): void {
     const storageService = new StorageService();
-    storageService.cypherParams = { salt: cipher.salt, iv: cipher.iv };
-    storageService.storage = { secret: cipher.text, expired: false };
+    if ((data as Cipher).text) {
+      data = data as Cipher;
+      storageService.cypherParams = { salt: data.salt, iv: data.iv };
+      storageService.storage = { secret: data.text, expired: false };
+    } else if (typeof data === 'string') {
+      storageService.storage = { secret: data, expired: false };
+    } else {
+      storageService.storage = { secret: data as PrivateKeys, expired: false };
+    }
   }
 
   static generateKeyPairs(mnemonic: string, password: string): Addresses {
