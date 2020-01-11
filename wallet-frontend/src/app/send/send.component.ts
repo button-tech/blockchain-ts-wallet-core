@@ -44,7 +44,7 @@ export class SendComponent implements OnInit {
     this.cypherParams = storageService.cypherParams;
   }
 
-  asngOnInit() {
+  async ngOnInit() {
     this.guid = GetGuid(this.route, 'tx');
 
     this.botApi.getTransactionData$(this.guid).pipe(

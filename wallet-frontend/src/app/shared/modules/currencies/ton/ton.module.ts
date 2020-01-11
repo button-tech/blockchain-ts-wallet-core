@@ -33,7 +33,7 @@ function handleMnemonicVersion(currency: TON, utils: NodeApiProvider, opt: Curre
 }
 
 function handlePrivateKeysVersion(currency: TON, utils: NodeApiProvider, opt: CurrencyFactoryOptions) {
-  const hdWallet = new HdWallet((opt.secret as PrivateKeys).waves, opt.password);
+  const hdWallet = new HdWallet((opt.secret as PrivateKeys).Waves, opt.password);
   const keys = hdWallet.generateKeyPair(currency, opt.derivationPath);
   return new TonUtils(keys.privateKey, utils, currency);
 }
