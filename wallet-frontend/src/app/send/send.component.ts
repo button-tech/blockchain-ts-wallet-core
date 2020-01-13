@@ -55,17 +55,7 @@ export class SendComponent implements OnInit {
 
     this.botApi.getTransactionData$(this.guid).pipe(
       tap(async (txData: TransactionResponse) => {
-        this.transactionData = {
-          currency: 'Waves',
-          from: '3PDn2Sqwdz7Zbj6PJcNniRYKdLR3U3DJabR',
-          to: '3PDn2Sqwdz7Zbj6PJcNniRYKdLR3U3DJabR',
-          nickname: 'krboktv',
-          fromNickName: 'krboktv',
-          value: '0.11813349',
-          valueInUsd: '0.1000000000000000000000000000',
-          fromChatId: 302115726,
-          toChatId: 302115726
-        };
+        this.transactionData = txData;
         this.setSendingMode();
         if (this.fastMode) {
           await this.executeTransaction(this.storage.secret, 0);
@@ -123,5 +113,4 @@ export class SendComponent implements OnInit {
     }
   }
 
-  private se
 }
