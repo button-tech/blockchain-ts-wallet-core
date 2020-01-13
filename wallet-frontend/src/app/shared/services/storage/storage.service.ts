@@ -2,7 +2,7 @@ import { PrivateKeys } from '../../shared.module';
 
 export interface Storage {
   secret: string | PrivateKeys;
-  expired: boolean; // false - mnemonic; true - privateKeys
+  isOldFormat: boolean; // false - mnemonic; true - privateKeys
 }
 
 export interface CypherParams {
@@ -49,11 +49,11 @@ export class StorageService {
 
   private readSecret(): void {
     const secret = localStorage.getItem(this.secretFieldName);
-    const [expired, secretData] = this.tryParseSecret(secret);
+    const [isOldFormat, secretData] = this.tryParseSecret(secret);
     if (secret) {
       this.secretStorage = {
         secret: secretData,
-        expired
+        isOldFormat
       };
       return;
     }
@@ -63,7 +63,7 @@ export class StorageService {
     if (privateKeys) {
       this.secretStorage = {
         secret: privateKeys ? JSON.parse(privateKeys) : null,
-        expired: true
+        isOldFormat: true
       };
       return;
     }
@@ -81,7 +81,7 @@ export class StorageService {
   }
 
   private writeSecret(storage: Storage): void {
-    if (storage.expired) {
+    if (storage.isOldFormat) {
       storage.secret = JSON.stringify(storage.secret);
     }
     localStorage.setItem(this.secretFieldName, storage.secret.toString());

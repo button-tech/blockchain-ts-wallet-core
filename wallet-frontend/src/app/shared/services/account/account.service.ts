@@ -12,6 +12,7 @@ export class AccountService {
 
   }
 
+  // todo: ad qr code component
   static generateQrCode(elem: ElementRef, cipher: Cipher): void {
     const qrData: QrCodeData = {
       mnemonic: cipher.text,
@@ -29,11 +30,11 @@ export class AccountService {
     if ((data as Cipher).text) {
       data = data as Cipher;
       storageService.cypherParams = { salt: data.salt, iv: data.iv };
-      storageService.storage = { secret: data.text, expired: false };
+      storageService.storage = { secret: data.text, isOldFormat: false };
     } else if (typeof data === 'string') {
-      storageService.storage = { secret: data as string, expired: false };
+      storageService.storage = { secret: data as string, isOldFormat: false };
     } else {
-      storageService.storage = { secret: data as PrivateKeys, expired: true };
+      storageService.storage = { secret: data as PrivateKeys, isOldFormat: true };
     }
   }
 

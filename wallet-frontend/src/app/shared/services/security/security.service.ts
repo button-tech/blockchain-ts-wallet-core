@@ -18,7 +18,11 @@ export class Security {
     };
     const key = this.generateKey(password, salt);
     const cipherText = aes.encrypt(secret, key, opt);
-    return { text: cipherText.toString(), salt: salt.toString(), iv: iv.toString() };
+    return {
+      text: cipherText.toString(),
+      salt: salt.toString(),
+      iv: iv.toString()
+    };
   }
 
   static decryptSecret(cipher: string, password: string, salt?: string, iv?: string): string {

@@ -111,11 +111,12 @@ export function TryParse<T>(text: string): [boolean, T] {
 }
 
 export function IsJson(text: string): boolean {
-  return /^[\],:{}\s]*$/.test(
-    text.replace(
-      /\\["\\\/bfnrtu]/g, '@')
-      .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-      .replace(/(?:^|:|,)(?:\s*\[)+/g, ''));
+  try {
+    const x = JSON.parse(text);
+    return !!x;
+  } catch (e) {
+    return false;
+  }
 }
 
 export function GetGuid(route: ActivatedRoute, param: string) {

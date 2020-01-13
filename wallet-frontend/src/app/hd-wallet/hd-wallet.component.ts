@@ -52,7 +52,7 @@ export class HdWalletComponent implements AfterViewInit {
 
     const cypher = Security.encryptSecret(newMnemonic, this.password);
     s.cypherParams = {salt: cypher.salt, iv: cypher.iv};
-    s.storage = {secret: cypher.text, expired: false};
+    s.storage = {secret: cypher.text, isOldFormat: false};
 
     const qrData: QrCodeData = {
       mnemonic: cypher.text,
