@@ -1,9 +1,9 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { HdWallet } from '../../shared/services/hd-wallet/hd-wallet.service';
-import { Cipher, Security } from '../../shared/services/security/security.service';
+import { Security } from '../../shared/services/security/security.service';
 import { GetGuid } from '../../shared/shared.module';
 import { BotBackendProvider } from '../../shared/providers/bot-backend.provider';
 import { ActivatedRoute } from '@angular/router';
@@ -17,12 +17,6 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     const isSubmitted = form && form.submitted;
     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
   }
-}
-
-interface IRow {
-  label: string;
-  address: string;
-  privateKey: string;
 }
 
 /** @title Input with a custom ErrorStateMatcher */

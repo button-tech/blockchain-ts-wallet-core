@@ -10,9 +10,10 @@ import {
 import { TransactionResponse } from '../shared/dto/bot-backend.dto';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { Decryption } from '../shared/services/send/send.service';
 import { AccountService } from '../shared/services/account/account.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-send',
@@ -64,11 +65,10 @@ export class SendComponent implements OnInit {
         }
       }),
       catchError((e) => {
-        console.log('Find error: ', e);
-        return of(e);
+        return throwError({ message: 'Transaction not found' });
       })
     ).subscribe((res) => {
-      if (!(res instanceof Error)) {
+      if (!(res instanceof HttpErrorResponse)) {
         console.log('Result: ', res);
       }
     });

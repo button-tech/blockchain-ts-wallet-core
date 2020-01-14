@@ -8,7 +8,6 @@ import { FormsModule } from '@angular/forms';
 import { StorageService } from '../shared/services/storage/storage.service';
 import { Decryption } from '../shared/services/send/send.service';
 import { UploadQrcodeModule } from '../shared/components/qrcode/uploadQrcode/uploadQrcode.module';
-import { ErrorModule } from '../shared/components/error/error.module';
 
 @NgModule({
   declarations: [
@@ -20,8 +19,7 @@ import { ErrorModule } from '../shared/components/error/error.module';
     SharedModule,
     SendRoutingModule,
     FormsModule,
-    UploadQrcodeModule,
-    ErrorModule
+    UploadQrcodeModule
   ],
   providers: [
     StorageService,

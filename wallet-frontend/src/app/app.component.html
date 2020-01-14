@@ -1,3 +1,8 @@
+<div *ngIf="notification && showNotification"
+     (click)="showNotification = !showNotification">
+  <p>{{ notification }}</p>
+</div>
+
 <h1 i18n="@@TranslationTagForTesting">App component</h1>
 
 <button routerLink="/wallet">Wallet</button>

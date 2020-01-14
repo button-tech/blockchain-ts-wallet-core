@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { map, retryWhen } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { IDomainCurrency } from '../DomainCurrency';
 import {
