@@ -12,6 +12,7 @@ import { CreateAccountRequest } from '../../shared/dto/bot-backend.dto';
 import { BotBackendProvider } from '../../shared/providers/bot-backend.provider';
 import { ActivatedRoute } from '@angular/router';
 import { RenderQrcodeComponent } from '../../shared/components/qrcode/renderQrcode/renderQrcode.component';
+import { HdWallet } from '../../shared/services/hd-wallet/hd-wallet.service';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -58,6 +59,12 @@ export class ImportAccountComponent {
   }
 
   importByMnemonic() {
+    if (!HdWallet.isValidMnemonic(this.mnemonic)) {
+      // todo: mnemonic is invalid
+      console.log('mnemonic is invalid');
+      return;
+    }
+
     const guid = GetGuid(this.router, 'create');
 
     // todo: check mnemonic

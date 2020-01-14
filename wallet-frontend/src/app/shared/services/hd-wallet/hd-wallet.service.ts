@@ -5,7 +5,7 @@ import { StrKey, Keypair } from 'stellar-sdk';
 import { address, publicKey } from '@waves/ts-lib-crypto';
 import { derivePath } from './hd-key-ed25519';
 import * as bip32 from 'bip32';
-import { entropyToMnemonic, mnemonicToSeedSync } from 'bip39';
+import { entropyToMnemonic, mnemonicToSeedSync, validateMnemonic } from 'bip39';
 import * as basex from 'base-x';
 import { EnDict } from './wordlist.en';
 
@@ -50,6 +50,10 @@ export class HdWallet {
 
   constructor(mnemonic: string, private password: string) {
     this.words = mnemonic;
+  }
+
+  static isValidMnemonic(mnemonic: string): boolean {
+    return validateMnemonic(mnemonic, EnDict);
   }
 
   static generateMnemonic(): string {
