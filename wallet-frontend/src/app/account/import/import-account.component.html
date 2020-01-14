@@ -1,6 +1,5 @@
-<div id="qrcode" #qrcode></div>
-<a [href]="href" *ngIf="!(display)" (click)="downloadImage()" download>Download Image</a>
-<form class="example-form" *ngIf="display" [formGroup]="importFormControl">
+<app-render-qr-code [hidden]="isQrCodeHidden"></app-render-qr-code>
+<form class="example-form" [hidden]="!isQrCodeHidden" [formGroup]="importFormControl">
   <h1>
     Import by mnemonic
   </h1>
@@ -21,5 +20,5 @@
     <input matInput placeholder="Password" type="password" formControlName="password_second">
   </mat-form-field>
   <br>
-  <app-qr-code (messageEvent)="importByQR($event)"></app-qr-code>
+  <app-upload-qr-code (messageEvent)="importByQR($event)"></app-upload-qr-code>
 </form>

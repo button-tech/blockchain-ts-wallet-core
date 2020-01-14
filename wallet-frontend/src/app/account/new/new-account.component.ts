@@ -3,12 +3,13 @@ import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '
 import { ErrorStateMatcher } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { HdWallet } from '../../shared/services/hd-wallet/hd-wallet.service';
-import { Security } from '../../shared/services/security/security.service';
+import { Cipher, Security } from '../../shared/services/security/security.service';
 import { GetGuid } from '../../shared/shared.module';
 import { BotBackendProvider } from '../../shared/providers/bot-backend.provider';
 import { ActivatedRoute } from '@angular/router';
 import { CreateAccountRequest } from '../../shared/dto/bot-backend.dto';
 import { AccountService } from '../../shared/services/account/account.service';
+import { RenderQrcodeComponent } from '../../shared/components/qrcode/renderQrcode/renderQrcode.component';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -28,28 +29,7 @@ interface IRow {
 @Component({
   selector: 'app-new-account',
   templateUrl: './new-account.component.html',
-  styles: [
-      `
-      .example-form {
-        min-width: 150px;
-        max-width: 500px;
-        width: 100%;
-      }
-
-      .example-full-width {
-        width: 100%;
-      }
-
-      .example-form > * {
-        margin-bottom: 10px;
-      }
-
-      .example-button-row button,
-      .example-button-row a {
-        margin-right: 8px;
-      }
-    `
-  ],
+  styleUrls: ['./new-account.component.css'],
 })
 
 
@@ -59,10 +39,12 @@ export class NewAccountComponent {
               private router: ActivatedRoute) {
   }
 
+  @ViewChild(RenderQrcodeComponent, { static: false })
+  private renderQrCode: RenderQrcodeComponent;
+
+  isQrCodeHidden = true;
+
   checked = false;
-  display = true;
-  href: string;
-  @ViewChild('qrcode', { static: false }) qrcode: ElementRef;
   color = 'accent';
 
   newAccountForm = new FormGroup({
@@ -84,9 +66,8 @@ export class NewAccountComponent {
 
     const newMnemonic = HdWallet.generateMnemonic();
     const cipher = Security.encryptSecret(newMnemonic, this.password);
+    this.renderQrCode.render(cipher);
 
-    document.querySelector('div#qrcode').innerHTML = '';
-    AccountService.generateQrCode(this.qrcode, cipher);
     AccountService.saveAccount(newMnemonic);
 
     const addresses = AccountService.generateKeyPairs(newMnemonic, this.password);
@@ -104,7 +85,8 @@ export class NewAccountComponent {
       };
       this.botApi.registerAccount$(req, guid).subscribe();
     }
-    this.display = false;
+
+    this.isQrCodeHidden = false;
   }
 
   get email() {
@@ -113,10 +95,6 @@ export class NewAccountComponent {
 
   get password(): string {
     return this.newAccountForm.value.password;
-  }
-
-  downloadImage() {
-    this.href = document.getElementsByTagName('img')[0].src;
   }
 
 }

@@ -1,27 +1,12 @@
 import { Cipher } from '../security/security.service';
-import { Addresses, PrivateKeys, QrCodeData } from '../../shared.module';
-import { Options, QrCode } from '../../components/qrcode/qrcode.service';
-import { ElementRef } from '@angular/core';
+import { Addresses, PrivateKeys } from '../../shared.module';
 import { StorageService } from '../storage/storage.service';
 import { HdWallet } from '../hd-wallet/hd-wallet.service';
 
-// todo: make it with module
 export class AccountService {
 
   constructor() {
 
-  }
-
-  // todo: ad qr code component
-  static generateQrCode(elem: ElementRef, cipher: Cipher): void {
-    const qrData: QrCodeData = {
-      mnemonic: cipher.text,
-      iv: cipher.iv,
-      salt: cipher.salt
-    };
-    const qrCodeData = { text: JSON.stringify(qrData) };
-    const qr = new QrCode();
-    qr.render(qrCodeData, elem);
   }
 
   // Cipher in case of strong encryption mode

@@ -11,6 +11,7 @@ import { AccountService } from '../../shared/services/account/account.service';
 import { CreateAccountRequest } from '../../shared/dto/bot-backend.dto';
 import { BotBackendProvider } from '../../shared/providers/bot-backend.provider';
 import { ActivatedRoute } from '@angular/router';
+import { RenderQrcodeComponent } from '../../shared/components/qrcode/renderQrcode/renderQrcode.component';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -27,11 +28,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styles: [],
 })
 export class ImportAccountComponent {
-  display = true;
-  href: string;
-  utils: NodeApiProvider;
-
-  @ViewChild('qrcode', { static: false }) qrcode: ElementRef;
+  isQrCodeHidden = true;
 
   importFormControl = new FormGroup({
     mnemonic: new FormControl('', Validators.required),
@@ -39,14 +36,13 @@ export class ImportAccountComponent {
     password_second: new FormControl('', Validators.required)
   });
 
+  @ViewChild(RenderQrcodeComponent, { static: false })
+  private renderQrCode: RenderQrcodeComponent;
+
   constructor(private storageService: StorageService,
               private decryption: Decryption,
               private botApi: BotBackendProvider,
               private router: ActivatedRoute) {
-  }
-
-  downloadImage() {
-    this.href = document.getElementsByTagName('img')[0].src;
   }
 
   get mnemonic() {
@@ -66,7 +62,8 @@ export class ImportAccountComponent {
 
     // todo: check mnemonic
     const cipher = Security.encryptSecret(this.mnemonic, this.password);
-    AccountService.generateQrCode(this.qrcode, cipher);
+    this.renderQrCode.render(cipher);
+
     AccountService.saveAccount(this.mnemonic);
 
     const addresses = AccountService.generateKeyPairs(this.mnemonic, this.password);
@@ -81,7 +78,7 @@ export class ImportAccountComponent {
       stellarAddress: addresses.Stellar
     };
     // this.botApi.registerAccount$(req, guid).subscribe();
-    this.display = false;
+    this.isQrCodeHidden = false;
   }
 
   importByQR(qrRawData: string) {

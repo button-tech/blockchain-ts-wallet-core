@@ -7,7 +7,7 @@ import { SharedModule } from '../shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { StorageService } from '../shared/services/storage/storage.service';
 import { Decryption } from '../shared/services/send/send.service';
-import { QrcodeModule } from '../shared/components/qrcode/qrcode.module';
+import { UploadQrcodeModule } from '../shared/components/qrcode/uploadQrcode/uploadQrcode.module';
 import { ErrorModule } from '../shared/components/error/error.module';
 
 @NgModule({
@@ -20,7 +20,7 @@ import { ErrorModule } from '../shared/components/error/error.module';
     SharedModule,
     SendRoutingModule,
     FormsModule,
-    QrcodeModule,
+    UploadQrcodeModule,
     ErrorModule
   ],
   providers: [

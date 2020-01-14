@@ -11,13 +11,13 @@ import { BotBackendProvider } from '../shared/providers/bot-backend.provider';
 import { Decryption } from '../shared/services/send/send.service';
 import { AccountService } from '../shared/services/account/account.service';
 import { StorageService } from '../shared/services/storage/storage.service';
-import { QrcodeModule } from '../shared/components/qrcode/qrcode.module';
-
+import { UploadQrcodeModule } from '../shared/components/qrcode/uploadQrcode/uploadQrcode.module';
+import { RenderQrcodeModule } from '../shared/components/qrcode/renderQrcode/renderQrcode.module';
 
 @NgModule({
   declarations: [
     NewAccountComponent,
-    ImportAccountComponent,
+    ImportAccountComponent
   ],
   imports: [
     HttpClientModule,
@@ -31,13 +31,14 @@ import { QrcodeModule } from '../shared/components/qrcode/qrcode.module';
     AccountRoutingModule,
     MatCardModule,
     MatCheckboxModule,
-    QrcodeModule
-  ],
+    UploadQrcodeModule,
+    RenderQrcodeModule
+],
   providers: [
     BotBackendProvider,
     Decryption,
     AccountService,
-    StorageService
+    StorageService,
   ]
 })
 export class AccountModule {

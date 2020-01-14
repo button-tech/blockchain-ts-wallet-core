@@ -1,17 +1,20 @@
 import {
   Component, EventEmitter, Output,
 } from '@angular/core';
-import { QrCode } from './qrcode.service';
+import { QrCode } from '../qrcode.service';
 
 @Component({
-  selector: 'app-qr-code',
-  templateUrl: './qrcode.component.html',
+  selector: 'app-upload-qr-code',
+  templateUrl: './uploadQrcode.component.html',
   styles: []
 })
-export class QrcodeComponent {
+export class UploadQrcodeComponent {
 
   private file: any;
   @Output() messageEvent = new EventEmitter<string>();
+
+  constructor() {
+  }
 
   fileChanged(e) {
     this.file = e.target.files[0];

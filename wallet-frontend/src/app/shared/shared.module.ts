@@ -16,8 +16,6 @@ import { AbiItem } from 'web3-utils';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { BigNumber } from 'bignumber.js';
-import { QRCode } from 'jsqr';
-import { QrcodeComponent } from './components/qrcode/qrcode.component';
 
 export interface QrCodeData {
   mnemonic: string;
