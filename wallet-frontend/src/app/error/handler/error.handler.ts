@@ -1,4 +1,4 @@
-import { Injectable, ErrorHandler, Injector } from '@angular/core';
+import { Injectable, ErrorHandler, Injector, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorContext, ErrorService } from '../service/error.service';
@@ -8,29 +8,35 @@ import { NotificationService } from '../service/notification.service';
   providedIn: 'root'
 })
 export class ErrorsHandler implements ErrorHandler {
-  constructor(private injector: Injector) {
+  constructor(private notificationService: NotificationService,
+              private errorsService: ErrorService,
+              private injector: Injector,
+              private zone: NgZone) {
   }
 
   handleError(error: any) {
-    const notificationService = this.injector.get(NotificationService);
-    const errorsService = this.injector.get(ErrorService);
     const router = this.injector.get(Router);
 
     if (error instanceof HttpErrorResponse) {
       if (!navigator.onLine) {
         // Handle offline error
-        return notificationService.notify('No Internet Connection');
+        this.notificationService.notify('No Internet Connection');
+        return;
       }
 
       // maybe will handle other http errors
     }
 
     console.error(error);
-    errorsService
-      .log(error)
-      .subscribe((errorWithContextInfo: ErrorContext) => {
-        router.navigate(['/error'], { queryParams: { message: errorWithContextInfo.message } });
-      });
+
+    this.zone.run(() => {
+      this.errorsService
+        .log(error)
+        .subscribe((errorWithContextInfo: ErrorContext) => {
+          router.navigate(['/error'], { queryParams: { message: errorWithContextInfo.message } });
+        });
+    });
   }
 
 }
+

@@ -1,5 +1,4 @@
-import { Injectable, Injector } from '@angular/core';
-import { NavigationError, Router } from '@angular/router';
+import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import * as StackTraceParser from 'stacktrace-parser';
@@ -20,25 +19,25 @@ export interface ErrorContext {
   providedIn: 'root'
 })
 export class ErrorService {
-  constructor(private injector: Injector, private router: Router) {
+  constructor(private locationStrategy: LocationStrategy) {
     // Listen to the navigation errors
-    this.router
-      .events
-      .subscribe((event) => {
-        if (event instanceof NavigationError) {
-          if (!navigator.onLine) {
-            return;
-          }
-          // Redirect to the ErrorComponent
-          this.log(event.error)
-            .subscribe((errorWithContext) => {
-              this.router.navigate(['/error'], { queryParams: errorWithContext });
-            });
-        }
-      });
+    // this.router
+    //   .events
+    //   .subscribe((event) => {
+    //     if (event instanceof NavigationError) {
+    //       if (!navigator.onLine) {
+    //         return;
+    //       }
+    //       // Redirect to the ErrorComponent
+    //       this.log(event.error)
+    //         .subscribe((errorWithContext) => {
+    //           this.router.navigate(['/error'], { queryParams: errorWithContext });
+    //         });
+    //     }
+    //   });
   }
 
-  private static parseStack(stack) {
+  private parseStack(stack) {
     try {
       return StackTraceParser.parse(stack);
     } catch (e) {
@@ -46,7 +45,7 @@ export class ErrorService {
     }
   }
 
-  private static parseMessage(error): string {
+  private parseMessage(error): string {
     if (error.message) {
       return error.message;
     }
@@ -65,11 +64,11 @@ export class ErrorService {
   addContextInfo(error: Error | HttpErrorResponse) {
     const name = error.name || null;
     const time = new Date().getTime();
-    const location = this.injector.get(LocationStrategy);
+    const location = this.locationStrategy;
     const url = location instanceof PathLocationStrategy ? location.path() : '';
     const status = (error as HttpErrorResponse).status || null;
-    const message = ErrorService.parseMessage(error);
-    const stack = error instanceof HttpErrorResponse ? null : ErrorService.parseStack(error.stack);
+    const message = this.parseMessage(error);
+    const stack = error instanceof HttpErrorResponse ? null : this.parseStack(error.stack);
     return { name, time, location, url, status, message, stack };
   }
 
