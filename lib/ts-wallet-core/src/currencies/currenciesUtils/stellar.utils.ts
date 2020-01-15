@@ -1,5 +1,5 @@
 import { combineLatest, from, Observable, of } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import {
   Networks,
   Server,
@@ -12,16 +12,13 @@ import {
   Memo,
   Transaction
 } from 'stellar-sdk';
-import { FromDecimal, IBlockchainService, SignTransactionParams, ToDecimal } from '../../../shared.module';
-import { Stellar } from '../../../DomainCurrency';
-import { NodeApiProvider } from '../../../providers/node-api.provider';
-import { EthereumDecimals } from '../ethereum.utils';
+import { IBlockchain, StellarTransactionParams } from '../../typings/ts-wallet-core.dto';
 
 export const StellarDecimals = 7;
 
 const fee = 1000;
 
-function payment(privateKey: string, params: SignTransactionParams, account: AccountResponse, memo: Memo): Transaction {
+function payment(privateKey: string, params: StellarTransactionParams, account: AccountResponse, memo: Memo): Transaction {
   const transaction = new TransactionBuilder(account, { fee, memo, networkPassphrase: Networks.PUBLIC })
     .addOperation(Operation.payment({
       destination: params.toAddress,
@@ -35,7 +32,7 @@ function payment(privateKey: string, params: SignTransactionParams, account: Acc
   return transaction;
 }
 
-function createAccount(privateKey: string, params: SignTransactionParams, account: AccountResponse, memo: Memo): Transaction {
+function createAccount(privateKey: string, params: StellarTransactionParams, account: AccountResponse, memo: Memo): Transaction {
   if (+params.amount < 1) {
     throw new Error('Start balance should be at least 1');
   }
@@ -52,58 +49,48 @@ function createAccount(privateKey: string, params: SignTransactionParams, accoun
   return transaction;
 }
 
-export class StellarUtils implements IBlockchainService {
+export class StellarUtils implements IBlockchain {
 
-  private network;
-  private currency = Stellar.Instance();
+  private network: any;
 
-  constructor(private readonly privateKey: string, private blockchainUtils: NodeApiProvider) {
+  constructor(private readonly privateKey: string) {
     this.network = new Server('https://horizon.stellar.org');
   }
 
-  getAddress(seed: string): string {
-    const keyPair = this.getKeyPairFromSeed(seed);
+  getAddress(privateKey: string): string {
+    const keyPair = this.getKeyPairFromSeed(privateKey);
     return StrKey.encodeEd25519PublicKey(keyPair.rawPublicKey());
   }
 
-  getBalance$(address: string, guid: string): Observable<number> {
-    return this.blockchainUtils.getBalance$(this.currency, address, guid)
-      .pipe(map(x => {
-        return FromDecimal(x, StellarDecimals).toNumber();
-      }));
-  }
-
-  signTransaction$(params: SignTransactionParams): Observable<Transaction> {
+  signTransaction$(params: StellarTransactionParams): Observable<string> {
     const fromAddress = this.getAddress(this.privateKey);
 
-    const accountTo$ = this.getAccount(params.toAddress);
-    const accountFrom$ = from(this.network.loadAccount(fromAddress));
+    const accountTo$: Observable<AccountResponse | null> = this.getAccount(params.toAddress);
+    const accountFrom$: Observable<AccountResponse | null> = this.getAccount(fromAddress);
 
     return combineLatest(accountTo$, accountFrom$).pipe(
-      map(([accountTo, accountFrom]: [AccountResponse, AccountResponse]) => {
+      map(([accountTo, accountFrom]: [AccountResponse | null, AccountResponse | null]) => {
+          if (accountFrom === null) {
+            throw new Error('account from not exists');
+          }
           const memo: Memo = Memo.fromXDRObject(Memo.text(!params.memo ? 'BUTTON Wallet' : params.memo).toXDRObject());
           params.amount = (+params.amount).toFixed(7).toString();
-          return !accountTo
+          const transactionToSign = !accountTo
             ? createAccount(this.privateKey, params, accountFrom, memo)
             : payment(this.privateKey, params, accountFrom, memo);
+          return JSON.stringify(transactionToSign);
         }
       )
     );
-  }
-
-  sendTransaction$(rawTransaction: string | Transaction, guid: string): Observable<string> {
-    if (rawTransaction instanceof Transaction) {
-      rawTransaction = rawTransaction.toEnvelope().toXDR().toString('base64');
-    }
-    return this.blockchainUtils.sendTx$(this.currency, rawTransaction, guid);
   }
 
   private getKeyPairFromSeed(seed: string): Keypair {
     return Keypair.fromSecret(seed);
   }
 
-  private getAccount(address: string): Observable<AccountResponse> {
-    return from(this.network.loadAccount(address))
+  private getAccount(address: string): Observable<AccountResponse | null> {
+    const account: Promise<AccountResponse> = this.network.loadAccount(address);
+    return from(account)
       .pipe(
         map((account: AccountResponse) => account),
         catchError(() => of(null))

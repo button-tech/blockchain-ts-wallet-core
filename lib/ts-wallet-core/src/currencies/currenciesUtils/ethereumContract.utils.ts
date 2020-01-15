@@ -2,12 +2,11 @@ import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core';
 import { AbiItem } from 'web3-utils';
 import { Contract } from 'web3-eth-contract';
-import { EthereumUtils } from './ethereum.utils';
+import { from, Observable } from 'rxjs';
+import { ContractCall, IContract } from '../../typings/ts-wallet-core.dto';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
-import { NodeApiProvider } from '../../providers/node-api.provider';
-import { ContractCall, IContractService, SignTransactionParams, Tbn } from '../../shared.module';
-import { combineLatest, from, Observable, of } from 'rxjs';
-import { map, mergeAll, mergeMap } from 'rxjs/operators';
+import { DecimalToHex } from '../../blockchain.utils';
+import { EthereumUtils } from './ethereum.utils';
 
 export interface TxConfig {
   to: string;
@@ -18,13 +17,12 @@ export interface TxConfig {
   gasPrice?: string;
 }
 
-export class EthereumContractUtils extends EthereumUtils implements IContractService {
+export class EthereumContractUtils extends EthereumUtils implements IContract {
 
   private web3: Web3;
 
-  constructor(privateKey: string,
-              blockchainUtils: NodeApiProvider, currency: Ethereum | EthereumClassic, private rpcEndpoint?: string) {
-    super(privateKey, blockchainUtils, currency);
+  constructor(privateKey: string, currency: Ethereum | EthereumClassic, private rpcEndpoint?: string) {
+    super(privateKey, currency);
     this.web3 = this.getProvider(rpcEndpoint);
   }
 
@@ -36,7 +34,8 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
     if (!params.contractInstance.methods[params.methodName]) {
       throw new Error(`Method ${params.methodName} does not exist`);
     }
-    return params.contractInstance.methods[params.methodName](...params.executionParameters).encodeABI();
+    const executionParameters = !params.executionParameters ? [] : params.executionParameters;
+    return params.contractInstance.methods[params.methodName](...executionParameters).encodeABI();
   }
 
   estimateGasRawData$(params: TxConfig): Observable<number> {
@@ -44,52 +43,31 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
       to: params.to,
       data: params.data,
       from: !params.from ? '0x0000000000000000000000000000000000000000' : params.from,
-      gas: !params.gas ? '0x6ACFC0' : this.decimalToHex(params.gas),                  // 7_000_000
-      gasPrice: !params.gasPrice ? '0xB2D05E00' : this.decimalToHex(params.gasPrice), // 3_000_000_000
-      value: !params.value ? '0' : this.decimalToHex(params.value)
+      gas: !params.gas ? '0x6ACFC0' : DecimalToHex(params.gas),                  // 7_000_000
+      gasPrice: !params.gasPrice ? '0xB2D05E00' : DecimalToHex(params.gasPrice), // 3_000_000_000
+      value: !params.value ? '0' : DecimalToHex(params.value)
     };
     return from(this.web3.eth.estimateGas(txConfig));
   }
 
   callMethod$(params: ContractCall): Observable<any> {
-    return from(params.contractInstance.methods[params.methodName](...params.executionParameters).call({ from: params.addressFrom }));
+    const executionParameters = !params.executionParameters ? [] : params.executionParameters;
+    return from(params.contractInstance.methods[params.methodName](...executionParameters).call({ from: params.addressFrom }));
   }
 
-  setValue$(params: ContractCall, guid: string, isSync: boolean = false): Observable<string> {
-    const data = this.getCallData(params);
-    const gasPrice$ = !params.gasPrice
-      ? this.blockchainUtils.getGasPrice$(this.currency, guid)
-      : of(params.gasPrice);
-    const gasLimit$ = !params.gasLimit
-      ? this.blockchainUtils.getGasLimit$(this.currency, params.contractAddress, data.substring(2), guid)
-      : of(params.gasLimit);
+  private getProvider(rpcEndpoint: string | undefined): Web3 {
+    if (rpcEndpoint) {
+      return new Web3(rpcEndpoint);
+    }
 
-    return combineLatest(gasPrice$, gasLimit$)
-      .pipe(
-        mergeMap(([gasPrice, gasLimit]: [number, number]) => {
-          const signingData: SignTransactionParams = {
-            toAddress: params.contractAddress,
-            amount: !params.amount ? '0' : params.amount,
-            gasLimit,
-            gasPrice,
-            data
-          };
-
-          return this.signTransaction$(signingData, guid);
-        }),
-        mergeMap((signedTx: string) => {
-          return this.sendTransaction$(signedTx, guid);
-        }),
-        map((hash: string) => {
-          // if (isSync) {
-          //   await this.awaitTx$(hash);
-          // }
-          return hash;
-        })
-      );
+    switch (this.currency.short) {
+      case 'etc':
+        return new Web3('https://ethereumclassic.network');
+      default:
+        return new Web3('https://mainnet.infura.io/1u84gV2YFYHHTTnh8uVl');
+    }
   }
 
-  // todo: make it observable
   awaitTx$(txnHash: Array<string> | string): Promise<any> | Promise<any[]> {
     if (Array.isArray(txnHash)) {
       const promises = [];
@@ -154,24 +132,4 @@ export class EthereumContractUtils extends EthereumUtils implements IContractSer
     }
   }
 
-  private getProvider(rpcEndpoint: string): Web3 {
-    if (rpcEndpoint) {
-      return new Web3(rpcEndpoint);
-    }
-
-    switch (this.currency.short) {
-      case 'etc':
-        return new Web3('https://ethereumclassic.network');
-      case 'eth':
-        return new Web3('https://mainnet.infura.io/1u84gV2YFYHHTTnh8uVl');
-    }
-  }
-
-  decimalToHex(d: number | string): string {
-    let hex = Tbn(d).toString(16);
-    if (hex.length % 2 !== 0) {
-      hex = '0' + hex;
-    }
-    return '0x' + hex;
-  }
 }

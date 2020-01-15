@@ -7,7 +7,7 @@ export interface IDomainCurrency {
 }
 
 export type shortName = 'ltc' | 'btc' | 'eth' | 'etc' | 'bch' | 'waves' | 'xlm' | 'ton';
-export type fullName = 'litecoin' | 'bitcoin' | 'ethereum' | 'ethereumClassic' | 'bitcoinCash' | 'waves' | 'stellar' | 'ton';
+export type fullName = 'Litecoin' | 'Bitcoin' | 'Ethereum' | 'EthereumClassic' | 'BitcoinCash' | 'Waves' | 'Stellar' | 'Ton';
 
 export class Ethereum implements IDomainCurrency {
 
@@ -16,7 +16,7 @@ export class Ethereum implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'ethereum';
+    return 'Ethereum';
   }
 
   get short(): shortName {
@@ -32,7 +32,7 @@ export class EthereumClassic implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'ethereumClassic';
+    return 'EthereumClassic';
   }
 
   get short(): shortName {
@@ -48,7 +48,7 @@ export class Bitcoin implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'bitcoin';
+    return 'Bitcoin';
   }
 
   get short(): shortName {
@@ -64,7 +64,7 @@ export class BitcoinCash implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'bitcoinCash';
+    return 'BitcoinCash';
   }
 
   get short(): shortName {
@@ -80,7 +80,7 @@ export class Litecoin implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'litecoin';
+    return 'Litecoin';
   }
 
   get short(): shortName {
@@ -96,7 +96,7 @@ export class Waves implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'waves';
+    return 'Waves';
   }
 
   get short(): shortName {
@@ -112,7 +112,7 @@ export class Stellar implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'stellar';
+    return 'Stellar';
   }
 
   get short(): shortName {
@@ -128,7 +128,7 @@ export class TON implements IDomainCurrency {
   }
 
   get full(): fullName {
-    return 'ton';
+    return 'Ton';
   }
 
   get short(): shortName {

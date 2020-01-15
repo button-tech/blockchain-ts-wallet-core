@@ -1,6 +1,6 @@
 import { BIP32Interface, Network, Payment, payments } from 'bitcoinjs-lib-cash';
 import { toCashAddress } from 'bchaddrjs';
-import { privateToAddress, addHexPrefix, toChecksumAddress, bufferToHex } from 'ethereumjs-util';
+import { privateToAddress, addHexPrefix, toChecksumAddress } from 'ethereumjs-util';
 import { StrKey, Keypair } from 'stellar-sdk';
 import { address, publicKey } from '@waves/ts-lib-crypto';
 import { derivePath } from './hd-key-ed25519';
@@ -24,7 +24,7 @@ import {
   Litecoin,
   Stellar, TON,
   Waves
-} from '../../DomainCurrency';
+} from '../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 
 const numWords = 12;
 
