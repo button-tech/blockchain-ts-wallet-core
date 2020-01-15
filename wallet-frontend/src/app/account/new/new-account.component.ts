@@ -55,6 +55,15 @@ export class NewAccountComponent {
 
   matcher = new MyErrorStateMatcher();
 
+
+  get email() {
+    return this.newAccountForm.get('email');
+  }
+
+  get password(): string {
+    return this.newAccountForm.value.password;
+  }
+
   createNewAccount() {
     const guid = GetGuid(this.router, 'create');
 
@@ -81,14 +90,6 @@ export class NewAccountComponent {
     }
 
     this.isQrCodeHidden = false;
-  }
-
-  get email() {
-    return this.newAccountForm.get('email');
-  }
-
-  get password(): string {
-    return this.newAccountForm.value.password;
   }
 
 }
