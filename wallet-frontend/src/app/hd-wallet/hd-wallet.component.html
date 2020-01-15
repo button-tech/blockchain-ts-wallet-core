@@ -1,12 +1,12 @@
 <h1>Hd wallet sample:</h1>
 
 <div style="display:flex;flex-direction:column;">
-  <button style="padding:10px" (click)="generateMnemonic()">Generate Mnemonic</button>
+  <button style="padding:10px" (click)="createAccount()">Generate Mnemonic</button>
 
   <br>
 
   <div>Mnemonic:</div>
-  <div id="qrcode" #qrcode></div>
+  <app-render-qr-code [hidden]="isQrCodeHidden"></app-render-qr-code>
   <textarea type="text" style="width:400px" [(ngModel)]="words"></textarea>
 
   <div>Password:</div>

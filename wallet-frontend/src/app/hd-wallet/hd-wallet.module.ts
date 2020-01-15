@@ -6,6 +6,7 @@ import {HdWalletComponent} from './hd-wallet.component';
 import {HttpClientModule} from '@angular/common/http';
 import {SharedModule} from '../shared/shared.module';
 import {NodeApiProvider} from '../shared/providers/node-api.provider';
+import { RenderQrcodeModule } from '../shared/components/qrcode/renderQrcode/renderQrcode.module';
 
 @NgModule({
   declarations: [HdWalletComponent],
@@ -14,7 +15,8 @@ import {NodeApiProvider} from '../shared/providers/node-api.provider';
     CommonModule,
     SharedModule,
     HdWalletRoutingModule,
-    FormsModule
+    FormsModule,
+    RenderQrcodeModule
   ],
   providers: [
     NodeApiProvider
