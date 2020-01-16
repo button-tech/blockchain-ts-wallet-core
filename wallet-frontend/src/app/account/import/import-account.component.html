@@ -3,22 +3,22 @@
   <h1>
     Import by mnemonic
   </h1>
-  <mat-form-field class="example-full-width">
+  <label>
     <input matInput placeholder="Mnemonic" formControlName="mnemonic">
-  </mat-form-field>
+  </label>
   <br>
-  <mat-form-field class="example-full-width">
+  <label>
     <input matInput placeholder="Password" type="password" formControlName="password">
-  </mat-form-field>
+  </label>
   <br>
   <button (click)="importByMnemonic()">Import</button>
   <h1>
     Import by QR code
   </h1>
   <br>
-  <mat-form-field class="example-full-width">
+  <label>
     <input matInput placeholder="Password" type="password" formControlName="password_second">
-  </mat-form-field>
+  </label>
   <br>
   <app-upload-qr-code (messageEvent)="importByQR($event)"></app-upload-qr-code>
 </form>
