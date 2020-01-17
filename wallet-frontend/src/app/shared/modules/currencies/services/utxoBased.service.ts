@@ -6,6 +6,7 @@ import { IBlockchainService } from '../../../shared.module';
 import { IDomainCurrency } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import { INodeApiProvider } from '../../../providers/node-api.provider';
 import { FromDecimal } from '../../../../../../../lib/ts-wallet-core/src/blockchain.utils';
+import { toCashAddress } from 'bchaddrjs';
 
 
 export class UtxoBasedService implements IBlockchainService {
@@ -31,8 +32,11 @@ export class UtxoBasedService implements IBlockchainService {
 
   signTransaction$(params: UtxoTransactionParams, guid: string): Observable<string> {
     const fromAddress = this.getAddress(this.privateKey);
-
-    return this.nodeApiProvider.getCustomFee$(this.currency, fromAddress, params.amount, guid)
+    let utxoAddress = fromAddress;
+    if (this.currency.short === 'bch') {
+      utxoAddress = toCashAddress(fromAddress);
+    }
+    return this.nodeApiProvider.getCustomFee$(this.currency, utxoAddress, params.amount, guid)
       .pipe(
         mergeMap((feeObj) => {
           params.fee = feeObj.fee;

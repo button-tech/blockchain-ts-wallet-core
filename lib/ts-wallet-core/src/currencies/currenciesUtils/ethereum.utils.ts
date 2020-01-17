@@ -3,7 +3,6 @@ import { privateToAddress } from 'ethereumjs-util';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
 import { FromDecimal, Tbn } from '../../blockchain.utils';
 import { EthereumTransactionParams, IBlockchain } from '../../typings/ts-wallet-core.dto';
-import { Observable, of } from 'rxjs';
 
 export const EthereumDecimals = 18;
 
@@ -31,7 +30,7 @@ export class EthereumUtils implements IBlockchain {
     return '0x' + privateToAddress(new Buffer(privateKey, 'hex')).toString('hex');
   }
 
-  signTransaction$(params: EthereumTransactionParams): Observable<string> {
+  signTransaction$(params: EthereumTransactionParams): Promise<string> {
     const value = FromDecimal(params.amount, EthereumDecimals).toNumber();
     const nonce = params.nonce;
 
@@ -44,7 +43,7 @@ export class EthereumUtils implements IBlockchain {
       data: params.data || '0x'
     };
 
-    return of(this.sign(txParam, this.privateKey));
+    return Promise.resolve(this.sign(txParam, this.privateKey));
   }
 
   private sign(txParam: TxData, privateKey: string): string {

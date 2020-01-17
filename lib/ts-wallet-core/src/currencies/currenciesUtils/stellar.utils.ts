@@ -1,5 +1,3 @@
-import { combineLatest, from, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import {
   Networks,
   Server,
@@ -62,25 +60,24 @@ export class StellarUtils implements IBlockchain {
     return StrKey.encodeEd25519PublicKey(keyPair.rawPublicKey());
   }
 
-  signTransaction$(params: StellarTransactionParams): Observable<string> {
+  signTransaction$(params: StellarTransactionParams): Promise<string> {
     const fromAddress = this.getAddress(this.privateKey);
 
-    const accountTo$: Observable<AccountResponse | null> = this.getAccount(params.toAddress);
-    const accountFrom$: Observable<AccountResponse | null> = this.getAccount(fromAddress);
+    const accountTo$: Promise<AccountResponse> = this.getAccount(params.toAddress);
+    const accountFrom$: Promise<AccountResponse> = this.getAccount(fromAddress);
 
-    return combineLatest(accountTo$, accountFrom$).pipe(
-      map(([accountTo, accountFrom]: [AccountResponse | null, AccountResponse | null]) => {
-          if (accountFrom === null) {
-            throw new Error('account from not exists');
-          }
-          const memo: Memo = Memo.fromXDRObject(Memo.text(!params.memo ? 'BUTTON Wallet' : params.memo).toXDRObject());
-          params.amount = (+params.amount).toFixed(7).toString();
-          const transactionToSign = !accountTo
-            ? createAccount(this.privateKey, params, accountFrom, memo)
-            : payment(this.privateKey, params, accountFrom, memo);
-          return JSON.stringify(transactionToSign);
+    return Promise.all([accountTo$, accountFrom$]).then(
+      ([accountTo, accountFrom]: [AccountResponse | null, AccountResponse | null]) => {
+        if (accountFrom === null) {
+          throw new Error('account from not exists');
         }
-      )
+        const memo: Memo = Memo.fromXDRObject(Memo.text(!params.memo ? 'BUTTON Wallet' : params.memo).toXDRObject());
+        params.amount = (+params.amount).toFixed(7).toString();
+        const signedTx = !accountTo
+          ? createAccount(this.privateKey, params, accountFrom, memo)
+          : payment(this.privateKey, params, accountFrom, memo);
+        return signedTx.toEnvelope().toXDR().toString('base64');
+      }
     );
   }
 
@@ -88,12 +85,14 @@ export class StellarUtils implements IBlockchain {
     return Keypair.fromSecret(seed);
   }
 
-  private getAccount(address: string): Observable<AccountResponse | null> {
+  private getAccount(address: string): Promise<AccountResponse | null> {
     const account: Promise<AccountResponse> = this.network.loadAccount(address);
-    return from(account)
-      .pipe(
-        map((account: AccountResponse) => account),
-        catchError(() => of(null))
-      );
+    return account
+      .then(
+        (account: AccountResponse) => account
+      )
+      .catch(() => {
+        return null;
+      });
   }
 }

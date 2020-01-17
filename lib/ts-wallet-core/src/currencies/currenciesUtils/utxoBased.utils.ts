@@ -1,4 +1,3 @@
-import { from, Observable } from 'rxjs';
 import { ECPair, payments, TransactionBuilder, Network, Transaction, Signer, Payment } from 'bitcoinjs-lib-cash';
 import { toLegacyAddress } from 'bchaddrjs';
 import { Bitcoin, BitcoinCash, Litecoin } from '../../DomainCurrency';
@@ -71,7 +70,7 @@ export class UtxoBasedUtils implements IBlockchain {
     return payment.address;
   }
 
-  signTransaction$(params: UtxoTransactionParams): Observable<string> {
+  signTransaction$(params: UtxoTransactionParams): Promise<string> {
     const fromAddress = this.getAddress(this.privateKey);
 
     const value = FromDecimal(params.amount, UtxoDecimals).toNumber();
@@ -98,12 +97,15 @@ export class UtxoBasedUtils implements IBlockchain {
     if (balanceWithoutFeeAndSendingAmount > 0) {
       tx.addOutput(fromAddress, balanceWithoutFeeAndSendingAmount);
     }
+    debugger
+
     for (let i = 0; i < utxos.length; i++) {
       tx.sign(i, this.getPrivateKey(this.privateKey),
         undefined, hashType, utxos[i].satoshis);
     }
 
-    return from(tx.build().toHex());
+
+    return Promise.resolve(tx.build().toHex());
   }
 
   private getTransactionBuilder(): TransactionBuilder {

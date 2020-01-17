@@ -1,4 +1,4 @@
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, from, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import {
   EthereumTransactionParams,

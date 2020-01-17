@@ -2,7 +2,6 @@ import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core';
 import { AbiItem } from 'web3-utils';
 import { Contract } from 'web3-eth-contract';
-import { from, Observable } from 'rxjs';
 import { ContractCall, IContract } from '../../typings/ts-wallet-core.dto';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
 import { DecimalToHex } from '../../blockchain.utils';
@@ -38,7 +37,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContract {
     return params.contractInstance.methods[params.methodName](...executionParameters).encodeABI();
   }
 
-  estimateGasRawData$(params: TxConfig): Observable<number> {
+  estimateGasRawData$(params: TxConfig): Promise<number> {
     const txConfig: TransactionConfig = {
       to: params.to,
       data: params.data,
@@ -47,12 +46,12 @@ export class EthereumContractUtils extends EthereumUtils implements IContract {
       gasPrice: !params.gasPrice ? '0xB2D05E00' : DecimalToHex(params.gasPrice), // 3_000_000_000
       value: !params.value ? '0' : DecimalToHex(params.value)
     };
-    return from(this.web3.eth.estimateGas(txConfig));
+    return Promise.resolve(this.web3.eth.estimateGas(txConfig));
   }
 
-  callMethod$(params: ContractCall): Observable<any> {
+  callMethod$(params: ContractCall): Promise<any> {
     const executionParameters = !params.executionParameters ? [] : params.executionParameters;
-    return from(params.contractInstance.methods[params.methodName](...executionParameters).call({ from: params.addressFrom }));
+    return Promise.resolve(params.contractInstance.methods[params.methodName](...executionParameters).call({ from: params.addressFrom }));
   }
 
   private getProvider(rpcEndpoint: string | undefined): Web3 {

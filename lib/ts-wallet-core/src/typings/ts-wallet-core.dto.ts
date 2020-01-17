@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 
 // Ethereum
 import { Contract } from 'web3-eth-contract';
@@ -12,7 +11,7 @@ export interface IBlockchain {
                      UtxoTransactionParams |
                      WavesTransactionParams |
                      StellarTransactionParams
-  ): Observable<string>;
+  ): Promise<string>;
 }
 
 export interface IContract extends IBlockchain {
@@ -20,9 +19,9 @@ export interface IContract extends IBlockchain {
 
   getCallData(params: ContractCall);
 
-  callMethod$(params: ContractCall): Observable<any>;
+  callMethod$(params: ContractCall): Promise<any>;
 
-  estimateGasRawData$?(params: TxConfig): Observable<number>;
+  estimateGasRawData$?(params: TxConfig): Promise<number>;
 
   awaitTx$(txnHash: Array<string> | string): Promise<any> | Promise<any[]>;
 }

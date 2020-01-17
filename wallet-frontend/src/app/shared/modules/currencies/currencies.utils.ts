@@ -5,7 +5,7 @@ import { HdWallet } from '../../services/hd-wallet/hd-wallet.service';
 export function getPrivateKey(currency: IDomainCurrency, opt: CurrencyFactoryOptions) {
   if (typeof opt.secret === 'string') {
     return fromMnemonic(currency, opt);
-  } else if ((opt.secret as PrivateKeys)[currency.full]) {
+  } else if ((opt.secret as PrivateKeys)[ucFirst(currency.full)]) {
     if (opt.derivationPath === 0) {
       return fromPrivateKeyObject(currency, opt.secret);
     } else {
@@ -24,5 +24,9 @@ export function fromMnemonic(currency: IDomainCurrency, opt: CurrencyFactoryOpti
 }
 
 export function fromPrivateKeyObject(currency: IDomainCurrency, secret: PrivateKeys): string {
-  return secret[currency.full];
+  return secret[ucFirst(currency.full)];
+}
+
+function ucFirst(str: string): string {
+  return str[0].toUpperCase() + str.slice(1);
 }

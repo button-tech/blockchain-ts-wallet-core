@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ITransferTransaction } from 'waves-transactions/transactions';
 import { IBlockchainService } from '../../../shared.module';
@@ -29,14 +29,11 @@ export class WavesService implements IBlockchainService {
       }));
   }
 
-  signTransaction$(params: WavesTransactionParams): Observable<ITransferTransaction> {
-    return this.blockchain.signTransaction$(params);
+  signTransaction$(params: WavesTransactionParams): Observable<string> {
+    return from(this.blockchain.signTransaction$(params));
   }
 
-  sendTransaction$(rawTransaction: string | ITransferTransaction, guid: string): Observable<string> {
-    if (typeof rawTransaction === 'object') {
-      rawTransaction = JSON.stringify(rawTransaction);
-    }
+  sendTransaction$(rawTransaction: string, guid: string): Observable<string> {
     return this.nodeApiProvider.sendTx$(this.currency, String(rawTransaction), guid);
   }
 

@@ -1,4 +1,3 @@
-import { Observable, of } from 'rxjs';
 import { transfer } from 'waves-transactions';
 import { ITransferTransaction } from 'waves-transactions/transactions';
 import { address } from '@waves/ts-lib-crypto';
@@ -16,7 +15,7 @@ export class WavesUtils implements IBlockchain {
     return address(privateKey);
   }
 
-  signTransaction$(params: WavesTransactionParams): Observable<string> {
+  signTransaction$(params: WavesTransactionParams): Promise<string> {
     const timestamp = Date.now();
     const signedTx: ITransferTransaction = transfer({
       amount: FromDecimal(params.amount, WavesDecimals).toNumber(),
@@ -24,7 +23,7 @@ export class WavesUtils implements IBlockchain {
       timestamp,
     }, this.privateKey);
 
-    return of(JSON.stringify(signedTx));
+    return Promise.resolve(JSON.stringify(signedTx));
   }
 
 }

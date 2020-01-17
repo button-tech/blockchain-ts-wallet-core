@@ -1,4 +1,4 @@
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, from, Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import {
   ContractCall,
@@ -30,11 +30,11 @@ export class EthereumTokensService extends EthereumBasedService implements ICont
   }
 
   callMethod$(params: ContractCall): Observable<any> {
-    return this.tokens.callMethod$(params);
+    return from(this.tokens.callMethod$(params));
   }
 
   estimateGasRawData$(params: TxConfig): Observable<number> {
-    return this.tokens.estimateGasRawData$(params);
+    return from(this.tokens.estimateGasRawData$(params));
   }
 
   setValue$(params: ContractCall, guid: string, isSync: boolean = false): Observable<string> {
