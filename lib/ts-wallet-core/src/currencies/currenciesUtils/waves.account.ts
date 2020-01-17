@@ -1,12 +1,12 @@
 import { transfer } from 'waves-transactions';
 import { ITransferTransaction } from 'waves-transactions/transactions';
 import { address } from '@waves/ts-lib-crypto';
-import { IBlockchain, WavesTransactionParams } from '../../typings/ts-wallet-core.dto';
+import { IAccount, WavesTransactionParams } from '../../typings/ts-wallet-core.dto';
 import { FromDecimal } from '../../blockchain.utils';
 
 export const WavesDecimals = 8;
 
-export class WavesUtils implements IBlockchain {
+export class WavesAccount implements IAccount {
 
   constructor(private readonly privateKey: string) {
   }

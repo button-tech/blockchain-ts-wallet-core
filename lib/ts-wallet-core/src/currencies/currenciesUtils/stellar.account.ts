@@ -10,7 +10,7 @@ import {
   Memo,
   Transaction
 } from 'stellar-sdk';
-import { IBlockchain, StellarTransactionParams } from '../../typings/ts-wallet-core.dto';
+import { IAccount, StellarTransactionParams } from '../../typings/ts-wallet-core.dto';
 
 export const StellarDecimals = 7;
 
@@ -47,7 +47,7 @@ function createAccount(privateKey: string, params: StellarTransactionParams, acc
   return transaction;
 }
 
-export class StellarUtils implements IBlockchain {
+export class StellarAccount implements IAccount {
 
   private network: any;
 
@@ -63,8 +63,8 @@ export class StellarUtils implements IBlockchain {
   signTransaction$(params: StellarTransactionParams): Promise<string> {
     const fromAddress = this.getAddress(this.privateKey);
 
-    const accountTo$: Promise<AccountResponse> = this.getAccount(params.toAddress);
-    const accountFrom$: Promise<AccountResponse> = this.getAccount(fromAddress);
+    const accountTo$: Promise<AccountResponse | null> = this.getAccount(params.toAddress);
+    const accountFrom$: Promise<AccountResponse | null> = this.getAccount(fromAddress);
 
     return Promise.all([accountTo$, accountFrom$]).then(
       ([accountTo, accountFrom]: [AccountResponse | null, AccountResponse | null]) => {

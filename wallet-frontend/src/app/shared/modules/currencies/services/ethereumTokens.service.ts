@@ -2,7 +2,7 @@ import { combineLatest, from, Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import {
   ContractCall,
-  IBlockchain, IContract, TxConfig
+  IAccount, IContract, TxConfig
 } from '../../../../../../../lib/ts-wallet-core/src/typings/ts-wallet-core.dto';
 import { IContractService } from '../../../shared.module';
 import { IDomainCurrency } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
@@ -19,7 +19,7 @@ export class EthereumTokensService extends EthereumBasedService implements ICont
   constructor(
     privateKey: string,
     currency: IDomainCurrency,
-    private tokens: IBlockchain & IContract,
+    private tokens: IAccount & IContract,
     nodeApiProvider: INodeApiProvider,
   ) {
     super(privateKey, currency, tokens, nodeApiProvider);
@@ -56,7 +56,7 @@ export class EthereumTokensService extends EthereumBasedService implements ICont
           toAddress: params.contractAddress,
           amount: params.amount
         };
-        return this.blockchain.signTransaction$(ethParams);
+        return this.tokens.signTransaction$(ethParams);
       })
     );
   }

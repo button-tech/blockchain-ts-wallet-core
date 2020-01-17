@@ -1,6 +1,6 @@
-import { IBlockchain } from '../../typings/ts-wallet-core.dto';
-import { WavesUtils } from '../currenciesUtils/waves.utils';
+import { IAccount } from '../../typings/ts-wallet-core.dto';
+import { WavesAccount } from '../currenciesUtils/waves.account';
 
-export function Waves(privateKey: string): IBlockchain {
-  return new WavesUtils(privateKey);
+export function Waves(privateKey: string): IAccount {
+  return new WavesAccount(privateKey);
 }

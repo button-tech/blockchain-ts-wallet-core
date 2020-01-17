@@ -1,7 +1,7 @@
-import { IBlockchain, IContract } from '../../typings/ts-wallet-core.dto';
+import { IAccount, IContract } from '../../typings/ts-wallet-core.dto';
 import * as Currency from '../../DomainCurrency';
-import { EthereumContractUtils } from '../currenciesUtils/ethereumContract.utils';
+import { EthereumContractAccount } from '../currenciesUtils/ethereumBasedContract.account';
 
-export function EthereumTokens(privateKey: string): IContract & IBlockchain {
-  return new EthereumContractUtils(privateKey, Currency.Ethereum.Instance());
+export function EthereumTokens(privateKey: string): IContract & IAccount {
+  return new EthereumContractAccount(privateKey, Currency.Ethereum.Instance());
 }

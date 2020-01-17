@@ -9,38 +9,38 @@ import { BitcoinCash } from './currencies/bitcoinCash/bitcoinCash';
 import { Litecoin } from './currencies/litecoin/litecoin';
 import { Waves } from './currencies/waves/waves';
 import { Stellar } from './currencies/stellar/stellar';
-import { IBlockchain, IContract } from './typings/ts-wallet-core.dto';
+import { IAccount, IContract } from './typings/ts-wallet-core.dto';
 
 export default class TsWalletCore {
-  static Ethereum(privateKey: string): IBlockchain {
+  static Ethereum(privateKey: string): IAccount {
     return Ethereum(privateKey);
   }
 
-  static EthereumClassic(privateKey: string): IBlockchain {
+  static EthereumClassic(privateKey: string): IAccount {
     return EthereumClassic(privateKey);
   }
 
-  static EthereumTokens(privateKey: string): IContract & IBlockchain {
+  static EthereumTokens(privateKey: string): IContract & IAccount {
     return EthereumTokens(privateKey);
   }
 
-  static Bitcoin(privateKey: string): IBlockchain {
+  static Bitcoin(privateKey: string): IAccount {
     return Bitcoin(privateKey);
   }
 
-  static BitcoinCash(privateKey: string): IBlockchain {
+  static BitcoinCash(privateKey: string): IAccount {
     return BitcoinCash(privateKey);
   }
 
-  static Litecoin(privateKey: string): IBlockchain {
+  static Litecoin(privateKey: string): IAccount {
     return Litecoin(privateKey);
   }
 
-  static Waves(privateKey: string): IBlockchain {
+  static Waves(privateKey: string): IAccount {
     return Waves(privateKey);
   }
 
-  static Stellar(privateKey: string): IBlockchain {
+  static Stellar(privateKey: string): IAccount {
     return Stellar(privateKey);
   }
 }

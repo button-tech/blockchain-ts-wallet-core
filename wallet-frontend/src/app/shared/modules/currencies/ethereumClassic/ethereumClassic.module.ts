@@ -7,12 +7,12 @@ import { CurrencyFactoryOptions, SharedModule } from '../../../shared.module';
 import { EthereumClassic } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import { getPrivateKey } from '../currencies.utils';
 import { EthereumBasedService } from '../services/ethereumBased.service';
-import TsWalletCore from '../../../../../../../lib/ts-wallet-core/src/ts-wallet-core';
+import Index from '../../../../../../../lib/ts-wallet-core/src/index';
 
 export function init(utils: INodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = EthereumClassic.Instance();
   const privateKey = getPrivateKey(currency, opt);
-  const blockchain = TsWalletCore.EthereumClassic(privateKey);
+  const blockchain = Index.EthereumClassic(privateKey);
   return new EthereumBasedService(privateKey, currency, blockchain, utils);
 }
 

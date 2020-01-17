@@ -1,7 +1,7 @@
-import { IBlockchain } from '../../typings/ts-wallet-core.dto';
-import { EthereumUtils } from '../currenciesUtils/ethereum.utils';
+import { IAccount } from '../../typings/ts-wallet-core.dto';
+import { EthereumAccount } from '../currenciesUtils/ethereumBased.account';
 import * as Currency from '../../DomainCurrency';
 
-export function EthereumClassic(privateKey: string): IBlockchain {
-  return new EthereumUtils(privateKey, Currency.EthereumClassic.Instance());
+export function EthereumClassic(privateKey: string): IAccount {
+  return new EthereumAccount(privateKey, Currency.EthereumClassic.Instance());
 }

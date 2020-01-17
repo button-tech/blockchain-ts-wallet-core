@@ -1,4 +1,4 @@
-import DummyClass from '../src/ts-wallet-core';
+import DummyClass from '../src/index';
 
 /**
  * Dummy test

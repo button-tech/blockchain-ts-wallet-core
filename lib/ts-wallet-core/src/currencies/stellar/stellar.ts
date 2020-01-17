@@ -1,6 +1,6 @@
-import { IBlockchain } from '../../typings/ts-wallet-core.dto';
-import { StellarUtils } from '../currenciesUtils/stellar.utils';
+import { IAccount } from '../../typings/ts-wallet-core.dto';
+import { StellarAccount } from '../currenciesUtils/stellar.account';
 
-export function Stellar(privateKey: string): IBlockchain {
-  return new StellarUtils(privateKey);
+export function Stellar(privateKey: string): IAccount {
+  return new StellarAccount(privateKey);
 }

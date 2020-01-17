@@ -5,7 +5,7 @@ import { Contract } from 'web3-eth-contract';
 import { ContractCall, IContract } from '../../typings/ts-wallet-core.dto';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
 import { DecimalToHex } from '../../blockchain.utils';
-import { EthereumUtils } from './ethereum.utils';
+import { EthereumAccount } from './ethereumBased.account';
 
 export interface TxConfig {
   to: string;
@@ -16,7 +16,7 @@ export interface TxConfig {
   gasPrice?: string;
 }
 
-export class EthereumContractUtils extends EthereumUtils implements IContract {
+export class EthereumContractAccount extends EthereumAccount implements IContract {
 
   private web3: Web3;
 
@@ -29,7 +29,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContract {
     return new this.web3.eth.Contract(abi, contractAddress);
   }
 
-  getCallData(params: ContractCall) {
+  getCallData(params: ContractCall): any {
     if (!params.contractInstance.methods[params.methodName]) {
       throw new Error(`Method ${params.methodName} does not exist`);
     }
@@ -69,7 +69,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContract {
 
   awaitTx$(txnHash: Array<string> | string): Promise<any> | Promise<any[]> {
     if (Array.isArray(txnHash)) {
-      const promises = [];
+      const promises: any = [];
       txnHash.forEach((oneTxHash) => {
         promises.push(this.awaitTx$(oneTxHash));
       });
@@ -82,7 +82,7 @@ export class EthereumContractUtils extends EthereumUtils implements IContract {
   }
 
   // todo: make it observable
-  private async transactionReceiptAsync(txnHash: string, resolve, reject): Promise<void> {
+  private async transactionReceiptAsync(txnHash: string, resolve: any, reject: any): Promise<void> {
     const interval = 2000;
     const blocksToWait = 1;
 

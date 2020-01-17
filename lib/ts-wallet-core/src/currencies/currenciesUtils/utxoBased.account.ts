@@ -1,7 +1,7 @@
 import { ECPair, payments, TransactionBuilder, Network, Transaction, Signer, Payment } from 'bitcoinjs-lib-cash';
 import { toLegacyAddress } from 'bchaddrjs';
 import { Bitcoin, BitcoinCash, Litecoin } from '../../DomainCurrency';
-import { IBlockchain, UTXO, UtxoTransactionParams } from '../../typings/ts-wallet-core.dto';
+import { IAccount, UTXO, UtxoTransactionParams } from '../../typings/ts-wallet-core.dto';
 import { FromDecimal, Tbn } from '../../blockchain.utils';
 import BigNumber from 'bignumber.js';
 
@@ -56,7 +56,7 @@ function dynamicSort(property: string) {
   };
 }
 
-export class UtxoBasedUtils implements IBlockchain {
+export class UtxoBasedAccount implements IAccount {
 
   constructor(private readonly privateKey: string, private currency: Bitcoin | BitcoinCash | Litecoin) {
   }

@@ -1,27 +1,27 @@
 import { IBlockchainService } from '../../../shared.module';
 import { IDomainCurrency } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import {
-  IBlockchain,
+  IAccount,
   StellarTransactionParams
 } from '../../../../../../../lib/ts-wallet-core/src/typings/ts-wallet-core.dto';
 import { INodeApiProvider } from '../../../providers/node-api.provider';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FromDecimal } from '../../../../../../../lib/ts-wallet-core/src/blockchain.utils';
-import { StellarDecimals } from '../../../../../../../lib/ts-wallet-core/src/currencies/currenciesUtils/stellar.utils';
+import { StellarDecimals } from '../../../../../../../lib/ts-wallet-core/src/currencies/currenciesUtils/stellar.account';
 
 export class StellarService implements IBlockchainService {
 
   constructor(
     private privateKey: string,
     private currency: IDomainCurrency,
-    private blockchain: IBlockchain,
+    private account: IAccount,
     private nodeApiProvider: INodeApiProvider,
   ) {
   }
 
   getAddress(privateKey: string): string {
-    return this.blockchain.getAddress(privateKey);
+    return this.account.getAddress(privateKey);
   }
 
   getBalance$(address: string, guid: string): Observable<number> {
@@ -33,7 +33,7 @@ export class StellarService implements IBlockchainService {
 
   signTransaction$(params: StellarTransactionParams, guid: string): Observable<string> {
       params.memo = 'BUTTON Wallet';
-      return from(this.blockchain.signTransaction$(params));
+      return from(this.account.signTransaction$(params));
   }
 
   sendTransaction$(rawTransaction: string, guid: string): Observable<string> {

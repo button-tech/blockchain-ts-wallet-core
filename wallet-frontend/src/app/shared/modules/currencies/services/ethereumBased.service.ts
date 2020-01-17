@@ -2,14 +2,14 @@ import { combineLatest, from, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import {
   EthereumTransactionParams,
-  IBlockchain
+  IAccount
 } from '../../../../../../../lib/ts-wallet-core/src/typings/ts-wallet-core.dto';
 import { IBlockchainService } from '../../../shared.module';
 import { IDomainCurrency } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import { INodeApiProvider } from '../../../providers/node-api.provider';
 import { FromDecimal } from '../../../../../../../lib/ts-wallet-core/src/blockchain.utils';
 import { CustomFeeResponse } from '../../../dto/node-api.dto';
-import { EthereumDecimals } from '../../../../../../../lib/ts-wallet-core/src/currencies/currenciesUtils/ethereum.utils';
+import { EthereumDecimals } from '../../../../../../../lib/ts-wallet-core/src/currencies/currenciesUtils/ethereumBased.account';
 
 
 export class EthereumBasedService implements IBlockchainService {
@@ -17,13 +17,13 @@ export class EthereumBasedService implements IBlockchainService {
   constructor(
     protected privateKey: string,
     protected currency: IDomainCurrency,
-    protected blockchain: IBlockchain,
+    protected account: IAccount,
     protected nodeApiProvider: INodeApiProvider,
   ) {
   }
 
   getAddress(privateKey: string): string {
-    return this.blockchain.getAddress(privateKey);
+    return this.account.getAddress(privateKey);
   }
 
   getBalance$(address: string, guid: string): Observable<number> {
@@ -44,7 +44,7 @@ export class EthereumBasedService implements IBlockchainService {
         params.nonce = nonce;
         params.gasPrice = feeObj.gasPrice;
         params.gasLimit = 21000;
-        return this.blockchain.signTransaction$(params);
+        return this.account.signTransaction$(params);
       })
     );
   }

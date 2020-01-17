@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-import { IBlockchain, UtxoTransactionParams } from '../../../../../../../lib/ts-wallet-core/src/typings/ts-wallet-core.dto';
-import { UtxoDecimals } from '../../../../../../../lib/ts-wallet-core/src/currencies/currenciesUtils/utxoBased.utils';
+import { IAccount, UtxoTransactionParams } from '../../../../../../../lib/ts-wallet-core/src/typings/ts-wallet-core.dto';
+import { UtxoDecimals } from '../../../../../../../lib/ts-wallet-core/src/currencies/currenciesUtils/utxoBased.account';
 import { IBlockchainService } from '../../../shared.module';
 import { IDomainCurrency } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import { INodeApiProvider } from '../../../providers/node-api.provider';
@@ -14,13 +14,13 @@ export class UtxoBasedService implements IBlockchainService {
   constructor(
     private privateKey: string,
     private currency: IDomainCurrency,
-    private blockchain: IBlockchain,
+    private account: IAccount,
     private nodeApiProvider: INodeApiProvider,
   ) {
   }
 
   getAddress(privateKey: string): string {
-    return this.blockchain.getAddress(privateKey);
+    return this.account.getAddress(privateKey);
   }
 
   getBalance$(address: string, guid: string): Observable<number> {
@@ -41,7 +41,7 @@ export class UtxoBasedService implements IBlockchainService {
         mergeMap((feeObj) => {
           params.fee = feeObj.fee;
           params.inputs = feeObj.inputs;
-          return this.blockchain.signTransaction$(params);
+          return this.account.signTransaction$(params);
         })
       );
   }

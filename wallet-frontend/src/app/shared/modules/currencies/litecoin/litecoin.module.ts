@@ -6,13 +6,13 @@ import { INodeApiProvider } from '../../../providers/node-api.provider';
 import { CurrencyFactoryOptions, SharedModule } from '../../../shared.module';
 import { Litecoin } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import { getPrivateKey } from '../currencies.utils';
-import TsWalletCore from '../../../../../../../lib/ts-wallet-core/src/ts-wallet-core';
+import Index from '../../../../../../../lib/ts-wallet-core/src/index';
 import { UtxoBasedService } from '../services/utxoBased.service';
 
 export function init(utils: INodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = Litecoin.Instance();
   const privateKey = getPrivateKey(currency, opt);
-  const blockchain = TsWalletCore.Litecoin(privateKey);
+  const blockchain = Index.Litecoin(privateKey);
   return new UtxoBasedService(privateKey, currency, blockchain, utils);
 }
 

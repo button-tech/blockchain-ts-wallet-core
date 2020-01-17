@@ -7,12 +7,12 @@ import { CurrencyFactoryOptions, SharedModule } from '../../../shared.module';
 import { UtxoBasedService } from '../services/utxoBased.service';
 import { getPrivateKey } from '../currencies.utils';
 import { Bitcoin } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
-import TsWalletCore from '../../../../../../../lib/ts-wallet-core/src/ts-wallet-core';
+import Index from '../../../../../../../lib/ts-wallet-core/src/index';
 
 export function init(utils: INodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = Bitcoin.Instance();
   const privateKey = getPrivateKey(currency, opt);
-  const blockchain = TsWalletCore.Bitcoin(privateKey);
+  const blockchain = Index.Bitcoin(privateKey);
   return new UtxoBasedService(privateKey, currency, blockchain, utils);
 }
 

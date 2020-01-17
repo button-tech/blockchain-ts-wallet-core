@@ -3,7 +3,7 @@
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 
-export interface IBlockchain {
+export interface IAccount {
   getAddress(privateKey: string): string;
 
   signTransaction$(params:
@@ -14,10 +14,10 @@ export interface IBlockchain {
   ): Promise<string>;
 }
 
-export interface IContract extends IBlockchain {
+export interface IContract extends IAccount {
   getInstance(abi: AbiItem[], contractAddress: string): Contract;
 
-  getCallData(params: ContractCall);
+  getCallData(params: ContractCall): any;
 
   callMethod$(params: ContractCall): Promise<any>;
 

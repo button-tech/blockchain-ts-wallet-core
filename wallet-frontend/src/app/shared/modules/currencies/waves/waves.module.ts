@@ -5,14 +5,14 @@ import { SendModule } from '../../../../send/send.module';
 import { INodeApiProvider } from '../../../providers/node-api.provider';
 import { CurrencyFactoryOptions, SharedModule } from '../../../shared.module';
 import { getPrivateKey } from '../currencies.utils';
-import TsWalletCore from '../../../../../../../lib/ts-wallet-core/src/ts-wallet-core';
+import Index from '../../../../../../../lib/ts-wallet-core/src/index';
 import { Waves } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import { WavesService } from '../services/waves.service';
 
 export function init(utils: INodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = Waves.Instance();
   const privateKey = getPrivateKey(currency, opt);
-  const blockchain = TsWalletCore.Waves(privateKey);
+  const blockchain = Index.Waves(privateKey);
   return new WavesService(privateKey, currency, blockchain, utils);
 }
 

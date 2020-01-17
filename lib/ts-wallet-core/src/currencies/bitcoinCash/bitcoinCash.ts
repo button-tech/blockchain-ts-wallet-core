@@ -1,7 +1,7 @@
 import * as Currency from '../../DomainCurrency';
-import { IBlockchain } from '../../typings/ts-wallet-core.dto';
-import { UtxoBasedUtils } from '../currenciesUtils/utxoBased.utils';
+import { IAccount } from '../../typings/ts-wallet-core.dto';
+import { UtxoBasedAccount } from '../currenciesUtils/utxoBased.account';
 
-export function BitcoinCash(privateKey: string): IBlockchain {
-  return new UtxoBasedUtils(privateKey, Currency.BitcoinCash.Instance());
+export function BitcoinCash(privateKey: string): IAccount {
+  return new UtxoBasedAccount(privateKey, Currency.BitcoinCash.Instance());
 }

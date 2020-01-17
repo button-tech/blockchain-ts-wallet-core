@@ -5,14 +5,14 @@ import { SendModule } from '../../../../send/send.module';
 import { INodeApiProvider } from '../../../providers/node-api.provider';
 import { CurrencyFactoryOptions, SharedModule } from '../../../shared.module';
 import { getPrivateKey } from '../currencies.utils';
-import TsWalletCore from '../../../../../../../lib/ts-wallet-core/src/ts-wallet-core';
+import Index from '../../../../../../../lib/ts-wallet-core/src/index';
 import { EthereumTokensService } from '../services/ethereumTokens.service';
 import { Ethereum } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 
 export function init(utils: INodeApiProvider, opt: CurrencyFactoryOptions) {
   const currency = Ethereum.Instance();
   const privateKey = getPrivateKey(currency, opt);
-  const blockchain = TsWalletCore.EthereumTokens(privateKey);
+  const blockchain = Index.EthereumTokens(privateKey);
   return new EthereumTokensService(privateKey, currency, blockchain, utils);
 }
 

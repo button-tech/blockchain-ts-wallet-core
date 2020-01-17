@@ -2,7 +2,7 @@ import { Transaction, TransactionOptions, TxData } from 'ethereumjs-tx';
 import { privateToAddress } from 'ethereumjs-util';
 import { Ethereum, EthereumClassic } from '../../DomainCurrency';
 import { FromDecimal, Tbn } from '../../blockchain.utils';
-import { EthereumTransactionParams, IBlockchain } from '../../typings/ts-wallet-core.dto';
+import { EthereumTransactionParams, IAccount } from '../../typings/ts-wallet-core.dto';
 
 export const EthereumDecimals = 18;
 
@@ -14,7 +14,7 @@ function decimalToHex(d: number | string): string {
   return '0x' + hex;
 }
 
-export class EthereumUtils implements IBlockchain {
+export class EthereumAccount implements IAccount {
 
 
   constructor(private readonly privateKey: string, protected currency: Ethereum | EthereumClassic) {
