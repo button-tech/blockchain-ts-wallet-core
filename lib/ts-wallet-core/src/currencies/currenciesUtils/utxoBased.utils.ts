@@ -97,7 +97,6 @@ export class UtxoBasedUtils implements IBlockchain {
     if (balanceWithoutFeeAndSendingAmount > 0) {
       tx.addOutput(fromAddress, balanceWithoutFeeAndSendingAmount);
     }
-    debugger
 
     for (let i = 0; i < utxos.length; i++) {
       tx.sign(i, this.getPrivateKey(this.privateKey),
