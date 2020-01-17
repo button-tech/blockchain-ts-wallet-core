@@ -2,10 +2,15 @@
 import { Contract } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 
-export interface IAccount {
+export const EthereumDecimals = 18
+export const StellarDecimals = 7
+export const UtxoDecimals = 8
+export const WavesDecimals = 8
+
+export interface ICurrency {
   getAddress(privateKey: string): string
 
-  signTransaction$(
+  signTransaction(
     params:
       | EthereumTransactionParams
       | UtxoTransactionParams
@@ -14,7 +19,7 @@ export interface IAccount {
   ): Promise<string>
 }
 
-export interface IContract extends IAccount {
+export interface IContract extends ICurrency {
   getInstance(abi: AbiItem[], contractAddress: string): Contract
 
   getCallData(params: ContractCall): any
@@ -86,4 +91,13 @@ export interface UTXO {
   confirmations: number
   legacyAddress?: string
   cashAddress?: string
+}
+
+export interface TxConfig {
+  to: string
+  data: string
+  from?: string
+  gas?: number
+  value?: string
+  gasPrice?: string
 }

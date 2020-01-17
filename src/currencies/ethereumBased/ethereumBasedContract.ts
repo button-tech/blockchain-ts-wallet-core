@@ -2,26 +2,21 @@ import Web3 from 'web3'
 import { TransactionConfig } from 'web3-core'
 import { AbiItem } from 'web3-utils'
 import { Contract } from 'web3-eth-contract'
-import { ContractCall, IContract } from '../../types/ts-wallet-core.dto'
-import { Ethereum, EthereumClassic } from '../../DomainCurrency'
+import { ContractCall, ICurrency, IContract, TxConfig } from '../../types'
 import { DecimalToHex } from '../../blockchain.utils'
-import { EthereumAccount } from './ethereumBased.account'
+import { EthereumBasedCurrency } from './ethereumBased'
+import * as Currency from '../../DomainCurrency'
 
-export interface TxConfig {
-  to: string
-  data: string
-  from?: string
-  gas?: number
-  value?: string
-  gasPrice?: string
+export function EthereumTokens(privateKey: string): IContract & ICurrency {
+  return new EthereumContract(privateKey, Currency.Ethereum.Instance())
 }
 
-export class EthereumContractAccount extends EthereumAccount implements IContract {
+export class EthereumContract extends EthereumBasedCurrency implements IContract {
   private web3: Web3
 
   constructor(
     privateKey: string,
-    currency: Ethereum | EthereumClassic,
+    currency: Currency.Ethereum | Currency.EthereumClassic,
     private rpcEndpoint?: string
   ) {
     super(privateKey, currency)
@@ -88,7 +83,7 @@ export class EthereumContractAccount extends EthereumAccount implements IContrac
     }
   }
 
-  // todo: make it observable
+  // todo: rewrite
   private async transactionReceiptAsync(txnHash: string, resolve: any, reject: any): Promise<void> {
     const interval = 2000
     const blocksToWait = 1

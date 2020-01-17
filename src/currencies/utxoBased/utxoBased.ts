@@ -8,66 +8,28 @@ import {
   Payment
 } from 'bitcoinjs-lib-cash'
 import { toLegacyAddress } from 'bchaddrjs'
-import { Bitcoin, BitcoinCash, Litecoin } from '../../DomainCurrency'
-import { IAccount, UTXO, UtxoTransactionParams } from '../../types/ts-wallet-core.dto'
+import { ICurrency, UTXO, UtxoDecimals, UtxoTransactionParams } from '../../types'
 import { FromDecimal, Tbn } from '../../blockchain.utils'
 import BigNumber from 'bignumber.js'
+import * as Currency from '../../DomainCurrency'
+import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from './networks'
 
-export const UtxoDecimals = 8
-
-const LitecoinConfig: Network = {
-  messagePrefix: '\x19Litecoin Signed Message:\n',
-  bech32: 'ltc',
-  bip32: {
-    public: 0x019da462,
-    private: 0x019d9cfe
-  },
-  pubKeyHash: 0x30,
-  scriptHash: 0x32,
-  wif: 0xb0
+export function Litecoin(privateKey: string): ICurrency {
+  return new UtxoBased(privateKey, Currency.Litecoin.Instance())
 }
 
-// https://github.com/cryptocoinjs/coininfo/blob/master/lib/coins/bch.js
-const BitcoinCashConfig: Network = {
-  messagePrefix: '\x18Bitcoin Signed Message:\n',
-  bech32: 'bitcoincash:q',
-  bip32: {
-    public: 0x0488b21e,
-    private: 0x0488ade4
-  },
-  pubKeyHash: 0x00,
-  scriptHash: 0x05,
-  wif: 0x80
+export function BitcoinCash(privateKey: string): ICurrency {
+  return new UtxoBased(privateKey, Currency.BitcoinCash.Instance())
 }
 
-const BitcoinConfig: Network = {
-  messagePrefix: '\x18Bitcoin Signed Message:\n',
-  bech32: 'bc',
-  bip32: {
-    private: 0x0488ade4,
-    public: 0x0488b21e
-  },
-  pubKeyHash: 0x00,
-  scriptHash: 0x05,
-  wif: 0x80
+export function Bitcoin(privateKey: string): ICurrency {
+  return new UtxoBased(privateKey, Currency.Bitcoin.Instance())
 }
 
-function dynamicSort(property: string) {
-  let sortOrder = 1
-  if (property[0] === '-') {
-    sortOrder = -1
-    property = property.substr(1)
-  }
-  return (a: any, b: any) => {
-    const result = a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0
-    return result * sortOrder
-  }
-}
-
-export class UtxoBasedAccount implements IAccount {
+export class UtxoBased implements ICurrency {
   constructor(
     private readonly privateKey: string,
-    private currency: Bitcoin | BitcoinCash | Litecoin
+    private currency: Currency.Bitcoin | Currency.BitcoinCash | Currency.Litecoin
   ) {}
 
   getAddress(privateKey: string): string {
@@ -82,7 +44,7 @@ export class UtxoBasedAccount implements IAccount {
     return payment.address
   }
 
-  signTransaction$(params: UtxoTransactionParams): Promise<string> {
+  signTransaction(params: UtxoTransactionParams): Promise<string> {
     const fromAddress = this.getAddress(this.privateKey)
 
     const value = FromDecimal(params.amount, UtxoDecimals).toNumber()
@@ -127,7 +89,7 @@ export class UtxoBasedAccount implements IAccount {
   private getTransactionBuilder(): TransactionBuilder {
     switch (this.currency.short) {
       case 'btc':
-        return new TransactionBuilder()
+        return new TransactionBuilder(BitcoinConfig)
       case 'bch':
         return new TransactionBuilder(BitcoinCashConfig, true)
       case 'ltc':
@@ -146,16 +108,8 @@ export class UtxoBasedAccount implements IAccount {
   }
 
   private getPrivateKey(privateKey: string): Signer {
-    switch (this.currency.short) {
-      case 'btc':
-        return this.getKeyPair(privateKey)
-      case 'bch':
-        return this.getKeyPair(privateKey, BitcoinCashConfig)
-      case 'ltc':
-        return this.getKeyPair(privateKey, LitecoinConfig)
-      default:
-        throw new Error('key pair not exists in ' + this.currency.full)
-    }
+    const network = this.getNetwork()
+    return this.getKeyPair(privateKey, network)
   }
 
   private getNetwork(): Network {
@@ -181,5 +135,17 @@ export class UtxoBasedAccount implements IAccount {
         return acc.plus(n)
       })
       .toNumber()
+  }
+}
+
+function dynamicSort(property: string) {
+  let sortOrder = 1
+  if (property[0] === '-') {
+    sortOrder = -1
+    property = property.substr(1)
+  }
+  return (a: any, b: any) => {
+    const result = a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0
+    return result * sortOrder
   }
 }

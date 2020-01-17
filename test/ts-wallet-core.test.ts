@@ -1,4 +1,4 @@
-import TsWalletCore from '../src/index'
+import TsWalletCore from '../src/ts-wallet-core'
 
 /**
  * Dummy test

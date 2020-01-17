@@ -1,23 +1,21 @@
 import { Transaction, TransactionOptions, TxData } from 'ethereumjs-tx'
 import { privateToAddress } from 'ethereumjs-util'
-import { Ethereum, EthereumClassic } from '../../DomainCurrency'
-import { FromDecimal, Tbn } from '../../blockchain.utils'
-import { EthereumTransactionParams, IAccount } from '../../types/ts-wallet-core.dto'
+import { DecimalToHex, FromDecimal } from '../../blockchain.utils'
+import { EthereumDecimals, EthereumTransactionParams, ICurrency } from '../../types'
+import * as Currency from '../../DomainCurrency'
 
-export const EthereumDecimals = 18
-
-function decimalToHex(d: number | string): string {
-  let hex = Tbn(d).toString(16)
-  if (hex.length % 2 !== 0) {
-    hex = '0' + hex
-  }
-  return '0x' + hex
+export function Ethereum(privateKey: string): ICurrency {
+  return new EthereumBasedCurrency(privateKey, Currency.Ethereum.Instance())
 }
 
-export class EthereumAccount implements IAccount {
+export function EthereumClassic(privateKey: string): ICurrency {
+  return new EthereumBasedCurrency(privateKey, Currency.EthereumClassic.Instance())
+}
+
+export class EthereumBasedCurrency implements ICurrency {
   constructor(
     private readonly privateKey: string,
-    protected currency: Ethereum | EthereumClassic
+    protected currency: Currency.Ethereum | Currency.EthereumClassic
   ) {}
 
   getAddress(privateKey: string): string {
@@ -30,16 +28,16 @@ export class EthereumAccount implements IAccount {
     return '0x' + privateToAddress(new Buffer(privateKey, 'hex')).toString('hex')
   }
 
-  signTransaction$(params: EthereumTransactionParams): Promise<string> {
+  signTransaction(params: EthereumTransactionParams): Promise<string> {
     const value = FromDecimal(params.amount, EthereumDecimals).toNumber()
     const nonce = params.nonce
 
     const txParam: TxData = {
-      nonce: decimalToHex(nonce),
-      gasPrice: decimalToHex(params.gasPrice),
-      gasLimit: decimalToHex(params.gasLimit),
+      nonce: DecimalToHex(nonce),
+      gasPrice: DecimalToHex(params.gasPrice),
+      gasLimit: DecimalToHex(params.gasLimit),
       to: params.toAddress,
-      value: decimalToHex(value),
+      value: DecimalToHex(value),
       data: params.data || '0x'
     }
 

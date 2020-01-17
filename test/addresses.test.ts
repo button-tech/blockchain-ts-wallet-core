@@ -1,11 +1,8 @@
-import { Ethereum } from '../src/currencies/ethereum/ethereum'
-import { EthereumClassic } from '../src/currencies/ethereumClassic/ethereumClassic'
-import { Bitcoin } from '../src/currencies/bitcoin/bitcoin'
-import { BitcoinCash } from '../src/currencies/bitcoinCash/bitcoinCash'
-import { Litecoin } from '../src/currencies/litecoin/litecoin'
+import { toCashAddress } from 'bchaddrjs'
+import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased/ethereumBased'
+import { Bitcoin, BitcoinCash, Litecoin } from '../src/currencies/utxoBased/utxoBased'
 import { Stellar } from '../src/currencies/stellar/stellar'
 import { Waves } from '../src/currencies/waves/waves'
-import { toCashAddress } from 'bchaddrjs'
 
 describe('Addresses from private keys test', () => {
   it('Ethereum address test', () => {
