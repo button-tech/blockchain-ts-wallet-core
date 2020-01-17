@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { IDomainCurrency } from '../DomainCurrency';
 import {
   BalanceResponse, CustomFeeRequest, CustomFeeResponse, GasLimitRequest, GasLimitResponse,
   GasPriceResponse,
@@ -13,11 +12,33 @@ import {
 import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { delayedRetry } from './provider.utils';
+import { IDomainCurrency } from '../../../../../lib/ts-wallet-core/src/DomainCurrency';
+
+export interface INodeApiProvider {
+  sendTx$(currency: IDomainCurrency, data: string, guid?: string): Observable<string>;
+
+  getBalance$(currency: IDomainCurrency, address: string, guid?: string): Observable<string>;
+
+  getNonce$(currency: IDomainCurrency, address: string, guid?: string): Observable<number>;
+
+  getGasPrice$(currency: IDomainCurrency, guid?: string): Observable<number>;
+
+  getGasLimit$(currency: IDomainCurrency, contractAddress: string, data: string, guid?: string): Observable<number>;
+
+  getCustomFee$(currency: IDomainCurrency, fromAddress: string, amount: string, guid?: string): Observable<CustomFeeResponse>;
+
+  getUtxo$(currency: IDomainCurrency, address: string, guid?: string): Observable<Array<UTXO>>;
+
+  getTonAddressInfo$(address: string, guid?: string): Observable<TonAccountInfo>;
+
+  getTonAccountSeqno$(address: string, guid?: string): Observable<TonAccountSeqno>;
+
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class NodeApiProvider {
+export class NodeApiProvider implements INodeApiProvider {
 
   constructor(private http: HttpClient) {
   }

@@ -10,12 +10,17 @@ import { ITransferTransaction } from 'waves-transactions/transactions';
 import { Transaction } from 'stellar-sdk';
 
 // Ethereum
-import { TxConfig } from './modules/currencies/ethereumContract.utils';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { BigNumber } from 'bignumber.js';
+import {
+  ContractCall,
+  EthereumTransactionParams, StellarTransactionParams,
+  TxConfig,
+  UtxoTransactionParams,
+  WavesTransactionParams
+} from '../../../../lib/ts-wallet-core/src/typings/ts-wallet-core.dto';
 
 export interface QrCodeData {
   mnemonic: string;
@@ -53,28 +58,7 @@ export interface PrivateKeys {
   Stellar: string;
 }
 
-export interface SignTransactionParams {
-  toAddress: string;
-  amount: string;
-  nonce?: number;
-  gasLimit?: number;
-  gasPrice?: number;
-  data?: string;
-  memo?: string;
-}
-
-export interface ContractCall {
-  contractInstance: Contract;
-  methodName: string;
-  contractAddress: string;
-  addressFrom?: string;
-  privateKey?: string;
-  executionParameters?: Array<any>;
-  nonce?: number;
-  gasLimit?: number;
-  gasPrice?: number;
-  amount?: string;
-}
+export type SignTransactionParams = WavesTransactionParams | EthereumTransactionParams | UtxoTransactionParams | StellarTransactionParams;
 
 export interface IBlockchainService {
   getAddress(privateKey: string): string | Observable<string>;
@@ -96,8 +80,6 @@ export interface IContractService extends IBlockchainService {
   setValue$?(params: ContractCall, guid: string, isSync?: boolean): Observable<string>;
 
   estimateGasRawData$?(params: TxConfig): Observable<number>;
-
-  decimalToHex?(d: number | string): string;
 }
 
 export function TryParse<T>(text: string): [boolean, T] {
@@ -120,17 +102,6 @@ export function IsJson(text: string): boolean {
 export function GetGuid(route: ActivatedRoute, param: string) {
   return route.snapshot.queryParamMap.get(param);
 }
-
-export const Tbn = (x: string | number): BigNumber => new BigNumber(x);
-
-export function FromDecimal(x: string | number | BigNumber, n: number): BigNumber {
-  return BigNumber.isBigNumber(x) ? x.times(10 ** n).integerValue() : Tbn(x).times(10 ** n).integerValue();
-}
-
-export function ToDecimal(x: string | number | BigNumber, n: number): BigNumber {
-  return BigNumber.isBigNumber(x) ? x.div(10 ** n) : Tbn(x).div(10 ** n);
-}
-
 
 @NgModule({
   declarations: [

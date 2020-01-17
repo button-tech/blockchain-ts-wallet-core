@@ -31,10 +31,10 @@ const routes: Routes = [
     path: 'send/etc',
     loadChildren: () => import('./shared/modules/currencies/ethereumClassic/ethereumClassic.module').then(m => m.EthereumClassicModule)
   },
-  {
-    path: 'send/ton',
-    loadChildren: () => import('./shared/modules/currencies/ton/ton.module').then(m => m.TonModule)
-  }
+  // {
+  //   path: 'send/ton',
+  //   loadChildren: () => import('./shared/modules/currencies/ton/ton.module').then(m => m.TonModule)
+  // }
 
   // {path: 'eth/send', loadChildren: () => import('./xlm/xlm.module').then(m => m.XlmModule)}
   // {path: 'eth/token', loadChildren: () => import('./xlm/xlm.module').then(m => m.XlmModule)}
