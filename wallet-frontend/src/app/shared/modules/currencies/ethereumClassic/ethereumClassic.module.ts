@@ -4,15 +4,15 @@ import { EthereumClassicRoutingModule } from './ethereumClassic-routing.module';
 import { SendModule } from '../../../../send/send.module';
 import { INodeApiProvider } from '../../../providers/node-api.provider';
 import { CurrencyFactoryOptions, SharedModule } from '../../../shared.module';
-import { Ethereum } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
+import { EthereumClassic } from '../../../../../../../lib/ts-wallet-core/src/DomainCurrency';
 import { getPrivateKey } from '../currencies.utils';
 import { EthereumBasedService } from '../services/ethereumBased.service';
 import TsWalletCore from '../../../../../../../lib/ts-wallet-core/src/ts-wallet-core';
 
 export function init(utils: INodeApiProvider, opt: CurrencyFactoryOptions) {
-  const currency = Ethereum.Instance();
+  const currency = EthereumClassic.Instance();
   const privateKey = getPrivateKey(currency, opt);
-  const blockchain = TsWalletCore.Ethereum(privateKey);
+  const blockchain = TsWalletCore.EthereumClassic(privateKey);
   return new EthereumBasedService(privateKey, currency, blockchain, utils);
 }
 
