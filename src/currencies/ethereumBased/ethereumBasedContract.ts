@@ -8,7 +8,7 @@ import { EthereumBasedCurrency } from './ethereumBased'
 import * as Currency from '../../DomainCurrency'
 
 export function EthereumTokens(privateKey: string): IContract & ICurrency {
-  return new EthereumContract(privateKey, Currency.Ethereum.Instance())
+  return new EthereumContract(privateKey, Currency.DomainEthereum.Instance())
 }
 
 export class EthereumContract extends EthereumBasedCurrency implements IContract {
@@ -16,7 +16,7 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
 
   constructor(
     privateKey: string,
-    currency: Currency.Ethereum | Currency.EthereumClassic,
+    currency: Currency.DomainEthereum | Currency.DomainEthereumClassic,
     private rpcEndpoint?: string
   ) {
     super(privateKey, currency)

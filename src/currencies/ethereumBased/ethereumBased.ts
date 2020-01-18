@@ -5,17 +5,17 @@ import { EthereumDecimals, EthereumTransactionParams, ICurrency } from '../../ty
 import * as Currency from '../../DomainCurrency'
 
 export function Ethereum(privateKey: string): ICurrency {
-  return new EthereumBasedCurrency(privateKey, Currency.Ethereum.Instance())
+  return new EthereumBasedCurrency(privateKey, Currency.DomainEthereum.Instance())
 }
 
 export function EthereumClassic(privateKey: string): ICurrency {
-  return new EthereumBasedCurrency(privateKey, Currency.EthereumClassic.Instance())
+  return new EthereumBasedCurrency(privateKey, Currency.DomainEthereumClassic.Instance())
 }
 
 export class EthereumBasedCurrency implements ICurrency {
   constructor(
     private readonly privateKey: string,
-    protected currency: Currency.Ethereum | Currency.EthereumClassic
+    protected currency: Currency.DomainEthereum | Currency.DomainEthereumClassic
   ) {}
 
   getAddress(privateKey: string): string {

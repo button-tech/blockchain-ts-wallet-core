@@ -15,21 +15,21 @@ import * as Currency from '../../DomainCurrency'
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from './networks'
 
 export function Litecoin(privateKey: string): ICurrency {
-  return new UtxoBased(privateKey, Currency.Litecoin.Instance())
+  return new UtxoBased(privateKey, Currency.DomainLitecoin.Instance())
 }
 
 export function BitcoinCash(privateKey: string): ICurrency {
-  return new UtxoBased(privateKey, Currency.BitcoinCash.Instance())
+  return new UtxoBased(privateKey, Currency.DomainBitcoinCash.Instance())
 }
 
 export function Bitcoin(privateKey: string): ICurrency {
-  return new UtxoBased(privateKey, Currency.Bitcoin.Instance())
+  return new UtxoBased(privateKey, Currency.DomainBitcoin.Instance())
 }
 
 export class UtxoBased implements ICurrency {
   constructor(
     private readonly privateKey: string,
-    private currency: Currency.Bitcoin | Currency.BitcoinCash | Currency.Litecoin
+    private currency: Currency.DomainBitcoin | Currency.DomainBitcoinCash | Currency.DomainLitecoin
   ) {}
 
   getAddress(privateKey: string): string {

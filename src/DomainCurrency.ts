@@ -15,9 +15,9 @@ export type fullName =
   | 'stellar'
   | 'ton'
 
-export class Ethereum implements IDomainCurrency {
-  static Instance(): Ethereum {
-    return new Ethereum()
+export class DomainEthereum implements IDomainCurrency {
+  static Instance(): DomainEthereum {
+    return new DomainEthereum()
   }
 
   get full(): fullName {
@@ -29,9 +29,9 @@ export class Ethereum implements IDomainCurrency {
   }
 }
 
-export class EthereumClassic implements IDomainCurrency {
-  static Instance(): EthereumClassic {
-    return new EthereumClassic()
+export class DomainEthereumClassic implements IDomainCurrency {
+  static Instance(): DomainEthereumClassic {
+    return new DomainEthereumClassic()
   }
 
   get full(): fullName {
@@ -43,9 +43,9 @@ export class EthereumClassic implements IDomainCurrency {
   }
 }
 
-export class Bitcoin implements IDomainCurrency {
-  static Instance(): Bitcoin {
-    return new Bitcoin()
+export class DomainBitcoin implements IDomainCurrency {
+  static Instance(): DomainBitcoin {
+    return new DomainBitcoin()
   }
 
   get full(): fullName {
@@ -57,9 +57,9 @@ export class Bitcoin implements IDomainCurrency {
   }
 }
 
-export class BitcoinCash implements IDomainCurrency {
-  static Instance(): BitcoinCash {
-    return new BitcoinCash()
+export class DomainBitcoinCash implements IDomainCurrency {
+  static Instance(): DomainBitcoinCash {
+    return new DomainBitcoinCash()
   }
 
   get full(): fullName {
@@ -71,9 +71,9 @@ export class BitcoinCash implements IDomainCurrency {
   }
 }
 
-export class Litecoin implements IDomainCurrency {
-  static Instance(): Litecoin {
-    return new Litecoin()
+export class DomainLitecoin implements IDomainCurrency {
+  static Instance(): DomainLitecoin {
+    return new DomainLitecoin()
   }
 
   get full(): fullName {
@@ -85,9 +85,9 @@ export class Litecoin implements IDomainCurrency {
   }
 }
 
-export class Waves implements IDomainCurrency {
-  static Instance(): Waves {
-    return new Waves()
+export class DomainWaves implements IDomainCurrency {
+  static Instance(): DomainWaves {
+    return new DomainWaves()
   }
 
   get full(): fullName {
@@ -99,9 +99,9 @@ export class Waves implements IDomainCurrency {
   }
 }
 
-export class Stellar implements IDomainCurrency {
-  static Instance(): Stellar {
-    return new Stellar()
+export class DomainStellar implements IDomainCurrency {
+  static Instance(): DomainStellar {
+    return new DomainStellar()
   }
 
   get full(): fullName {
@@ -113,9 +113,9 @@ export class Stellar implements IDomainCurrency {
   }
 }
 
-export class TON implements IDomainCurrency {
-  static Instance(): TON {
-    return new TON()
+export class DomainTON implements IDomainCurrency {
+  static Instance(): DomainTON {
+    return new DomainTON()
   }
 
   get full(): fullName {
