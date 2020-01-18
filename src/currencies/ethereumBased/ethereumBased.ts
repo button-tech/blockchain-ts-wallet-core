@@ -13,19 +13,23 @@ export function EthereumClassic(privateKey: string): ICurrency {
 }
 
 export class EthereumBasedCurrency implements ICurrency {
+  private readonly address: string
+
   constructor(
     private readonly privateKey: string,
     protected currency: Currency.DomainEthereum | Currency.DomainEthereumClassic
-  ) {}
-
-  getAddress(privateKey: string): string {
+  ) {
     if (privateKey.indexOf('0x') === 0) {
-      privateKey = privateKey.substring(2)
+      this.privateKey = privateKey.substring(2)
     }
     if (privateKey.length !== 64) {
       throw new Error('Ethereum private key is invalid')
     }
-    return '0x' + privateToAddress(new Buffer(privateKey, 'hex')).toString('hex')
+    this.address = '0x' + privateToAddress(new Buffer(privateKey, 'hex')).toString('hex')
+  }
+
+  getAddress(privateKey: string): string {
+    return this.address
   }
 
   signTransaction(params: EthereumTransactionParams): Promise<string> {

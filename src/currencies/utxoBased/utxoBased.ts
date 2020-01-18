@@ -27,21 +27,25 @@ export function Bitcoin(privateKey: string): ICurrency {
 }
 
 export class UtxoBased implements ICurrency {
+  private readonly address: string
+
   constructor(
     private readonly privateKey: string,
     private currency: Currency.DomainBitcoin | Currency.DomainBitcoinCash | Currency.DomainLitecoin
-  ) {}
-
-  getAddress(privateKey: string): string {
-    const keypair: Signer = this.getKeyPair(privateKey)
+  ) {
+    const keyPair: Signer = this.getKeyPair(privateKey)
     const payment: Payment = payments.p2pkh({
-      pubkey: keypair.publicKey,
+      pubkey: keyPair.publicKey,
       network: this.getNetwork()
     })
     if (!payment.address) {
       throw new Error('address not exists in ' + this.currency.full)
     }
-    return payment.address
+    this.address = payment.address
+  }
+
+  getAddress(privateKey: string): string {
+    return this.address
   }
 
   signTransaction(params: UtxoTransactionParams): Promise<string> {

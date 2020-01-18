@@ -19,15 +19,17 @@ export function Stellar(privateKey: string): ICurrency {
 const fee = 1000
 
 export class StellarCurrency implements ICurrency {
-  private network: any
+  private readonly network: Server
+  private readonly address: string
 
   constructor(private readonly privateKey: string) {
+    const keyPair = this.getKeyPairFromSeed(privateKey)
+    this.address = StrKey.encodeEd25519PublicKey(keyPair.rawPublicKey())
     this.network = new Server('https://horizon.stellar.org')
   }
 
   getAddress(privateKey: string): string {
-    const keyPair = this.getKeyPairFromSeed(privateKey)
-    return StrKey.encodeEd25519PublicKey(keyPair.rawPublicKey())
+    return this.address
   }
 
   signTransaction(params: StellarTransactionParams): Promise<string> {

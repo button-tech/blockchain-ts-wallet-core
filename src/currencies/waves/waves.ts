@@ -9,10 +9,14 @@ export function Waves(privateKey: string): ICurrency {
 }
 
 export class WavesCurrency implements ICurrency {
-  constructor(private readonly privateKey: string) {}
+  private readonly address: string
+
+  constructor(private readonly privateKey: string) {
+    this.address = address(privateKey)
+  }
 
   getAddress(privateKey: string): string {
-    return address(privateKey)
+    return this.address
   }
 
   signTransaction(params: WavesTransactionParams): Promise<string> {
