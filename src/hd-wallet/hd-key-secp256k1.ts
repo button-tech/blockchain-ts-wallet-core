@@ -3,28 +3,56 @@ import * as bip32 from 'bip32'
 import { hdPath, KeyPair } from './hd-wallet.utils'
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig, Network } from '../networks'
 
-export function getBitcoinKeyPair(mnemonic: string, index: number = 0): KeyPair {
-  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.bitcoin, index, BitcoinConfig)
+export function getBitcoinKeyPair(mnemonic: string, index: number = 0, password?: string): KeyPair {
+  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.bitcoin, index, BitcoinConfig, password)
   return getKeyPair(keys)
 }
 
-export function getBitcoinCashKeyPair(mnemonic: string, index: number = 0): KeyPair {
-  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.bitcoincash, index, BitcoinCashConfig)
+export function getBitcoinCashKeyPair(
+  mnemonic: string,
+  index: number = 0,
+  password?: string
+): KeyPair {
+  const keys = generateSecp256k1KeyPair(
+    mnemonic,
+    hdPath.bitcoincash,
+    index,
+    BitcoinCashConfig,
+    password
+  )
   return getKeyPair(keys)
 }
 
-export function getLitecoinKeyPair(mnemonic: string, index: number = 0): KeyPair {
-  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.litecoin, index, LitecoinConfig)
+export function getLitecoinKeyPair(
+  mnemonic: string,
+  index: number = 0,
+  password?: string
+): KeyPair {
+  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.litecoin, index, LitecoinConfig, password)
   return getKeyPair(keys)
 }
 
-export function getEthereumKeyPair(mnemonic: string, index: number = 0): KeyPair {
-  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.ethereum, index)
+export function getEthereumKeyPair(
+  mnemonic: string,
+  index: number = 0,
+  password?: string
+): KeyPair {
+  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.ethereum, index, BitcoinConfig, password)
   return getKeyPair(keys)
 }
 
-export function getEthereumClassicKeyPair(mnemonic: string, index: number = 0): KeyPair {
-  const keys = generateSecp256k1KeyPair(mnemonic, hdPath.ethereumClassic, index)
+export function getEthereumClassicKeyPair(
+  mnemonic: string,
+  index: number = 0,
+  password?: string
+): KeyPair {
+  const keys = generateSecp256k1KeyPair(
+    mnemonic,
+    hdPath.ethereumClassic,
+    index,
+    BitcoinConfig,
+    password
+  )
   return getKeyPair(keys)
 }
 
@@ -42,9 +70,10 @@ function generateSecp256k1KeyPair(
   mnemonic: string,
   path: string,
   index: number = 0,
-  network?: Network
+  network?: Network,
+  password?: string
 ): bip32.BIP32Interface {
-  const seed = mnemonicToSeedSync(mnemonic, '')
+  const seed = mnemonicToSeedSync(mnemonic, password)
   const bip32RootKey = bip32.fromSeed(seed, network)
   const bip32ExtendedKey = calcBip32ExtendedKey(bip32RootKey, path)
   return bip32ExtendedKey.derive(index)

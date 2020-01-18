@@ -19,8 +19,8 @@ interface BufferKeyPair {
   publicKey: Buffer
 }
 
-export function getStellarKeyPair(mnemonic: string, index: number = 0): KeyPair {
-  const keyPair = generateEd25519KeyPair(mnemonic, hdPath.stellar, index)
+export function getStellarKeyPair(mnemonic: string, index: number = 0, password?: string): KeyPair {
+  const keyPair = generateEd25519KeyPair(mnemonic, hdPath.stellar, index, password)
   const secret = StrKey.encodeEd25519SecretSeed(keyPair.privateKey)
   const stellarKeyPair = Keypair.fromSecret(secret)
   return {
@@ -29,8 +29,8 @@ export function getStellarKeyPair(mnemonic: string, index: number = 0): KeyPair 
   }
 }
 
-export function getWavesKeyPair(mnemonic: string, index: number = 0): KeyPair {
-  const keyPair = generateEd25519KeyPair(mnemonic, hdPath.stellar, index)
+export function getWavesKeyPair(mnemonic: string, index: number = 0, password?: string): KeyPair {
+  const keyPair = generateEd25519KeyPair(mnemonic, hdPath.stellar, index, password)
   // const privateKey = basex('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz').encode(
   //   new Buffer(keyPair.privateKey, 'hex')
   // );
@@ -40,8 +40,13 @@ export function getWavesKeyPair(mnemonic: string, index: number = 0): KeyPair {
   }
 }
 
-function generateEd25519KeyPair(mnemonic: string, path: string, index: number = 0): BufferKeyPair {
-  const seed = mnemonicToSeedSync(mnemonic, '')
+function generateEd25519KeyPair(
+  mnemonic: string,
+  path: string,
+  index: number = 0,
+  password?: string
+): BufferKeyPair {
+  const seed = mnemonicToSeedSync(mnemonic, password)
   const keys = derivePath(path + index + "'", seed.toString('hex'))
   return {
     privateKey: keys.key,

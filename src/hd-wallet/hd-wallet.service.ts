@@ -46,7 +46,7 @@ export interface Keys {
 export class HdWallet {
   private readonly words: string
 
-  constructor(mnemonic: string, private password: string) {
+  constructor(mnemonic: string, private password: string = '') {
     this.words = mnemonic
   }
 
@@ -99,10 +99,10 @@ export class HdWallet {
     return keyPairsObject
   }
 
-  generateKeyPair(currency: IDomainCurrency, index: number): Keys {
+  generateKeyPair(currency: IDomainCurrency, index: number, password?: string): Keys {
     switch (currency.short) {
       case 'eth':
-        const ethKeys = getEthereumKeyPair(this.words, index)
+        const ethKeys = getEthereumKeyPair(this.words, index, password)
         return {
           privateKey: ethKeys.privateKey,
           publicKey: ethKeys.publicKey,
@@ -110,7 +110,7 @@ export class HdWallet {
         }
 
       case 'etc':
-        const etcKeys = getEthereumClassicKeyPair(this.words, index)
+        const etcKeys = getEthereumClassicKeyPair(this.words, index, password)
         return {
           privateKey: etcKeys.privateKey,
           publicKey: etcKeys.publicKey,
@@ -118,22 +118,22 @@ export class HdWallet {
         }
 
       case 'btc':
-        const btcKeys = getBitcoinKeyPair(this.words, index)
+        const btcKeys = getBitcoinKeyPair(this.words, index, password)
         const btcAddress = this.getUtxoAddress(currency, btcKeys.publicKey)
         return { address: btcAddress, publicKey: btcKeys.publicKey, privateKey: btcKeys.privateKey }
 
       case 'bch':
-        const bchKeys = getBitcoinKeyPair(this.words, index)
+        const bchKeys = getBitcoinKeyPair(this.words, index, password)
         const bchAddress = this.getUtxoAddress(currency, bchKeys.publicKey)
         return { address: bchAddress, publicKey: bchKeys.publicKey, privateKey: bchKeys.privateKey }
 
       case 'ltc':
-        const ltcKeys = getBitcoinKeyPair(this.words, index)
+        const ltcKeys = getBitcoinKeyPair(this.words, index, password)
         const ltcAddress = this.getUtxoAddress(currency, ltcKeys.publicKey)
         return { address: ltcAddress, publicKey: ltcKeys.publicKey, privateKey: ltcKeys.privateKey }
 
       case 'waves':
-        const wavesKeys = getWavesKeyPair(this.words, index)
+        const wavesKeys = getWavesKeyPair(this.words, index, password)
         return {
           privateKey: wavesKeys.privateKey,
           publicKey: wavesKeys.publicKey,
@@ -141,7 +141,7 @@ export class HdWallet {
         }
 
       case 'xlm':
-        const stellarKeyPair = getStellarKeyPair(hdPath.stellar, index)
+        const stellarKeyPair = getStellarKeyPair(hdPath.stellar, index, password)
         return {
           address: stellarKeyPair.publicKey,
           publicKey: stellarKeyPair.publicKey,
