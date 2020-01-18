@@ -1,10 +1,10 @@
-import { Network, payments } from 'bitcoinjs-lib-cash'
-import { privateToAddress, addHexPrefix, toChecksumAddress } from 'ethereumjs-util'
-import { address } from '@waves/ts-lib-crypto'
-import { entropyToMnemonic, validateMnemonic } from 'bip39'
-import { EnDict } from './wordlist.en'
+import { Network, payments } from 'bitcoinjs-lib-cash';
+import { privateToAddress, addHexPrefix, toChecksumAddress } from 'ethereumjs-util';
+import { address } from '@waves/ts-lib-crypto';
+import { entropyToMnemonic, validateMnemonic } from 'bip39';
+import { EnDict } from './wordlist.en';
 
-import { hasStrongRandom, hdPath, uint8ArrayToHex } from './hd-wallet.utils'
+import { hasStrongRandom, hdPath, uint8ArrayToHex } from './hd-wallet.utils';
 import {
   DomainBitcoin,
   DomainBitcoinCash,
@@ -15,53 +15,53 @@ import {
   DomainStellar,
   DomainTON,
   DomainWaves
-} from '../DomainCurrency'
+} from '../DomainCurrency';
 import {
   getBitcoinKeyPair,
   getEthereumClassicKeyPair,
   getEthereumKeyPair
-} from './hd-key-secp256k1'
-import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../networks'
-import { getStellarKeyPair, getWavesKeyPair } from './hd-key-ed25519'
+} from './hd-key-secp256k1';
+import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../networks';
+import { getStellarKeyPair, getWavesKeyPair } from './hd-key-ed25519';
 
-type NumWords = 12 | 15 | 18 | 21 | 24
+type NumWords = 12 | 15 | 18 | 21 | 24;
 
 export interface Currencies {
-  eth: Keys
-  etc: Keys
-  btc: Keys
-  ltc: Keys
-  bch: Keys
-  waves: Keys
-  xlm: Keys
-  ton: Keys
+  eth: Keys;
+  etc: Keys;
+  btc: Keys;
+  ltc: Keys;
+  bch: Keys;
+  waves: Keys;
+  xlm: Keys;
+  ton: Keys;
 }
 
 export interface Keys {
-  privateKey: string
-  publicKey: string
-  address: string
+  privateKey: string;
+  publicKey: string;
+  address: string;
 }
 
 export class HdWallet {
-  private readonly words: string
+  private readonly words: string;
 
   constructor(mnemonic: string, private password: string = '') {
-    this.words = mnemonic
+    this.words = mnemonic;
   }
 
   static isValidMnemonic(mnemonic: string): boolean {
-    return validateMnemonic(mnemonic, EnDict)
+    return validateMnemonic(mnemonic, EnDict);
   }
 
   static generateMnemonic(numWords: NumWords = 12): string {
     if (!hasStrongRandom()) {
-      alert('This browser does not support strong randomness')
-      return ''
+      alert('This browser does not support strong randomness');
+      return '';
     }
 
     // get the amount of entropy (bits) to use
-    const strength = (numWords / 3) * 32
+    const strength = (numWords / 3) * 32;
 
     // words | strength
     // 12   -> 128 bit / 16 bytes
@@ -69,84 +69,100 @@ export class HdWallet {
     // 18   -> 192 bit / 24 bytes
     // 21   -> 224 bit / 28 bytes
     // 24   -> 256 bit / 32 bytes
-    const b = new Uint8Array(strength / 8)
-    const entropy = crypto.getRandomValues(b)
+    const b = new Uint8Array(strength / 8);
+    const entropy = crypto.getRandomValues(b);
 
-    return entropyToMnemonic(uint8ArrayToHex(entropy), EnDict)
+    return entropyToMnemonic(uint8ArrayToHex(entropy), EnDict);
   }
 
   generateAllKeyPairs(index: number): Currencies {
-    const keyPairsObject = Object.create(null)
+    const keyPairsObject = Object.create(null);
 
-    const ethereum = DomainEthereum.Instance()
-    const ethereumClassic = DomainEthereumClassic.Instance()
-    const bitcoin = DomainBitcoin.Instance()
-    const bitcoinCash = DomainBitcoinCash.Instance()
-    const litecoin = DomainLitecoin.Instance()
-    const waves = DomainWaves.Instance()
-    const stellar = DomainStellar.Instance()
-    const ton = DomainTON.Instance()
+    const ethereum = DomainEthereum.Instance();
+    const ethereumClassic = DomainEthereumClassic.Instance();
+    const bitcoin = DomainBitcoin.Instance();
+    const bitcoinCash = DomainBitcoinCash.Instance();
+    const litecoin = DomainLitecoin.Instance();
+    const waves = DomainWaves.Instance();
+    const stellar = DomainStellar.Instance();
+    // const ton = DomainTON.Instance()
 
-    keyPairsObject[ethereum.short] = this.generateKeyPair(ethereum, index)
-    keyPairsObject[ethereumClassic.short] = this.generateKeyPair(ethereumClassic, index)
-    keyPairsObject[bitcoinCash.short] = this.generateKeyPair(bitcoinCash, index)
-    keyPairsObject[bitcoin.short] = this.generateKeyPair(bitcoin, index)
-    keyPairsObject[litecoin.short] = this.generateKeyPair(litecoin, index)
-    keyPairsObject[waves.short] = this.generateKeyPair(waves, index)
-    keyPairsObject[stellar.short] = this.generateKeyPair(stellar, index)
-    keyPairsObject[ton.short] = this.generateKeyPair(ton, index)
+    keyPairsObject[ethereum.short] = this.generateKeyPair(ethereum, index, this.password);
+    keyPairsObject[ethereumClassic.short] = this.generateKeyPair(
+      ethereumClassic,
+      index,
+      this.password
+    );
+    keyPairsObject[bitcoinCash.short] = this.generateKeyPair(bitcoinCash, index, this.password);
+    keyPairsObject[bitcoin.short] = this.generateKeyPair(bitcoin, index, this.password);
+    keyPairsObject[litecoin.short] = this.generateKeyPair(litecoin, index, this.password);
+    keyPairsObject[waves.short] = this.generateKeyPair(waves, index, this.password);
+    keyPairsObject[stellar.short] = this.generateKeyPair(stellar, index, this.password);
+    // keyPairsObject[ton.short] = this.generateKeyPair(ton, index, this.password)
 
-    return keyPairsObject
+    return keyPairsObject;
   }
 
   generateKeyPair(currency: IDomainCurrency, index: number, password?: string): Keys {
     switch (currency.short) {
       case 'eth':
-        const ethKeys = getEthereumKeyPair(this.words, index, password)
+        const ethKeys = getEthereumKeyPair(this.words, index, password);
         return {
           privateKey: ethKeys.privateKey,
           publicKey: ethKeys.publicKey,
           address: this.getEthereumAddress(ethKeys.privateKey)
-        }
+        };
 
       case 'etc':
-        const etcKeys = getEthereumClassicKeyPair(this.words, index, password)
+        const etcKeys = getEthereumClassicKeyPair(this.words, index, password);
         return {
           privateKey: etcKeys.privateKey,
           publicKey: etcKeys.publicKey,
           address: this.getEthereumAddress(etcKeys.privateKey)
-        }
+        };
 
       case 'btc':
-        const btcKeys = getBitcoinKeyPair(this.words, index, password)
-        const btcAddress = this.getUtxoAddress(currency, btcKeys.publicKey)
-        return { address: btcAddress, publicKey: btcKeys.publicKey, privateKey: btcKeys.privateKey }
+        const btcKeys = getBitcoinKeyPair(this.words, index, password);
+        const btcAddress = this.getUtxoAddress(currency, btcKeys.publicKey);
+        return {
+          address: btcAddress,
+          publicKey: btcKeys.publicKey,
+          privateKey: btcKeys.privateKey
+        };
 
       case 'bch':
-        const bchKeys = getBitcoinKeyPair(this.words, index, password)
-        const bchAddress = this.getUtxoAddress(currency, bchKeys.publicKey)
-        return { address: bchAddress, publicKey: bchKeys.publicKey, privateKey: bchKeys.privateKey }
+        const bchKeys = getBitcoinKeyPair(this.words, index, password);
+        const bchAddress = this.getUtxoAddress(currency, bchKeys.publicKey);
+        return {
+          address: bchAddress,
+          publicKey: bchKeys.publicKey,
+          privateKey: bchKeys.privateKey
+        };
 
       case 'ltc':
-        const ltcKeys = getBitcoinKeyPair(this.words, index, password)
-        const ltcAddress = this.getUtxoAddress(currency, ltcKeys.publicKey)
-        return { address: ltcAddress, publicKey: ltcKeys.publicKey, privateKey: ltcKeys.privateKey }
+        const ltcKeys = getBitcoinKeyPair(this.words, index, password);
+        const ltcAddress = this.getUtxoAddress(currency, ltcKeys.publicKey);
+        return {
+          address: ltcAddress,
+          publicKey: ltcKeys.publicKey,
+          privateKey: ltcKeys.privateKey
+        };
 
       case 'waves':
-        const wavesKeys = getWavesKeyPair(this.words, index, password)
+        const wavesKeys = getWavesKeyPair(this.words, index, password);
         return {
           privateKey: wavesKeys.privateKey,
           publicKey: wavesKeys.publicKey,
           address: address(new Buffer(wavesKeys.privateKey, 'hex'))
-        }
+        };
 
       case 'xlm':
-        const stellarKeyPair = getStellarKeyPair(hdPath.stellar, index, password)
+        const stellarKeyPair = getStellarKeyPair(hdPath.stellar, index, password);
         return {
           address: stellarKeyPair.publicKey,
           publicKey: stellarKeyPair.publicKey,
           privateKey: stellarKeyPair.privateKey
-        }
+        };
 
       // case 'ton':
       //   const tonKeyPair = this.generateEd25519KeyPair(hdPath.ton, index);
@@ -158,42 +174,42 @@ export class HdWallet {
       //   };
 
       default:
-        throw new Error('this currency not supported')
+        throw new Error('this currency not supported');
     }
   }
 
   private getEthereumAddress(privateKey: string): string {
-    const addressBuffer = privateToAddress(new Buffer(privateKey, 'hex'))
-    const hexAddress = addressBuffer.toString('hex')
-    return addHexPrefix(toChecksumAddress(hexAddress))
+    const addressBuffer = privateToAddress(new Buffer(privateKey, 'hex'));
+    const hexAddress = addressBuffer.toString('hex');
+    return addHexPrefix(toChecksumAddress(hexAddress));
   }
 
   private getUtxoAddress(currency: IDomainCurrency, publicKey: string): string {
     const btcOpt = {
       pubkey: new Buffer(publicKey, 'hex'),
       network: this.getNetwork(currency)
-    }
-    const p = payments.p2pkh(btcOpt)
+    };
+    const p = payments.p2pkh(btcOpt);
     if (p === undefined) {
-      throw new Error('payment is undefined')
+      throw new Error('payment is undefined');
     }
     // @ts-ignore
-    return p.address
+    return p.address;
   }
 
   private getNetwork(currency: IDomainCurrency): Network {
     switch (currency.short) {
       case 'btc':
-        return BitcoinConfig as Network
+        return BitcoinConfig as Network;
 
       case 'bch':
-        return BitcoinCashConfig as Network
+        return BitcoinCashConfig as Network;
 
       case 'ltc':
-        return LitecoinConfig as Network
+        return LitecoinConfig as Network;
 
       default:
-        throw new Error('config not exists in ' + currency)
+        throw new Error('config not exists in ' + currency);
     }
   }
 }
