@@ -12,7 +12,11 @@ import { ICurrency, UTXO, UtxoDecimals, UtxoTransactionParams } from '../../type
 import { FromDecimal, Tbn } from '../../blockchain.utils'
 import BigNumber from 'bignumber.js'
 import * as Currency from '../../DomainCurrency'
-import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from './networks'
+import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../../networks'
+
+export function Bitcoin(privateKey: string): ICurrency {
+  return new UtxoBased(privateKey, Currency.DomainBitcoin.Instance())
+}
 
 export function Litecoin(privateKey: string): ICurrency {
   return new UtxoBased(privateKey, Currency.DomainLitecoin.Instance())
@@ -20,10 +24,6 @@ export function Litecoin(privateKey: string): ICurrency {
 
 export function BitcoinCash(privateKey: string): ICurrency {
   return new UtxoBased(privateKey, Currency.DomainBitcoinCash.Instance())
-}
-
-export function Bitcoin(privateKey: string): ICurrency {
-  return new UtxoBased(privateKey, Currency.DomainBitcoin.Instance())
 }
 
 export class UtxoBased implements ICurrency {
@@ -91,15 +91,12 @@ export class UtxoBased implements ICurrency {
   }
 
   private getTransactionBuilder(): TransactionBuilder {
+    const network = this.getNetwork()
     switch (this.currency.short) {
-      case 'btc':
-        return new TransactionBuilder(BitcoinConfig)
       case 'bch':
-        return new TransactionBuilder(BitcoinCashConfig, true)
-      case 'ltc':
-        return new TransactionBuilder(LitecoinConfig)
+        return new TransactionBuilder(network, true)
       default:
-        throw new Error('transaction builder not exists in ' + this.currency.full)
+        return new TransactionBuilder(network)
     }
   }
 
@@ -119,13 +116,13 @@ export class UtxoBased implements ICurrency {
   private getNetwork(): Network {
     switch (this.currency.short) {
       case 'btc':
-        return BitcoinConfig
+        return BitcoinConfig as Network
 
       case 'bch':
-        return BitcoinCashConfig
+        return BitcoinCashConfig as Network
 
       case 'ltc':
-        return LitecoinConfig
+        return LitecoinConfig as Network
 
       default:
         throw new Error('config not exists in ' + this.currency.full)

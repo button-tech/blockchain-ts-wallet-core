@@ -1,21 +1,10 @@
-import { BIP32Interface, Network, Payment, payments } from 'bitcoinjs-lib-cash'
-import { toCashAddress } from 'bchaddrjs'
+import { Network, payments } from 'bitcoinjs-lib-cash'
 import { privateToAddress, addHexPrefix, toChecksumAddress } from 'ethereumjs-util'
-import { StrKey, Keypair } from 'stellar-sdk'
-import { address, publicKey } from '@waves/ts-lib-crypto'
-import { derivePath } from './hd-key-ed25519'
-import * as bip32 from 'bip32'
-import { entropyToMnemonic, mnemonicToSeedSync, validateMnemonic } from 'bip39'
-import * as basex from 'base-x'
+import { address } from '@waves/ts-lib-crypto'
+import { entropyToMnemonic, validateMnemonic } from 'bip39'
 import { EnDict } from './wordlist.en'
 
-import {
-  calcBip32ExtendedKey,
-  hasStrongRandom,
-  hdPath,
-  networks,
-  uint8ArrayToHex
-} from './hd-wallet.utils'
+import { hasStrongRandom, hdPath, uint8ArrayToHex } from './hd-wallet.utils'
 import {
   DomainBitcoin,
   DomainBitcoinCash,
@@ -27,6 +16,13 @@ import {
   DomainTON,
   DomainWaves
 } from '../DomainCurrency'
+import {
+  getBitcoinKeyPair,
+  getEthereumClassicKeyPair,
+  getEthereumKeyPair
+} from './hd-key-secp256k1'
+import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../networks'
+import { getStellarKeyPair, getWavesKeyPair } from './hd-key-ed25519'
 
 type NumWords = 12 | 15 | 18 | 21 | 24
 
@@ -43,6 +39,7 @@ export interface Currencies {
 
 export interface Keys {
   privateKey: string
+  publicKey: string
   address: string
 }
 
@@ -105,113 +102,98 @@ export class HdWallet {
   generateKeyPair(currency: IDomainCurrency, index: number): Keys {
     switch (currency.short) {
       case 'eth':
-        const eth = this.generateSecp256k1KeyPair(hdPath.ethereum, index)
-        return this.ethFromKeyPair(eth)
+        const ethKeys = getEthereumKeyPair(this.words, index)
+        return {
+          privateKey: ethKeys.privateKey,
+          publicKey: ethKeys.publicKey,
+          address: this.getEthereumAddress(ethKeys.privateKey)
+        }
 
       case 'etc':
-        const etc = this.generateSecp256k1KeyPair(hdPath.ethereumClassic, index)
-        return this.ethFromKeyPair(etc)
+        const etcKeys = getEthereumClassicKeyPair(this.words, index)
+        return {
+          privateKey: etcKeys.privateKey,
+          publicKey: etcKeys.publicKey,
+          address: this.getEthereumAddress(etcKeys.privateKey)
+        }
 
       case 'btc':
-        const btc = this.generateSecp256k1KeyPair(hdPath.bitcoin, index, networks.bitcoin)
-        return {
-          // @ts-ignore
-          address: payments.p2pkh({ pubkey: btc.publicKey, network: networks.bitcoin }).address,
-          // @ts-ignore
-          privateKey: btc.privateKey.toString('hex')
-        }
+        const btcKeys = getBitcoinKeyPair(this.words, index)
+        const btcAddress = this.getUtxoAddress(currency, btcKeys.publicKey)
+        return { address: btcAddress, publicKey: btcKeys.publicKey, privateKey: btcKeys.privateKey }
 
       case 'bch':
-        const bch = this.generateSecp256k1KeyPair(hdPath.bitcoincash, index, networks.bitcoin)
-        const opt: Payment = { pubkey: bch.publicKey, network: networks.bitcoin }
-        const bchAddress = payments.p2pkh(opt).address
-        return {
-          // @ts-ignore
-          address: toCashAddress(bchAddress),
-          // @ts-ignore
-          privateKey: bch.privateKey.toString('hex')
-        }
+        const bchKeys = getBitcoinKeyPair(this.words, index)
+        const bchAddress = this.getUtxoAddress(currency, bchKeys.publicKey)
+        return { address: bchAddress, publicKey: bchKeys.publicKey, privateKey: bchKeys.privateKey }
 
       case 'ltc':
-        const ltc = this.generateSecp256k1KeyPair(hdPath.litecoin, index, networks.litecoin)
-        return {
-          // @ts-ignore
-          address: payments.p2pkh({ pubkey: ltc.publicKey, network: networks.litecoin }).address,
-          // @ts-ignore
-          privateKey: ltc.privateKey.toString('hex')
-        }
+        const ltcKeys = getBitcoinKeyPair(this.words, index)
+        const ltcAddress = this.getUtxoAddress(currency, ltcKeys.publicKey)
+        return { address: ltcAddress, publicKey: ltcKeys.publicKey, privateKey: ltcKeys.privateKey }
 
       case 'waves':
-        const wavesKeyPair = this.generateEd25519KeyPair(hdPath.waves, index)
-        return this.getWavesKeys(wavesKeyPair.key)
+        const wavesKeys = getWavesKeyPair(this.words, index)
+        return {
+          privateKey: wavesKeys.privateKey,
+          publicKey: wavesKeys.publicKey,
+          address: address(new Buffer(wavesKeys.privateKey, 'hex'))
+        }
 
       case 'xlm':
-        const stellarKeyPair = this.generateEd25519KeyPair(hdPath.stellar, index)
-        return this.getStellarKeys(stellarKeyPair.key)
-
-      case 'ton':
-        const tonKeyPair = this.generateEd25519KeyPair(hdPath.ton, index)
-        const pvk = tonKeyPair.key.toString('hex')
-        const keyPair = (window as any).nacl.sign.keyPair.fromSeed(tonKeyPair.key)
+        const stellarKeyPair = getStellarKeyPair(hdPath.stellar, index)
         return {
-          privateKey: pvk,
-          address: (window as any).wallet_creation_generate_external_message(keyPair, '-1')
+          address: stellarKeyPair.publicKey,
+          publicKey: stellarKeyPair.publicKey,
+          privateKey: stellarKeyPair.privateKey
         }
+
+      // case 'ton':
+      //   const tonKeyPair = this.generateEd25519KeyPair(hdPath.ton, index);
+      //   const pvk = tonKeyPair.key.toString('hex');
+      //   const keyPair = (window as any).nacl.sign.keyPair.fromSeed(tonKeyPair.key);
+      //   return {
+      //     privateKey: pvk,
+      //     address: (window as any).wallet_creation_generate_external_message(keyPair, '-1')
+      //   };
+
+      default:
+        throw new Error('this currency not supported')
     }
   }
 
-  private ethFromKeyPair(keyPair: BIP32Interface): Keys {
-    const privateKeyBuffer = keyPair.privateKey
-    // @ts-ignore
-    const addressBuffer = privateToAddress(privateKeyBuffer)
+  private getEthereumAddress(privateKey: string): string {
+    const addressBuffer = privateToAddress(new Buffer(privateKey, 'hex'))
     const hexAddress = addressBuffer.toString('hex')
+    return addHexPrefix(toChecksumAddress(hexAddress))
+  }
 
-    return {
-      address: addHexPrefix(toChecksumAddress(hexAddress)),
-      // @ts-ignore
-      privateKey: addHexPrefix(privateKeyBuffer.toString('hex'))
+  private getUtxoAddress(currency: IDomainCurrency, publicKey: string): string {
+    const btcOpt = {
+      pubkey: new Buffer(publicKey, 'hex'),
+      network: this.getNetwork(currency)
     }
-  }
-
-  private getWavesKeys(privateKey: Buffer): Keys {
-    const pvk = basex('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz').encode(
-      privateKey
-    )
-
-    const pbk = publicKey({ privateKey: pvk })
-    const addr = address({ publicKey: pbk })
-
-    return {
-      privateKey: pvk,
-      address: addr
+    const p = payments.p2pkh(btcOpt)
+    if (p === undefined) {
+      throw new Error('payment is undefined')
     }
+    // @ts-ignore
+    return p.address
   }
 
-  private getStellarKeys(privateKey: Buffer): Keys {
-    const secret = StrKey.encodeEd25519SecretSeed(privateKey)
-    const stellarKeyPair = Keypair.fromSecret(secret)
-    const pvk = stellarKeyPair.secret()
-    const pbk = stellarKeyPair.publicKey()
+  private getNetwork(currency: IDomainCurrency): Network {
+    switch (currency.short) {
+      case 'btc':
+        return BitcoinConfig as Network
 
-    return {
-      privateKey: pvk,
-      address: pbk
+      case 'bch':
+        return BitcoinCashConfig as Network
+
+      case 'ltc':
+        return LitecoinConfig as Network
+
+      default:
+        throw new Error('config not exists in ' + currency)
     }
-  }
-
-  private generateSecp256k1KeyPair(
-    path: string,
-    index: number = 0,
-    network?: Network
-  ): BIP32Interface {
-    const seed = mnemonicToSeedSync(this.words, this.password)
-    const bip32RootKey = bip32.fromSeed(seed, network)
-    const bip32ExtendedKey = calcBip32ExtendedKey(bip32RootKey, path)
-    return bip32ExtendedKey.derive(index)
-  }
-
-  private generateEd25519KeyPair(path: string, index: number = 0) {
-    const seed = mnemonicToSeedSync(this.words, this.password)
-    return derivePath(path + index + "'", seed.toString('hex'))
   }
 }
