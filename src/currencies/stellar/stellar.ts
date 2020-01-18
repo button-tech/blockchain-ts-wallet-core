@@ -10,11 +10,11 @@ import {
   Memo,
   Transaction
 } from 'stellar-sdk';
-import { ICurrency, Mnemonic, StellarTransactionParams } from '../../types';
+import { ICurrency, MnemonicDescriptor, StellarTransactionParams } from '../../types';
 import { getStellarKeyPair } from '../../hd-wallet';
 
-export function Stellar(secret: string | Mnemonic): ICurrency {
-  if (secret instanceof Mnemonic) {
+export function Stellar(secret: string | MnemonicDescriptor): ICurrency {
+  if (secret instanceof MnemonicDescriptor) {
     const keyPair = getStellarKeyPair(secret.phrase, secret.index, secret.password);
     return new StellarCurrency(keyPair.privateKey);
   }

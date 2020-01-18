@@ -7,7 +7,7 @@ export const StellarDecimals = 7;
 export const UtxoDecimals = 8;
 export const WavesDecimals = 8;
 
-export class Mnemonic {
+export class MnemonicDescriptor {
   constructor(public phrase: string, public index: number, public password: string = '') {}
 }
 

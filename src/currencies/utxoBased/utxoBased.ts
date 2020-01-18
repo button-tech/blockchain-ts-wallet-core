@@ -8,31 +8,37 @@ import {
   Payment
 } from 'bitcoinjs-lib-cash';
 import { toLegacyAddress } from 'bchaddrjs';
-import { ICurrency, Mnemonic, UTXO, UtxoDecimals, UtxoTransactionParams } from '../../types';
+import {
+  ICurrency,
+  MnemonicDescriptor,
+  UTXO,
+  UtxoDecimals,
+  UtxoTransactionParams
+} from '../../types';
 import { FromDecimal, Tbn } from '../../blockchain.utils';
 import BigNumber from 'bignumber.js';
 import * as Currency from '../../DomainCurrency';
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../../networks';
 import { getBitcoinCashKeyPair, getBitcoinKeyPair, getLitecoinKeyPair } from '../../hd-wallet';
 
-export function Bitcoin(secret: string | Mnemonic): ICurrency {
-  if (secret instanceof Mnemonic) {
+export function Bitcoin(secret: string | MnemonicDescriptor): ICurrency {
+  if (secret instanceof MnemonicDescriptor) {
     const keyPair = getBitcoinKeyPair(secret.phrase, secret.index, secret.password);
     return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoin.Instance());
   }
   return new UtxoBased(secret, Currency.DomainBitcoin.Instance());
 }
 
-export function Litecoin(secret: string | Mnemonic): ICurrency {
-  if (secret instanceof Mnemonic) {
+export function Litecoin(secret: string | MnemonicDescriptor): ICurrency {
+  if (secret instanceof MnemonicDescriptor) {
     const keyPair = getLitecoinKeyPair(secret.phrase, secret.index, secret.password);
     return new UtxoBased(keyPair.privateKey, Currency.DomainLitecoin.Instance());
   }
   return new UtxoBased(secret, Currency.DomainLitecoin.Instance());
 }
 
-export function BitcoinCash(secret: string | Mnemonic): ICurrency {
-  if (secret instanceof Mnemonic) {
+export function BitcoinCash(secret: string | MnemonicDescriptor): ICurrency {
+  if (secret instanceof MnemonicDescriptor) {
     const keyPair = getBitcoinCashKeyPair(secret.phrase, secret.index, secret.password);
     return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoinCash.Instance());
   }

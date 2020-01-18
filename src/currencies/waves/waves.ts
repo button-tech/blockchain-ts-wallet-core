@@ -1,14 +1,14 @@
 import { transfer } from 'waves-transactions';
 import { ITransferTransaction } from 'waves-transactions/transactions';
 import { address } from '@waves/ts-lib-crypto';
-import { ICurrency, Mnemonic, WavesDecimals, WavesTransactionParams } from '../../types';
+import { ICurrency, MnemonicDescriptor, WavesDecimals, WavesTransactionParams } from '../../types';
 import { FromDecimal } from '../../blockchain.utils';
 import { getWavesKeyPair } from '../../hd-wallet';
 import { Buffer } from 'buffer';
 import { box } from 'tweetnacl';
 
-export function Waves(secret: string | Mnemonic): ICurrency {
-  if (secret instanceof Mnemonic) {
+export function Waves(secret: string | MnemonicDescriptor): ICurrency {
+  if (secret instanceof MnemonicDescriptor) {
     const keyPair = getWavesKeyPair(secret.phrase, secret.index, secret.password);
     return new WavesCurrency(keyPair.privateKey);
   }

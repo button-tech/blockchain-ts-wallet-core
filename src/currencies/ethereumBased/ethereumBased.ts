@@ -1,20 +1,25 @@
 import { Transaction, TransactionOptions, TxData } from 'ethereumjs-tx';
 import { privateToAddress } from 'ethereumjs-util';
 import { DecimalToHex, FromDecimal } from '../../blockchain.utils';
-import { EthereumDecimals, EthereumTransactionParams, ICurrency, Mnemonic } from '../../types';
+import {
+  EthereumDecimals,
+  EthereumTransactionParams,
+  ICurrency,
+  MnemonicDescriptor
+} from '../../types';
 import * as Currency from '../../DomainCurrency';
 import { getEthereumClassicKeyPair, getEthereumKeyPair } from '../../hd-wallet';
 
-export function Ethereum(secret: string | Mnemonic): ICurrency {
-  if (secret instanceof Mnemonic) {
+export function Ethereum(secret: string | MnemonicDescriptor): ICurrency {
+  if (secret instanceof MnemonicDescriptor) {
     const keyPair = getEthereumKeyPair(secret.phrase, secret.index, secret.password);
     return new EthereumBasedCurrency(keyPair.privateKey, Currency.DomainEthereum.Instance());
   }
   return new EthereumBasedCurrency(secret, Currency.DomainEthereum.Instance());
 }
 
-export function EthereumClassic(secret: string | Mnemonic): ICurrency {
-  if (secret instanceof Mnemonic) {
+export function EthereumClassic(secret: string | MnemonicDescriptor): ICurrency {
+  if (secret instanceof MnemonicDescriptor) {
     const keyPair = getEthereumClassicKeyPair(secret.phrase, secret.index, secret.password);
     return new EthereumBasedCurrency(keyPair.privateKey, Currency.DomainEthereumClassic.Instance());
   }
