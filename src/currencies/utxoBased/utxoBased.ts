@@ -6,126 +6,139 @@ import {
   Transaction,
   Signer,
   Payment
-} from 'bitcoinjs-lib-cash'
-import { toLegacyAddress } from 'bchaddrjs'
-import { ICurrency, UTXO, UtxoDecimals, UtxoTransactionParams } from '../../types'
-import { FromDecimal, Tbn } from '../../blockchain.utils'
-import BigNumber from 'bignumber.js'
-import * as Currency from '../../DomainCurrency'
-import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../../networks'
+} from 'bitcoinjs-lib-cash';
+import { toLegacyAddress } from 'bchaddrjs';
+import { ICurrency, Mnemonic, UTXO, UtxoDecimals, UtxoTransactionParams } from '../../types';
+import { FromDecimal, Tbn } from '../../blockchain.utils';
+import BigNumber from 'bignumber.js';
+import * as Currency from '../../DomainCurrency';
+import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../../networks';
+import { getBitcoinCashKeyPair, getBitcoinKeyPair, getLitecoinKeyPair } from '../../hd-wallet';
 
-export function Bitcoin(privateKey: string): ICurrency {
-  return new UtxoBased(privateKey, Currency.DomainBitcoin.Instance())
+export function Bitcoin(secret: string | Mnemonic): ICurrency {
+  if (secret instanceof Mnemonic) {
+    const keyPair = getBitcoinKeyPair(secret.phrase, secret.index, secret.password);
+    return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoin.Instance());
+  }
+  return new UtxoBased(secret, Currency.DomainBitcoin.Instance());
 }
 
-export function Litecoin(privateKey: string): ICurrency {
-  return new UtxoBased(privateKey, Currency.DomainLitecoin.Instance())
+export function Litecoin(secret: string | Mnemonic): ICurrency {
+  if (secret instanceof Mnemonic) {
+    const keyPair = getLitecoinKeyPair(secret.phrase, secret.index, secret.password);
+    return new UtxoBased(keyPair.privateKey, Currency.DomainLitecoin.Instance());
+  }
+  return new UtxoBased(secret, Currency.DomainLitecoin.Instance());
 }
 
-export function BitcoinCash(privateKey: string): ICurrency {
-  return new UtxoBased(privateKey, Currency.DomainBitcoinCash.Instance())
+export function BitcoinCash(secret: string | Mnemonic): ICurrency {
+  if (secret instanceof Mnemonic) {
+    const keyPair = getBitcoinCashKeyPair(secret.phrase, secret.index, secret.password);
+    return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoinCash.Instance());
+  }
+  return new UtxoBased(secret, Currency.DomainBitcoinCash.Instance());
 }
 
 export class UtxoBased implements ICurrency {
-  private readonly address: string
+  private readonly address: string;
 
   constructor(
     private readonly privateKey: string,
     private currency: Currency.DomainBitcoin | Currency.DomainBitcoinCash | Currency.DomainLitecoin
   ) {
-    const keyPair: Signer = this.getKeyPair(privateKey)
+    const keyPair: Signer = this.getKeyPair(privateKey);
     const payment: Payment = payments.p2pkh({
       pubkey: keyPair.publicKey,
       network: this.getNetwork()
-    })
+    });
     if (!payment.address) {
-      throw new Error('address not exists in ' + this.currency.full)
+      throw new Error('address not exists in ' + this.currency.full);
     }
-    this.address = payment.address
+    this.address = payment.address;
   }
 
   getAddress(privateKey: string): string {
-    return this.address
+    return this.address;
   }
 
   signTransaction(params: UtxoTransactionParams): Promise<string> {
-    const fromAddress = this.getAddress(this.privateKey)
+    const fromAddress = this.getAddress(this.privateKey);
 
-    const value = FromDecimal(params.amount, UtxoDecimals).toNumber()
+    const value = FromDecimal(params.amount, UtxoDecimals).toNumber();
 
-    let hashType = Transaction.SIGHASH_ALL
+    let hashType = Transaction.SIGHASH_ALL;
     if (this.currency.short === 'bch') {
-      params.toAddress = toLegacyAddress(params.toAddress)
-      hashType = hashType | Transaction.SIGHASH_BITCOINCASHBIP143
+      params.toAddress = toLegacyAddress(params.toAddress);
+      hashType = hashType | Transaction.SIGHASH_BITCOINCASHBIP143;
     }
 
-    const utxos = params.inputs.sort(dynamicSort('-amount'))
-    const tx = this.getTransactionBuilder()
-    tx.setVersion(1)
+    const utxos = params.inputs.sort(dynamicSort('-amount'));
+    const tx = this.getTransactionBuilder();
+    tx.setVersion(1);
 
     for (let i = 0; i < utxos.length; i++) {
-      const currentInput = utxos[i]
+      const currentInput = utxos[i];
       tx.addInput(
         currentInput.txid,
         currentInput.vout,
         currentInput.confirmations,
         new Buffer(currentInput.scriptPubKey, 'hex')
-      )
+      );
     }
 
-    const inputsAmount = this.getInputsTotalAmount(params.inputs)
+    const inputsAmount = this.getInputsTotalAmount(params.inputs);
     const balanceWithoutFeeAndSendingAmount = Tbn(inputsAmount)
       .minus(value)
       .minus(params.fee)
-      .toNumber()
-    tx.addOutput(params.toAddress, value)
+      .toNumber();
+    tx.addOutput(params.toAddress, value);
     if (balanceWithoutFeeAndSendingAmount > 0) {
-      tx.addOutput(fromAddress, balanceWithoutFeeAndSendingAmount)
+      tx.addOutput(fromAddress, balanceWithoutFeeAndSendingAmount);
     }
 
     for (let i = 0; i < utxos.length; i++) {
-      tx.sign(i, this.getPrivateKey(this.privateKey), undefined, hashType, utxos[i].satoshis)
+      tx.sign(i, this.getPrivateKey(this.privateKey), undefined, hashType, utxos[i].satoshis);
     }
 
-    return Promise.resolve(tx.build().toHex())
+    return Promise.resolve(tx.build().toHex());
   }
 
   private getTransactionBuilder(): TransactionBuilder {
-    const network = this.getNetwork()
+    const network = this.getNetwork();
     switch (this.currency.short) {
       case 'bch':
-        return new TransactionBuilder(network, true)
+        return new TransactionBuilder(network, true);
       default:
-        return new TransactionBuilder(network)
+        return new TransactionBuilder(network);
     }
   }
 
   private getKeyPair(privateKey: string, network?: Network): Signer {
     if (network) {
-      const options: any = { network }
-      return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'), options)
+      const options: any = { network };
+      return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'), options);
     }
-    return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'))
+    return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'));
   }
 
   private getPrivateKey(privateKey: string): Signer {
-    const network = this.getNetwork()
-    return this.getKeyPair(privateKey, network)
+    const network = this.getNetwork();
+    return this.getKeyPair(privateKey, network);
   }
 
   private getNetwork(): Network {
     switch (this.currency.short) {
       case 'btc':
-        return BitcoinConfig as Network
+        return BitcoinConfig as Network;
 
       case 'bch':
-        return BitcoinCashConfig as Network
+        return BitcoinCashConfig as Network;
 
       case 'ltc':
-        return LitecoinConfig as Network
+        return LitecoinConfig as Network;
 
       default:
-        throw new Error('config not exists in ' + this.currency.full)
+        throw new Error('config not exists in ' + this.currency.full);
     }
   }
 
@@ -133,20 +146,20 @@ export class UtxoBased implements ICurrency {
     return inputs
       .map((x: UTXO): BigNumber => FromDecimal(x.amount, UtxoDecimals))
       .reduce((acc: BigNumber, n: BigNumber) => {
-        return acc.plus(n)
+        return acc.plus(n);
       })
-      .toNumber()
+      .toNumber();
   }
 }
 
 function dynamicSort(property: string) {
-  let sortOrder = 1
+  let sortOrder = 1;
   if (property[0] === '-') {
-    sortOrder = -1
-    property = property.substr(1)
+    sortOrder = -1;
+    property = property.substr(1);
   }
   return (a: any, b: any) => {
-    const result = a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0
-    return result * sortOrder
-  }
+    const result = a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0;
+    return result * sortOrder;
+  };
 }
