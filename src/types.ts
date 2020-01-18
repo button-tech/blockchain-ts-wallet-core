@@ -12,7 +12,7 @@ export class MnemonicDescriptor {
 }
 
 export interface ICurrency {
-  getAddress(privateKey: string): string;
+  getAddress(): string;
 
   signTransaction(
     params:

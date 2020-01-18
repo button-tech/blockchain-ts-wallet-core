@@ -33,12 +33,12 @@ export class StellarCurrency implements ICurrency {
     this.network = new Server('https://horizon.stellar.org');
   }
 
-  getAddress(privateKey: string): string {
+  getAddress(): string {
     return this.address;
   }
 
   signTransaction(params: StellarTransactionParams): Promise<string> {
-    const fromAddress = this.getAddress(this.privateKey);
+    const fromAddress = this.getAddress();
 
     const accountTo$: Promise<AccountResponse | null> = this.getAccount(params.toAddress);
     const accountFrom$: Promise<AccountResponse | null> = this.getAccount(fromAddress);

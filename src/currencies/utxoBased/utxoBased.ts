@@ -63,12 +63,12 @@ export class UtxoBased implements ICurrency {
     this.address = payment.address;
   }
 
-  getAddress(privateKey: string): string {
+  getAddress(): string {
     return this.address;
   }
 
   signTransaction(params: UtxoTransactionParams): Promise<string> {
-    const fromAddress = this.getAddress(this.privateKey);
+    const fromAddress = this.getAddress();
 
     const value = FromDecimal(params.amount, UtxoDecimals).toNumber();
 

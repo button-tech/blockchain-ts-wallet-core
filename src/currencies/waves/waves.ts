@@ -23,7 +23,7 @@ export class WavesCurrency implements ICurrency {
     this.address = address(publicKey);
   }
 
-  getAddress(privateKey: string): string {
+  getAddress(): string {
     return this.address;
   }
 

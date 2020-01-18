@@ -33,16 +33,16 @@ export class EthereumBasedCurrency implements ICurrency {
     private readonly privateKey: string,
     protected currency: Currency.DomainEthereum | Currency.DomainEthereumClassic
   ) {
-    if (privateKey.indexOf('0x') === 0) {
+    if (this.privateKey.indexOf('0x') === 0) {
       this.privateKey = privateKey.substring(2);
     }
-    if (privateKey.length !== 64) {
+    if (this.privateKey.length !== 64) {
       throw new Error('Ethereum private key is invalid');
     }
-    this.address = '0x' + privateToAddress(new Buffer(privateKey, 'hex')).toString('hex');
+    this.address = '0x' + privateToAddress(new Buffer(this.privateKey, 'hex')).toString('hex');
   }
 
-  getAddress(privateKey: string): string {
+  getAddress(): string {
     return this.address;
   }
 
