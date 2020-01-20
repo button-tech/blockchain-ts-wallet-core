@@ -1,4 +1,3 @@
-import { toCashAddress } from 'bchaddrjs';
 import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased';
 import { Bitcoin, BitcoinCash, Litecoin } from '../src/currencies/utxoBased';
 import { Stellar } from '../src/currencies/stellar';
@@ -27,9 +26,7 @@ describe('Addresses from private keys test', () => {
   it('BitcoinCash address test', () => {
     const privateKey = '91485a3431fe3fb2772ed0765ab7ddb6fa5ee6fcfc4b2fc0dff991503e20d39e';
     const address = BitcoinCash(privateKey).getAddress();
-    expect(toCashAddress(address)).toEqual(
-      'bitcoincash:qz489et46v0rkajzy8drtd42w72hlm3cnykjhsqa08'
-    );
+    expect(address).toEqual('bitcoincash:qz489et46v0rkajzy8drtd42w72hlm3cnykjhsqa08');
   });
 
   it('Litecoin address test', () => {
@@ -75,9 +72,7 @@ describe('Addresses from mnemonic test', () => {
 
   it('BitcoinCash address test', () => {
     const address = BitcoinCash(mnemonic).getAddress();
-    expect(toCashAddress(address)).toEqual(
-      'bitcoincash:qzdrr84qwasqzpnr53nkxdknlz8ykelugvg047625c'
-    );
+    expect(address).toEqual('bitcoincash:qzdrr84qwasqzpnr53nkxdknlz8ykelugvg047625c');
   });
 
   it('Litecoin address test', () => {

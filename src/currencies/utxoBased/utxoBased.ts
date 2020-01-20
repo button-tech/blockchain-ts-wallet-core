@@ -7,7 +7,7 @@ import {
   Signer,
   Payment
 } from 'bitcoinjs-lib-cash';
-import { toLegacyAddress } from 'bchaddrjs';
+import { toCashAddress, toLegacyAddress } from 'bchaddrjs';
 import {
   ICurrency,
   MnemonicDescriptor,
@@ -60,7 +60,7 @@ export class UtxoBased implements ICurrency {
     if (!payment.address) {
       throw new Error('address not exists in ' + this.currency.full);
     }
-    this.address = payment.address;
+    this.address = currency.short === 'bch' ? toCashAddress(payment.address) : payment.address;
   }
 
   getAddress(): string {
