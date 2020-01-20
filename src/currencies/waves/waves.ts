@@ -6,6 +6,7 @@ import { FromDecimal } from '../../blockchain.utils';
 import { getWavesKeyPair } from '../../hd-wallet';
 import { Buffer } from 'buffer';
 import { box } from 'tweetnacl';
+import * as basex from 'base-x';
 
 export function Waves(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
@@ -19,8 +20,12 @@ export class WavesCurrency implements ICurrency {
   private readonly address: string;
 
   constructor(private readonly privateKey: string) {
-    const publicKey = new Buffer(box.keyPair.fromSecretKey(new Buffer(privateKey)).publicKey);
-    this.address = address(publicKey);
+    const bufferKey = new Buffer(privateKey, 'hex');
+    const publicKey = box.keyPair.fromSecretKey(new Uint8Array(bufferKey)).publicKey;
+    const base58PubKey = basex('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz').encode(
+      new Buffer(publicKey)
+    );
+    this.address = address({ publicKey: base58PubKey });
   }
 
   getAddress(): string {

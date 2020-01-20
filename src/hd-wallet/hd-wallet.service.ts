@@ -3,8 +3,9 @@ import { privateToAddress, addHexPrefix, toChecksumAddress } from 'ethereumjs-ut
 import { address } from '@waves/ts-lib-crypto';
 import { entropyToMnemonic, validateMnemonic } from 'bip39';
 import { EnDict } from './wordlist.en';
+import * as basex from 'base-x';
 
-import { hasStrongRandom, hdPath, uint8ArrayToHex } from './hd-wallet.utils';
+import { hasStrongRandom, uint8ArrayToHex } from './hd-wallet.utils';
 import {
   DomainBitcoin,
   DomainBitcoinCash,
@@ -13,7 +14,6 @@ import {
   IDomainCurrency,
   DomainLitecoin,
   DomainStellar,
-  DomainTON,
   DomainWaves
 } from '../DomainCurrency';
 import {
@@ -23,6 +23,7 @@ import {
 } from './hd-key-secp256k1';
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../networks';
 import { getStellarKeyPair, getWavesKeyPair } from './hd-key-ed25519';
+import { Buffer } from 'buffer';
 
 type NumWords = 12 | 15 | 18 | 21 | 24;
 
@@ -153,11 +154,11 @@ export class HdWallet {
         return {
           privateKey: wavesKeys.privateKey,
           publicKey: wavesKeys.publicKey,
-          address: address(new Buffer(wavesKeys.privateKey, 'hex'))
+          address: this.buildWavesAddress(wavesKeys.publicKey)
         };
 
       case 'xlm':
-        const stellarKeyPair = getStellarKeyPair(hdPath.stellar, index, password);
+        const stellarKeyPair = getStellarKeyPair(this.words, index, password);
         return {
           address: stellarKeyPair.publicKey,
           publicKey: stellarKeyPair.publicKey,
@@ -182,6 +183,13 @@ export class HdWallet {
     const addressBuffer = privateToAddress(new Buffer(privateKey, 'hex'));
     const hexAddress = addressBuffer.toString('hex');
     return addHexPrefix(toChecksumAddress(hexAddress));
+  }
+
+  private buildWavesAddress(publicKey: string): string {
+    const publicKey1 = basex('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz').encode(
+      new Buffer(publicKey, 'hex')
+    );
+    return address({ publicKey: publicKey1 });
   }
 
   private getUtxoAddress(currency: IDomainCurrency, publicKey: string): string {

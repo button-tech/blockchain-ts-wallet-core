@@ -1,20 +1,21 @@
 import { toCashAddress } from 'bchaddrjs';
-import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased/ethereumBased';
-import { Bitcoin, BitcoinCash, Litecoin } from '../src/currencies/utxoBased/utxoBased';
-import { Stellar } from '../src/currencies/stellar/stellar';
-import { Waves } from '../src/currencies/waves/waves';
+import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased';
+import { Bitcoin, BitcoinCash, Litecoin } from '../src/currencies/utxoBased';
+import { Stellar } from '../src/currencies/stellar';
+import { Waves } from '../src/currencies/waves';
+import { getPublicKey, MnemonicDescriptor } from '../src';
 
 describe('Addresses from private keys test', () => {
   it('Ethereum address test', () => {
     const privateKey = '0x61767b546ad545f954aef85fed6bbbe270ce2863403e5e74c1ca2c437aef0da8';
     const address = Ethereum(privateKey).getAddress();
-    expect(address).toEqual('0xd9e5efaebff27a5aaf6ed173a85709c6c21c3386');
+    expect(address).toEqual('0xd9E5EFAEBFf27a5aAF6eD173a85709c6C21c3386');
   });
 
   it('Ethereum Classic address test', () => {
     const privateKey = '0xb8f418168a58e712e9f7512bf8eab4c8afcdcf464784bacadb8e4d4f2dfc005f';
     const address = EthereumClassic(privateKey).getAddress();
-    expect(address).toEqual('0x50aea0ed2cfdb7354d2f07f24c476f25e31cad5c');
+    expect(address).toEqual('0x50aea0eD2CFdB7354D2F07F24c476F25e31cad5C');
   });
 
   it('Bitcoin address test', () => {
@@ -44,9 +45,53 @@ describe('Addresses from private keys test', () => {
   });
 
   it('Waves address test', () => {
-    const privateKey = '4551fdce10cbb2c25a51d6ddb826c1fb';
+    const privateKey = 'c0ca8a85df32da6c9bc652208b046d3e97c4c2f2daa14a5336b43dcd24227479';
     const address = Waves(privateKey).getAddress();
-    console.log(address);
-    expect(address).toEqual('3PAEQd7rHBE8Xt47NGE9kyRf1CXhmJXuBGX');
+    expect(address).toEqual('3PDn2Sqwdz7Zbj6PJcNniRYKdLR3U3DJabR');
+  });
+});
+
+describe('Addresses from mnemonic test', () => {
+  const mnemonic = new MnemonicDescriptor(
+    'control sock axis field icon jewel gown duck amateur type step save',
+    0,
+    ''
+  );
+
+  it('Ethereum address test', () => {
+    const address = Ethereum(mnemonic).getAddress();
+    expect(address).toEqual('0xC9330Ce433DfB0046efc7dD8aB1A8ACC433f37Aa');
+  });
+
+  it('Ethereum Classic address test', () => {
+    const address = EthereumClassic(mnemonic).getAddress();
+    expect(address).toEqual('0x73974c2e5F442969b443Aed9c31Df94d854584c3');
+  });
+
+  it('Bitcoin address test', () => {
+    const address = Bitcoin(mnemonic).getAddress();
+    expect(address).toEqual('1B7eaEtrFd2vzQDC2NcVXrbj8mCiTJDEAj');
+  });
+
+  it('BitcoinCash address test', () => {
+    const address = BitcoinCash(mnemonic).getAddress();
+    expect(toCashAddress(address)).toEqual(
+      'bitcoincash:qzdrr84qwasqzpnr53nkxdknlz8ykelugvg047625c'
+    );
+  });
+
+  it('Litecoin address test', () => {
+    const address = Litecoin(mnemonic).getAddress();
+    expect(address).toEqual('LMMN6Ybq87MhTf7YRfhapg33BWH53LkCgF');
+  });
+
+  it('Stellar address test', () => {
+    const address = Stellar(mnemonic).getAddress();
+    expect(address).toEqual('GC6WS24RVX5LIOVZEOH4FWQZAJVSF3AMFH37XU5K3XO7LTDLSMSVYA36');
+  });
+
+  it('Waves address test', () => {
+    const address = Waves(mnemonic).getAddress();
+    expect(address).toEqual('3P3kCK7VjQyRDVb4QGXxctp1jycxpdn5563');
   });
 });

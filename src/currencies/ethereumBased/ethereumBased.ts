@@ -1,5 +1,5 @@
 import { Transaction, TransactionOptions, TxData } from 'ethereumjs-tx';
-import { privateToAddress } from 'ethereumjs-util';
+import { privateToAddress, toChecksumAddress } from 'ethereumjs-util';
 import { DecimalToHex, FromDecimal } from '../../blockchain.utils';
 import {
   EthereumDecimals,
@@ -39,7 +39,9 @@ export class EthereumBasedCurrency implements ICurrency {
     if (this.privateKey.length !== 64) {
       throw new Error('Ethereum private key is invalid');
     }
-    this.address = '0x' + privateToAddress(new Buffer(this.privateKey, 'hex')).toString('hex');
+    this.address = toChecksumAddress(
+      privateToAddress(new Buffer(this.privateKey, 'hex')).toString('hex')
+    );
   }
 
   getAddress(): string {
