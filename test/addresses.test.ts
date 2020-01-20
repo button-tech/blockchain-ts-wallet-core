@@ -3,7 +3,7 @@ import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased';
 import { Bitcoin, BitcoinCash, Litecoin } from '../src/currencies/utxoBased';
 import { Stellar } from '../src/currencies/stellar';
 import { Waves } from '../src/currencies/waves';
-import { getPublicKey, MnemonicDescriptor } from '../src';
+import { MnemonicDescriptor } from '../src';
 
 describe('Addresses from private keys test', () => {
   it('Ethereum address test', () => {
