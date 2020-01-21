@@ -1,4 +1,5 @@
 # BLOCKCHAIN-TS-WALLET-CORE
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6fcfc61217ed4494a87ac1835c2edac2)](https://app.codacy.com/gh/button-tech/blockchain-ts-wallet-core?utm_source=github.com&utm_medium=referral&utm_content=button-tech/blockchain-ts-wallet-core&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/button-tech/blockchain-ts-wallet-core.svg?branch=master)](https://travis-ci.org/button-tech/blockchain-ts-wallet-core)
 
 ## Installation
