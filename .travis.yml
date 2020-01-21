@@ -1,20 +1,20 @@
 language: node_js
+node_js:
+- "11.15.0"
+os: osx
+sudo: false
+
+git:
+  submodules: true
+
 cache:
   directories:
-    - ~/.npm
-notifications:
-  email: false
-node_js:
-  - '10'
-  - '11'
-  - '8'
-  - '6'
+  - node_modules
+
+compiler:
+  - clang
+  - gcc
+
 script:
-  - npm run test:prod && npm run build
-after_success:
-  - npm run travis-deploy-once "npm run report-coverage"
-  - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then npm run travis-deploy-once "npm run deploy-docs"; fi
-  - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then npm run travis-deploy-once "npm run semantic-release"; fi
-branches:
-  except:
-    - /^v\d+\.\d+\.\d+$/
+- npm run test:prod
+- npm run build
