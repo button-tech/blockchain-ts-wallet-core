@@ -1,4 +1,5 @@
 # BLOCKCHAIN-TS-WALLET-CORE
+[![Build Status](https://travis-ci.org/button-tech/blockchain-ts-wallet-core.svg?branch=master)](https://travis-ci.org/button-tech/blockchain-ts-wallet-core)
 
 ## Installation
 * `npm i -s @buttonwallet/blockchain-ts-wallet-core`
