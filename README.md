@@ -72,11 +72,13 @@ const wallet = new HdWallet(phrase, password)
 const derivationIndex = 0;
 const currency = wallet.generateKeyPair(DomainEthereum.Instance(), derivationIndex);
 console.log(currency)
+/*
 {
   privateKey: 'e3776b46699e2a6e55b19d7033b7724758b753c7391137e3eb5eaf3daed1db54',
   publicKey: '032348140ab3270e02cf9cce9e1fd3201cb9068671c490f3e2fabe0308a8afd284',
   address: '0xC9330Ce433DfB0046efc7dD8aB1A8ACC433f37Aa'
 }
+*/
 ```
 
 
