@@ -1,6 +1,6 @@
 {
-  "name": "test-krboktv",
-  "version": "0.1.6",
+  "name": "@buttonwallet/blockchain-ts-wallet-core",
+  "version": "0.0.1",
   "description": "HdWallet and sign transaction library for typescript",
   "keywords": [],
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
   "author": "Kirill <krboktv@gmail.com>",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/button-tech/blockchain-ts-wallet-core.git"
   },
   "license": "MIT",
   "engines": {
