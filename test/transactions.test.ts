@@ -1,5 +1,11 @@
 import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased';
-import { EthereumTransactionParams } from '../src';
+import {
+  Bitcoin,
+  BitcoinCash,
+  EthereumTransactionParams,
+  UTXO,
+  UtxoTransactionParams
+} from '../src';
 
 describe('Sign transaction from private keys test', () => {
   it('Sign Stellar transaction test', async () => {
@@ -49,6 +55,78 @@ describe('Sign transaction from private keys test', () => {
       'f86a378447868c00825208948ac03e162d1f0c417f5f057fe41321d00511e2bd8727ac4827f97c00801ba0e8' +
         '87be5184ad9be25af8e936511b1a0ef43bf25318346ba9b4ed796dfc3f4613a079b2b6afbc14cc7f759d15f4' +
         '5c1102bf8d8b2ea74fac77ebfdfcf769ac23b291'
+    );
+  });
+
+  it('Sign BitcoinCash transaction test', async () => {
+    const privateKey = '2b894d28b2bf96b5da66ce9e8d29ee2e754a59df0fc411ca01aace64f2023868';
+    const input1: UTXO = {
+      address: 'bitcoincash:qzqvhc0ksf2y4x0ta5nxhy8sf2wr5r6h55524c3m4h',
+      txid: '0fe552fa47d3a59444ee62994c4e9ab8d416df59e16c488ab612a9d2837ffa4e',
+      vout: 4,
+      scriptPubKey: '76a91480CBE1F682544A99EBED266B90F04A9C3A0F57A588ac',
+      amount: '0.01136865',
+      satoshis: 1136865,
+      height: 618275,
+      confirmations: 516
+    };
+    const params: UtxoTransactionParams = {
+      toAddress: '196Ns2Apq37TNJMQGWJaoDnMRyJ5b7Y3BV', // legacy format or cash
+      amount: '0.00578704',
+      fee: 678,
+      inputs: [input1]
+    };
+    const blockchain = BitcoinCash(privateKey);
+    const signedTx = await blockchain.signTransaction(params);
+    expect(signedTx).toEqual(
+      '01000000014efa7f83d2a912b68a486ce159df16d4b89a4e4c9962ee4494a5d347fa52e50f040000006b4830' +
+        '45022100a08a0a7022a5a40cd9e92321835660124400be233ff4328847290af27444cbce0220095b8573a7f0' +
+        'cb16618183387a5a79e683295db57c97d6bcf3f67924c213fe9e412103c1ef3cc8deae4b7f419815013348e1' +
+        '47fe1a47d2bb7dff37300cab24789295a6040200000290d40800000000001976a91458c555fde6bf11a96501' +
+        '3b1a55f6b9ab1d0e6b9488acab810800000000001976a91480cbe1f682544a99ebed266b90f04a9c3a0f57a5' +
+        '88ac00000000'
+    );
+  });
+
+  it('Sign Bitcoin transaction test', async () => {
+    const privateKey = '651ba268e08b41f412e74491ab81b698338bb77878328d0deddef57989475269';
+    const input1: UTXO = {
+      address: '1HRSXxPox3DDN19iY4nYoUPiGbErzzDDXh',
+      txid: '447a76b295bfb3939cc130f5dccfecee32bfda9110dfec725880b0a4aca0989d',
+      vout: 0,
+      scriptPubKey: '76a914B4214F62038E47A01097D167E8313020B4ADF9C188ac',
+      amount: '0.00092335',
+      satoshis: 92335,
+      height: 613853,
+      confirmations: 11
+    };
+    const input2: UTXO = {
+      address: '1HRSXxPox3DDN19iY4nYoUPiGbErzzDDXh',
+      txid: '447a76b295bfb3939cc130f5dccfecee32bfda9110dfec725880b0a4aca0989d',
+      vout: 1,
+      scriptPubKey: '76a914B4214F62038E47A01097D167E8313020B4ADF9C188ac',
+      amount: '0.00069832',
+      satoshis: 69832,
+      height: 613853,
+      confirmations: 11
+    };
+    const params: UtxoTransactionParams = {
+      toAddress: '1B1kgANQ5BtF15Nv6sXi8A9GYx8RXjErEk',
+      amount: '0.00158767',
+      fee: 3400,
+      inputs: [input1, input2]
+    };
+    const blockchain = Bitcoin(privateKey);
+    const signedTx = await blockchain.signTransaction(params);
+    expect(signedTx).toEqual(
+      '01000000029d98a0aca4b0805872ecdf1091dabf32eeeccfdcf530c19c93b3bf95b2767a44000000006a473' +
+        '04402207b48ce49fbdb9b5f248c33edc4255f2842ca8ca7a0b84435a5bc51bef810b0ce02204073c066d5d3' +
+        '948afcbdd745dec7354bb9c4762c533e591711dc7e1f05fb80f601210224de1a3a7d9bd87ec2a7687faa31d' +
+        '14fca634d80de583504312158adbd5ca91b0b0000009d98a0aca4b0805872ecdf1091dabf32eeeccfdcf530' +
+        'c19c93b3bf95b2767a44010000006b4830450221009400c33311b302bd54906624ec916ce2877eed4e0d38d' +
+        'fc16a7eab62de9784cf02206e6fc9cc0ebb98b5a6dc92272837f41271068c99bd1e4a737be8a462b2a77849' +
+        '01210224de1a3a7d9bd87ec2a7687faa31d14fca634d80de583504312158adbd5ca91b0b000000012f6c020' +
+        '0000000001976a9146dd5b74f8f9372d8ba754a8ce68e3550e26845d288ac00000000'
     );
   });
 });
