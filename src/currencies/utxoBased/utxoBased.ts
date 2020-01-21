@@ -19,11 +19,11 @@ import { FromDecimal, Tbn } from '../../blockchain.utils';
 import BigNumber from 'bignumber.js';
 import * as Currency from '../../DomainCurrency';
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../../networks';
-import { getBitcoinCashKeyPair, getBitcoinKeyPair, getLitecoinKeyPair } from '../../hd-wallet';
+import { getSecp256k1KeyPair } from '../../hd-wallet';
 
 export function Bitcoin(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getBitcoinKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getSecp256k1KeyPair(Currency.DomainBitcoin.Instance(), secret);
     return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoin.Instance());
   }
   return new UtxoBased(secret, Currency.DomainBitcoin.Instance());
@@ -31,7 +31,7 @@ export function Bitcoin(secret: string | MnemonicDescriptor): ICurrency {
 
 export function Litecoin(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getLitecoinKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getSecp256k1KeyPair(Currency.DomainLitecoin.Instance(), secret);
     return new UtxoBased(keyPair.privateKey, Currency.DomainLitecoin.Instance());
   }
   return new UtxoBased(secret, Currency.DomainLitecoin.Instance());
@@ -39,7 +39,7 @@ export function Litecoin(secret: string | MnemonicDescriptor): ICurrency {
 
 export function BitcoinCash(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getBitcoinCashKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getSecp256k1KeyPair(Currency.DomainBitcoinCash.Instance(), secret);
     return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoinCash.Instance());
   }
   return new UtxoBased(secret, Currency.DomainBitcoinCash.Instance());
