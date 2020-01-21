@@ -14,13 +14,7 @@ export class MnemonicDescriptor {
 export interface ICurrency {
   getAddress(): string;
 
-  signTransaction(
-    params:
-      | EthereumTransactionParams
-      | UtxoTransactionParams
-      | WavesTransactionParams
-      | StellarTransactionParams
-  ): Promise<string>;
+  signTransaction(params: TransactionParams): Promise<string>;
 }
 
 export interface IContract extends ICurrency {
@@ -34,6 +28,12 @@ export interface IContract extends ICurrency {
 
   awaitTx(txnHash: Array<string> | string): Promise<any> | Promise<any[]>;
 }
+
+export type TransactionParams =
+  | EthereumTransactionParams
+  | UtxoTransactionParams
+  | WavesTransactionParams
+  | StellarTransactionParams;
 
 export interface EthereumTransactionParams {
   toAddress: string;

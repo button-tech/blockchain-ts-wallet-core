@@ -7,14 +7,18 @@
 
 ## Usage
 ```typescript
-import { HdWallet } from '@buttonwallet/blockchain-ts-wallet-core'  
+import * as TsWalletCore from '@buttonwallet/blockchain-ts-wallet-core'  
+```
+or
+```javascript
+const TsWalletCore = require('@buttonwallet/blockchain-ts-wallet-core');
 ```
 
 ### HDWallet
 
 #### Generate mnemonic
 ```typescript
-const phrase = HdWallet.generateMnemonic()
+const phrase = TsWalletCore.HdWallet.generateMnemonic()
 console.log(phrase) // control sock axis field icon jewel gown duck amateur type step save
 ``` 
 
@@ -22,7 +26,7 @@ console.log(phrase) // control sock axis field icon jewel gown duck amateur type
 ```typescript
 const phrase = 'control sock axis field icon jewel gown duck amateur type step save'
 const password = ''
-const wallet = new HdWallet(phrase, password)
+const wallet = new TsWalletCore.HdWallet(phrase, password)
 
 const derivationIndex = 0;
 const currencies = wallet.generateAllKeyPairs(derivationIndex)
@@ -63,14 +67,12 @@ console.log(currencies)
 
 #### Generate specific keys
 ```typescript
-import { DomainEthereum } from '@buttonwallet/blockchain-ts-wallet-core'
-
 const phrase = 'control sock axis field icon jewel gown duck amateur type step save'
 const password = ''
-const wallet = new HdWallet(phrase, password)
+const wallet = new TsWalletCore.HdWallet(phrase, password)
 
 const derivationIndex = 0;
-const currency = wallet.generateKeyPair(DomainEthereum.Instance(), derivationIndex);
+const currency = wallet.generateKeyPair(TsWalletCore.DomainEthereum.Instance(), derivationIndex);
 console.log(currency)
 /*
 {
@@ -78,6 +80,30 @@ console.log(currency)
   publicKey: '032348140ab3270e02cf9cce9e1fd3201cb9068671c490f3e2fabe0308a8afd284',
   address: '0xC9330Ce433DfB0046efc7dD8aB1A8ACC433f37Aa'
 }
+*/
+```
+
+### Transaction Example
+
+You can find an example how to sign transactions for different blockchains [here](https://github.com/button-tech/blockchain-ts-wallet-core/blob/master/test/transactions.test.ts)
+
+```typescript
+// TsWalletCore.MnemonicDescriptor or private key
+const privateKey = '04e17ebf3b33a81a98ee779e50b725e03bbbacaca689c9f02a465800dd955e7c';
+
+// transaction parameters (specific almost for each blockchain)
+const params: TsWalletCore.TransactionParams = {
+  toAddress: '0x6f387b7d5FA35a874218128E778F568294069e4C',
+  amount: '0.00059655',
+  nonce: 342,
+  gasPrice: 7200000000,
+  gasLimit: 21000
+};
+const blockchain = TsWalletCore.Ethereum(privateKey);
+const signedTx = blockchain.signTransaction(params)
+  .then(console.log)
+/*
+f86d8201568501ad274800825208946f387b7d5fa35a874218128e778f568294069e4c87021e8f1ed73c008025a0af698edeaae7cfb5a7c6b5091f000baaaa741a9cd7cf60e53dccc21a1dcec22fa03ad3edf9cfc535c21e4d4ddebccad05ea07d3d09bba1be9fdffc40ce2adef040
 */
 ```
 
