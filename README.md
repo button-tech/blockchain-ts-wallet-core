@@ -19,7 +19,7 @@ TS library that implements wallet functionality for multiple blockchains. Allows
 | 5741564 | Waves            | WAVES  | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/waves/info/logo.png" width="32" />        | <https://wavesplatform.com>   |
 
 
-## Inpiration
+## Isnpiration
 [Trust Wallet: Wallet Core project](https://github.com/trustwallet/wallet-core) - C++ version for multiple platforms, except frontend. 
 
 
