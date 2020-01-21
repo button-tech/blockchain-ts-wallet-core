@@ -5,6 +5,8 @@ import { hdPath, KeyPair } from './hd-wallet.utils';
 import { StrKey, Keypair } from 'stellar-sdk';
 import { box } from 'tweetnacl';
 import * as ed2curve from 'ed2curve';
+import { IDomainCurrency } from '../DomainCurrency';
+import { MnemonicDescriptor } from '../types';
 
 const ED25519_CURVE = 'ed25519 seed';
 const HARDENED_OFFSET = 0x80000000;
@@ -19,23 +21,34 @@ interface BufferKeyPair {
   publicKey: Buffer;
 }
 
-export function getStellarKeyPair(mnemonic: string, index: number = 0, password?: string): KeyPair {
-  const keyPair = generateEd25519KeyPair(mnemonic, hdPath.stellar, index, password);
-  const secret = StrKey.encodeEd25519SecretSeed(keyPair.privateKey);
-  const stellarKeyPair = Keypair.fromSecret(secret);
-  return {
-    privateKey: stellarKeyPair.secret(),
-    publicKey: StrKey.encodeEd25519PublicKey(stellarKeyPair.rawPublicKey())
-  };
-}
+export function getEd25519KeyPair(
+  currency: IDomainCurrency,
+  mnemonic: MnemonicDescriptor
+): KeyPair {
+  const keys = generateEd25519KeyPair(
+    mnemonic.phrase,
+    hdPath[currency.full],
+    mnemonic.index,
+    mnemonic.password
+  );
 
-export function getWavesKeyPair(mnemonic: string, index: number = 0, password?: string): KeyPair {
-  const keyPair = generateEd25519KeyPair(mnemonic, hdPath.waves, index, password);
-  const privK = ed2curve.convertSecretKey(keyPair.privateKey);
-  return {
-    privateKey: new Buffer(privK).toString('hex'),
-    publicKey: keyPair.publicKey.toString('hex')
-  };
+  switch (currency.short) {
+    case 'xlm':
+      const secret = StrKey.encodeEd25519SecretSeed(keys.privateKey);
+      const stellarKeyPair = Keypair.fromSecret(secret);
+      return {
+        privateKey: stellarKeyPair.secret(),
+        publicKey: StrKey.encodeEd25519PublicKey(stellarKeyPair.rawPublicKey())
+      };
+    case 'waves':
+      const privK = ed2curve.convertSecretKey(keys.privateKey);
+      return {
+        privateKey: new Buffer(privK).toString('hex'),
+        publicKey: keys.publicKey.toString('hex')
+      };
+    default:
+      throw new Error(`${currency.full} not supported`);
+  }
 }
 
 function generateEd25519KeyPair(

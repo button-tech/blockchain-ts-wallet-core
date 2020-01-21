@@ -11,11 +11,12 @@ import {
   Transaction
 } from 'stellar-sdk';
 import { ICurrency, MnemonicDescriptor, StellarTransactionParams } from '../../types';
-import { getStellarKeyPair } from '../../hd-wallet';
+import { getEd25519KeyPair } from '../../hd-wallet';
+import { DomainStellar } from '../../DomainCurrency';
 
 export function Stellar(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getStellarKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getEd25519KeyPair(DomainStellar.Instance(), secret);
     return new StellarCurrency(keyPair.privateKey);
   }
   return new StellarCurrency(secret);

@@ -8,11 +8,11 @@ import {
   MnemonicDescriptor
 } from '../../types';
 import * as Currency from '../../DomainCurrency';
-import { getEthereumClassicKeyPair, getEthereumKeyPair } from '../../hd-wallet';
+import { getSecp256k1KeyPair } from '../../hd-wallet';
 
 export function Ethereum(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getEthereumKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getSecp256k1KeyPair(Currency.DomainEthereum.Instance(), secret);
     return new EthereumBasedCurrency(keyPair.privateKey, Currency.DomainEthereum.Instance());
   }
   return new EthereumBasedCurrency(secret, Currency.DomainEthereum.Instance());
@@ -20,7 +20,7 @@ export function Ethereum(secret: string | MnemonicDescriptor): ICurrency {
 
 export function EthereumClassic(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getEthereumClassicKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getSecp256k1KeyPair(Currency.DomainEthereumClassic.Instance(), secret);
     return new EthereumBasedCurrency(keyPair.privateKey, Currency.DomainEthereumClassic.Instance());
   }
   return new EthereumBasedCurrency(secret, Currency.DomainEthereumClassic.Instance());

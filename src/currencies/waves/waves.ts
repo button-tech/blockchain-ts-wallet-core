@@ -2,13 +2,14 @@ import { transfer, ITransferTransaction } from '@waves/waves-transactions';
 import { address, privateKey, publicKey, TPrivateKey } from '@waves/ts-lib-crypto';
 import { ICurrency, MnemonicDescriptor, WavesDecimals, WavesTransactionParams } from '../../types';
 import { FromDecimal } from '../../blockchain.utils';
-import { getWavesKeyPair } from '../../hd-wallet';
+import { getEd25519KeyPair } from '../../hd-wallet';
 import { Buffer } from 'buffer';
 import * as basex from 'base-x';
+import { DomainWaves } from '../../DomainCurrency';
 
 export function Waves(secret: string | MnemonicDescriptor): ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getWavesKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getEd25519KeyPair(DomainWaves.Instance(), secret);
     return new WavesCurrency(keyPair.privateKey);
   }
   return new WavesCurrency(secret);

@@ -24,7 +24,7 @@ export const hdPath = {
   bitcoin: "m/44'/0'/0'/0",
   litecoin: "m/44'/2'/0'/0",
   ripple: "m/44'/144'/0'/0",
-  bitcoincash: "m/44'/145'/0'/0",
+  bitcoinCash: "m/44'/145'/0'/0",
 
   // ETH forks
   ethereum: "m/44'/60'/0'/0",

@@ -6,11 +6,11 @@ import { ContractCall, ICurrency, IContract, TxConfig, MnemonicDescriptor } from
 import { DecimalToHex } from '../../blockchain.utils';
 import { EthereumBasedCurrency } from './ethereumBased';
 import * as Currency from '../../DomainCurrency';
-import { getEthereumKeyPair } from '../../hd-wallet';
+import { getSecp256k1KeyPair } from '../../hd-wallet';
 
 export function EthereumTokens(secret: string | MnemonicDescriptor): IContract & ICurrency {
   if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getEthereumKeyPair(secret.phrase, secret.index, secret.password);
+    const keyPair = getSecp256k1KeyPair(Currency.DomainEthereum.Instance(), secret);
     return new EthereumContract(keyPair.privateKey, Currency.DomainEthereum.Instance());
   }
   return new EthereumContract(secret, Currency.DomainEthereum.Instance());
