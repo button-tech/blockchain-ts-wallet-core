@@ -3,6 +3,7 @@ import {
   Bitcoin,
   BitcoinCash,
   EthereumTransactionParams,
+  Litecoin,
   UTXO,
   UtxoTransactionParams,
   Waves,
@@ -87,6 +88,35 @@ describe('Sign transaction from private keys test', () => {
         '47fe1a47d2bb7dff37300cab24789295a6040200000290d40800000000001976a91458c555fde6bf11a96501' +
         '3b1a55f6b9ab1d0e6b9488acab810800000000001976a91480cbe1f682544a99ebed266b90f04a9c3a0f57a5' +
         '88ac00000000'
+    );
+  });
+
+  it('Sign Litecoin transaction test', async () => {
+    const privateKey = 'db5dabe349cac60fae79ad1203538541239df681f370e5c27f46422a12bdff59';
+    const input1: UTXO = {
+      address: 'LfJeaRarYo31fx5DFA4D96hESS3mgHAbmd',
+      txid: '55d2afc3bace572df80d50df855fea8a3be100366b526f9a18715b4192377df3',
+      vout: 0,
+      scriptPubKey: '76a914DC45D4FAB1D13BFFEAAA02B7F2C6BC04C8007A4188ac',
+      amount: '0.11284167',
+      satoshis: 11284167,
+      height: 1772942,
+      confirmations: 2229
+    };
+    const params: UtxoTransactionParams = {
+      toAddress: 'LbjQ5PmBYkJnRrPYH8bNSv7brsYt8Wvn9N',
+      amount: '0.11279559',
+      fee: 4608,
+      inputs: [input1]
+    };
+    const blockchain = Litecoin(privateKey);
+    const signedTx = await blockchain.signTransaction(params);
+    expect(signedTx).toEqual(
+      '0100000001f37d3792415b71189a6f526b3600e13b8aea5f85df500df82d57cebac3afd255000000006a4' +
+        '7304402200198a2e55f2e6349279ce2da02a0a2c4a9b20e64a8ab8c2fd4884479e93a042f02200174100a' +
+        '407eb6bb2512a0e892fbf2e7505f100af7192208d78ee2e926d2db4e01210280ff6c9e20838bcbe431a58' +
+        '690cdf39a9fea3eae196e71a09dac2b9c4dd950ffb508000001c71cac00000000001976a914b5139f9847' +
+        'ced1b26cac598097f76829af93362688ac00000000'
     );
   });
 
