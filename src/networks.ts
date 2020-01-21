@@ -1,4 +1,14 @@
-import { Network } from 'bitcoinjs-lib-cash'
+export interface Network {
+  wif: number
+  bip32: {
+    public: number
+    private: number
+  }
+  messagePrefix?: string
+  bech32?: string
+  pubKeyHash?: number
+  scriptHash?: number
+}
 
 export const LitecoinConfig: Network = {
   messagePrefix: '\x19Litecoin Signed Message:\n',

@@ -1,7 +1,7 @@
 {
   "name": "test-krboktv",
-  "version": "0.0.4",
-  "description": "",
+  "version": "0.1.6",
+  "description": "HdWallet and sign transaction library for typescript",
   "keywords": [],
   "main": "dist/index.js",
   "typings": "dist/types/index.d.ts",
@@ -46,7 +46,7 @@
     }
   },
   "prettier": {
-    "semi": false,
+    "semi": true,
     "singleQuote": true
   },
   "commitlint": {
@@ -56,21 +56,27 @@
   },
   "dependencies": {
     "@waves/ts-lib-crypto": "^1.4.2",
+    "@waves/waves-transactions": "^3.25.0",
     "bchaddrjs": "^0.4.5",
     "bignumber.js": "^9.0.0",
+    "bip39": "^3.0.2",
     "bitcoinjs-lib-cash": "github:krboktv/bitcoinjs-lib#70e2ca6f33d258dce29ae49fcbb107d2aaff53be",
     "buffer": "^5.4.3",
+    "crypto": "^1.0.1",
+    "ed2curve": "^0.3.0",
     "ethereumjs-tx": "^2.1.1",
     "ethereumjs-util": "^6.2.0",
     "process": "^0.11.10",
     "stellar-sdk": "^3.3.0",
-    "waves-transactions": "^3.0.13",
+    "tweetnacl": "^1.0.2",
+    "tweetnacl-ts": "^1.0.3",
     "web3": "^1.2.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
     "@types/bchaddrjs": "^0.4.0",
+    "@types/ed2curve": "^0.2.2",
     "@types/jest": "^23.3.2",
     "@types/lodash.camelcase": "^4.3.6",
     "@types/node": "^10.11.0",
@@ -107,6 +113,6 @@
     "tslint-config-prettier": "^1.15.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.12.0",
-    "typescript": "^3.0.3"
+    "typescript": "~3.5.3"
   }
 }

@@ -2,11 +2,10 @@
 // import "core-js/fn/array.find"
 // ...
 import { ICurrency, IContract } from './types'
-import { Ethereum, EthereumClassic } from './currencies/ethereumBased/ethereumBased'
-import { EthereumTokens } from './currencies/ethereumBased/ethereumBasedContract'
-import { Bitcoin, BitcoinCash, Litecoin } from './currencies/utxoBased/utxoBased'
-import { Waves } from './currencies/waves/waves'
-import { Stellar } from './currencies/stellar/stellar'
+import { Ethereum, EthereumClassic, EthereumTokens } from './currencies/ethereumBased'
+import { Bitcoin, BitcoinCash, Litecoin } from './currencies/utxoBased'
+import { Waves } from './currencies/waves'
+import { Stellar } from './currencies/stellar'
 
 export default class TsWalletCore {
   static Ethereum(privateKey: string): ICurrency {
