@@ -12,13 +12,10 @@ TS library that implements wallet functionality for all multiple blockchains. Al
 | 0       | Bitcoin          | BTC    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png" width="32" />      | <https://bitcoin.org>         |
 | 2       | Litecoin         | LTC    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png" width="32" />     | <https://litecoin.org>        |
 | 60      | Ethereum         | ETH    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" width="32" />     | <https://ethereum.org>        |
-| 61      | Ethereum Classic | ETC    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/classic/info/logo.png" width="32" />      | <https://ethereumclassic.org> |
-| 144     | XRP              | XRP    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ripple/info/logo.png" width="32" />       | <https://ripple.com/xrp>      |
+| 61      | Ethereum Classic | ETC    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/classic/info/logo.png" width="32" />      | <https://ethereumclassic.org> |    |
 | 145     | Bitcoin Cash     | BCH    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png" width="32" />  | <https://bitcoincash.org>     |
 | 148     | Stellar          | XLM    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/stellar/info/logo.png" width="32" />      | <https://stellar.org>         |
-| 178     | POA Network      | POA    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/poa/info/logo.png" width="32" />          | <https://poa.network>         |
-| 313     | Zilliqa          | ZIL    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/zilliqa/info/logo.png" width="32" />      | <https://zilliqa.com>         |
-| 396     | TON              | GRAM   | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ton/info/logo.png" width="32" />          | <https://test.ton.org>        |
+| 178     | POA Network      | POA    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/poa/info/logo.png" width="32" />          | <https://poa.network>         |      |  |
 | 5741564 | Waves            | WAVES  | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/waves/info/logo.png" width="32" />        | <https://wavesplatform.com>   |
 
 
