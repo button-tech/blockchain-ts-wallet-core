@@ -4,7 +4,7 @@ export interface IDomainCurrency {
   short: shortName;
 }
 
-export type shortName = 'ltc' | 'btc' | 'eth' | 'etc' | 'bch' | 'waves' | 'xlm' | 'ton';
+export type shortName = 'ltc' | 'btc' | 'eth' | 'etc' | 'bch' | 'waves' | 'xlm' | 'poa' | 'ton';
 export type fullName =
   | 'litecoin'
   | 'bitcoin'
@@ -13,6 +13,7 @@ export type fullName =
   | 'bitcoinCash'
   | 'waves'
   | 'stellar'
+  | 'poa'
   | 'ton';
 
 export class DomainEthereum implements IDomainCurrency {
@@ -110,6 +111,20 @@ export class DomainStellar implements IDomainCurrency {
 
   get short(): shortName {
     return 'xlm';
+  }
+}
+
+export class DomainPOA implements IDomainCurrency {
+  static Instance(): DomainPOA {
+    return new DomainPOA();
+  }
+
+  get full(): fullName {
+    return 'poa';
+  }
+
+  get short(): shortName {
+    return 'poa';
   }
 }
 

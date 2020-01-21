@@ -2,36 +2,42 @@ import { Transaction, TransactionOptions, TxData } from 'ethereumjs-tx';
 import { privateToAddress, toChecksumAddress } from 'ethereumjs-util';
 import { DecimalToHex, FromDecimal } from '../../blockchain.utils';
 import {
+  currencyFactory,
   EthereumDecimals,
   EthereumTransactionParams,
   ICurrency,
   MnemonicDescriptor
 } from '../../types';
-import * as Currency from '../../DomainCurrency';
 import { getSecp256k1KeyPair } from '../../hd-wallet';
+import { DomainEthereum, DomainEthereumClassic, DomainPOA } from '../../DomainCurrency';
 
-export function Ethereum(secret: string | MnemonicDescriptor): ICurrency {
-  if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getSecp256k1KeyPair(Currency.DomainEthereum.Instance(), secret);
-    return new EthereumBasedCurrency(keyPair.privateKey, Currency.DomainEthereum.Instance());
-  }
-  return new EthereumBasedCurrency(secret, Currency.DomainEthereum.Instance());
-}
+export const Ethereum = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainEthereum.Instance(),
+    getKeyPair: getSecp256k1KeyPair,
+    instance: EthereumBasedCurrency
+  })(secret);
 
-export function EthereumClassic(secret: string | MnemonicDescriptor): ICurrency {
-  if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getSecp256k1KeyPair(Currency.DomainEthereumClassic.Instance(), secret);
-    return new EthereumBasedCurrency(keyPair.privateKey, Currency.DomainEthereumClassic.Instance());
-  }
-  return new EthereumBasedCurrency(secret, Currency.DomainEthereumClassic.Instance());
-}
+export const EthereumClassic = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainEthereumClassic.Instance(),
+    getKeyPair: getSecp256k1KeyPair,
+    instance: EthereumBasedCurrency
+  })(secret);
+
+export const PoaNetwork = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainPOA.Instance(),
+    getKeyPair: getSecp256k1KeyPair,
+    instance: EthereumBasedCurrency
+  })(secret);
 
 export class EthereumBasedCurrency implements ICurrency {
   private readonly address: string;
 
   constructor(
     private readonly privateKey: string,
-    protected currency: Currency.DomainEthereum | Currency.DomainEthereumClassic
+    protected currency: DomainEthereum | DomainEthereumClassic
   ) {
     if (this.privateKey.indexOf('0x') === 0) {
       this.privateKey = privateKey.substring(2);

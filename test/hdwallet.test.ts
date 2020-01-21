@@ -5,6 +5,7 @@ import {
   DomainEthereum,
   DomainEthereumClassic,
   DomainLitecoin,
+  DomainPOA,
   DomainStellar,
   DomainWaves,
   IDomainCurrency
@@ -46,6 +47,11 @@ describe('Hd wallet test', () => {
       address: 'GC6WS24RVX5LIOVZEOH4FWQZAJVSF3AMFH37XU5K3XO7LTDLSMSVYA36',
       privateKey: 'SARPW3LMX2GJGZGQ2DSKLF7TN6F5MUJJ45ONYZYRXTY6IFXNRPIFFEZM',
       publicKey: 'GC6WS24RVX5LIOVZEOH4FWQZAJVSF3AMFH37XU5K3XO7LTDLSMSVYA36'
+    },
+    poa: {
+      address: '0xBb69e1B42159b6028Bdf70D6999E95924f512712',
+      privateKey: 'c8e16ed14a5757995a74b35d7547bd1fde809ddc9062a6aab53d0a73f0b73963',
+      publicKey: '0368b94075224d3ac131c73055c981d7cac83684a1f8bfbfae196fb30c4d3d9bd4'
     }
   };
 
@@ -78,7 +84,8 @@ describe('Hd wallet test', () => {
       DomainBitcoinCash.Instance(),
       DomainLitecoin.Instance(),
       DomainWaves.Instance(),
-      DomainStellar.Instance()
+      DomainStellar.Instance(),
+      DomainPOA.Instance()
       // DomainTON.Instance()
     ];
 

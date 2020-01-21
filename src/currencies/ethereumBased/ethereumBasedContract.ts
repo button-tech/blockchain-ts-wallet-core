@@ -2,26 +2,32 @@ import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core';
 import { AbiItem } from 'web3-utils';
 import { Contract } from 'web3-eth-contract';
-import { ContractCall, ICurrency, IContract, TxConfig, MnemonicDescriptor } from '../../types';
+import {
+  ContractCall,
+  ICurrency,
+  IContract,
+  TxConfig,
+  MnemonicDescriptor,
+  currencyFactory
+} from '../../types';
 import { DecimalToHex } from '../../blockchain.utils';
 import { EthereumBasedCurrency } from './ethereumBased';
-import * as Currency from '../../DomainCurrency';
 import { getSecp256k1KeyPair } from '../../hd-wallet';
+import { DomainEthereum, DomainEthereumClassic } from '../../DomainCurrency';
 
-export function EthereumTokens(secret: string | MnemonicDescriptor): IContract & ICurrency {
-  if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getSecp256k1KeyPair(Currency.DomainEthereum.Instance(), secret);
-    return new EthereumContract(keyPair.privateKey, Currency.DomainEthereum.Instance());
-  }
-  return new EthereumContract(secret, Currency.DomainEthereum.Instance());
-}
+export const EthereumTokens = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainEthereum.Instance(),
+    getKeyPair: getSecp256k1KeyPair,
+    instance: EthereumContract
+  })(secret);
 
 export class EthereumContract extends EthereumBasedCurrency implements IContract {
   private web3: Web3;
 
   constructor(
     privateKey: string,
-    currency: Currency.DomainEthereum | Currency.DomainEthereumClassic,
+    currency: DomainEthereum | DomainEthereumClassic,
     private rpcEndpoint?: string
   ) {
     super(privateKey, currency);
@@ -69,6 +75,8 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
     switch (this.currency.short) {
       case 'etc':
         return new Web3('https://ethereumclassic.network');
+      case 'poa':
+        return new Web3('http://54.144.107.14:8545');
       default:
         return new Web3('https://mainnet.infura.io/1u84gV2YFYHHTTnh8uVl');
     }

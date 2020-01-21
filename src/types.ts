@@ -1,6 +1,8 @@
 // Ethereum
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
+import { IDomainCurrency } from './DomainCurrency';
+import { KeyPair } from './hd-wallet';
 
 export const EthereumDecimals = 18;
 export const StellarDecimals = 7;
@@ -9,6 +11,22 @@ export const WavesDecimals = 8;
 
 export class MnemonicDescriptor {
   constructor(public phrase: string, public index: number, public password: string = '') {}
+}
+
+interface CurrencyFactory {
+  currency: IDomainCurrency;
+  getKeyPair: (currency: IDomainCurrency, secret: MnemonicDescriptor) => KeyPair;
+  instance: new (privateKey: string, currency: IDomainCurrency) => ICurrency;
+}
+
+export function currencyFactory(factory: CurrencyFactory) {
+  return function(secret: string | MnemonicDescriptor): ICurrency {
+    if (secret instanceof MnemonicDescriptor) {
+      const keyPair = factory.getKeyPair(factory.currency, secret);
+      return new factory.instance(keyPair.privateKey, factory.currency);
+    }
+    return new factory.instance(secret, factory.currency);
+  };
 }
 
 export interface ICurrency {

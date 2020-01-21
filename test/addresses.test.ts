@@ -1,4 +1,4 @@
-import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased';
+import { Ethereum, EthereumClassic, PoaNetwork } from '../src/currencies/ethereumBased';
 import { Bitcoin, BitcoinCash, Litecoin } from '../src/currencies/utxoBased';
 import { Stellar } from '../src/currencies/stellar';
 import { Waves } from '../src/currencies/waves';
@@ -47,6 +47,12 @@ describe('Addresses from private keys test', () => {
       privateKey: 'c0ca8a85df32da6c9bc652208b046d3e97c4c2f2daa14a5336b43dcd24227479',
       func: Waves,
       shouldBe: '3PDn2Sqwdz7Zbj6PJcNniRYKdLR3U3DJabR'
+    },
+    {
+      currencyName: 'POA',
+      privateKey: '564e7b0cce6aa8833e5460be4b179d9cb4ae3f0015b42591b6d95117587494bd',
+      func: PoaNetwork,
+      shouldBe: '0xb6c086C6Aeeb3C654C92A106E25AC822F48AA20a'
     }
   ];
 
@@ -100,6 +106,11 @@ describe('Addresses from mnemonic test', () => {
       currencyName: 'Waves',
       func: Waves,
       shouldBe: '3P3kCK7VjQyRDVb4QGXxctp1jycxpdn5563'
+    },
+    {
+      currencyName: 'POA',
+      func: PoaNetwork,
+      shouldBe: '0xBb69e1B42159b6028Bdf70D6999E95924f512712'
     }
   ];
 

@@ -10,17 +10,21 @@ import {
   Memo,
   Transaction
 } from 'stellar-sdk';
-import { ICurrency, MnemonicDescriptor, StellarTransactionParams } from '../../types';
+import {
+  currencyFactory,
+  ICurrency,
+  MnemonicDescriptor,
+  StellarTransactionParams
+} from '../../types';
 import { getEd25519KeyPair } from '../../hd-wallet';
 import { DomainStellar } from '../../DomainCurrency';
 
-export function Stellar(secret: string | MnemonicDescriptor): ICurrency {
-  if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getEd25519KeyPair(DomainStellar.Instance(), secret);
-    return new StellarCurrency(keyPair.privateKey);
-  }
-  return new StellarCurrency(secret);
-}
+export const Stellar = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainStellar.Instance(),
+    getKeyPair: getEd25519KeyPair,
+    instance: StellarCurrency
+  })(secret);
 
 const fee = 1000;
 

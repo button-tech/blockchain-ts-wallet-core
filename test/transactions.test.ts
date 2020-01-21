@@ -1,4 +1,4 @@
-import { Ethereum, EthereumClassic } from '../src/currencies/ethereumBased';
+import { Ethereum, EthereumClassic, PoaNetwork } from '../src/currencies/ethereumBased';
 import {
   Bitcoin,
   BitcoinCash,
@@ -40,6 +40,24 @@ describe('Sign transaction from private keys test', () => {
       'f86d8201568501ad274800825208946f387b7d5fa35a874218128e778f568294069e4c87021e8f1ed73c00802' +
         '5a0af698edeaae7cfb5a7c6b5091f000baaaa741a9cd7cf60e53dccc21a1dcec22fa03ad3edf9cfc535c21e4d' +
         '4ddebccad05ea07d3d09bba1be9fdffc40ce2adef040'
+    );
+  });
+
+  it('should sign POA transaction', async () => {
+    const privateKey = '0x90c536e66cc51118d75fc3cb96efcdf0e0b13a5005f5a65878bc37def7e87839';
+    const params: EthereumTransactionParams = {
+      toAddress: '0x246616Acd0E83d406124Ab038B2B17b29f78B4b0',
+      amount: '0.1',
+      nonce: 1,
+      gasPrice: 1000000000,
+      gasLimit: 21000
+    };
+    const blockchain = PoaNetwork(privateKey);
+    const signedTx = await blockchain.signTransaction(params);
+    expect(signedTx).toEqual(
+      'f86b01843b9aca0082520894246616acd0e83d406124ab038b2b17b29f78b4b088016345785d8a00008025a09' +
+        '9bd73cda7ca5076ff04f1a9422add75267d8a82e01d26915b22405291ba25fba029f08c79f9b364e7950479bf' +
+        'c67adb7fb7143c88274022d878292445abff37bf'
     );
   });
 

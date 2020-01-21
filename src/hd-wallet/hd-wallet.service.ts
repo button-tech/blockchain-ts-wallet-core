@@ -15,7 +15,8 @@ import {
   IDomainCurrency,
   DomainLitecoin,
   DomainStellar,
-  DomainWaves
+  DomainWaves,
+  DomainPOA
 } from '../DomainCurrency';
 import { getSecp256k1KeyPair } from './hd-key-secp256k1';
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../networks';
@@ -33,6 +34,7 @@ export interface Currencies {
   bch: Keys;
   waves: Keys;
   xlm: Keys;
+  poa: Keys;
   // ton: Keys;
 }
 
@@ -77,7 +79,8 @@ export class HdWallet {
       DomainBitcoinCash.Instance(),
       DomainLitecoin.Instance(),
       DomainWaves.Instance(),
-      DomainStellar.Instance()
+      DomainStellar.Instance(),
+      DomainPOA.Instance()
       // DomainTON.Instance()
     ];
 
@@ -92,50 +95,28 @@ export class HdWallet {
     const mnemonic = new MnemonicDescriptor(this.words, index, this.password);
     switch (currency.short) {
       case 'eth':
-        const ethKeys = getSecp256k1KeyPair(DomainEthereum.Instance(), mnemonic);
+      case 'etc':
+      case 'poa':
+        const ethKeys = getSecp256k1KeyPair(currency, mnemonic);
         return {
           privateKey: ethKeys.privateKey,
           publicKey: ethKeys.publicKey,
           address: this.getEthereumAddress(ethKeys.privateKey)
         };
 
-      case 'etc':
-        const etcKeys = getSecp256k1KeyPair(DomainEthereumClassic.Instance(), mnemonic);
-        return {
-          privateKey: etcKeys.privateKey,
-          publicKey: etcKeys.publicKey,
-          address: this.getEthereumAddress(etcKeys.privateKey)
-        };
-
       case 'btc':
-        const btcKeys = getSecp256k1KeyPair(DomainBitcoin.Instance(), mnemonic);
-        const btcAddress = this.getUtxoAddress(currency, btcKeys.publicKey);
-        return {
-          address: btcAddress,
-          publicKey: btcKeys.publicKey,
-          privateKey: btcKeys.privateKey
-        };
-
       case 'bch':
-        const bchKeys = getSecp256k1KeyPair(DomainBitcoinCash.Instance(), mnemonic);
-        const bchAddress = this.getUtxoAddress(currency, bchKeys.publicKey);
-        return {
-          address: bchAddress,
-          publicKey: bchKeys.publicKey,
-          privateKey: bchKeys.privateKey
-        };
-
       case 'ltc':
-        const ltcKeys = getSecp256k1KeyPair(DomainLitecoin.Instance(), mnemonic);
-        const ltcAddress = this.getUtxoAddress(currency, ltcKeys.publicKey);
+        const utxoKeys = getSecp256k1KeyPair(currency, mnemonic);
+        const btcAddress = this.getUtxoAddress(currency, utxoKeys.publicKey);
         return {
-          address: ltcAddress,
-          publicKey: ltcKeys.publicKey,
-          privateKey: ltcKeys.privateKey
+          publicKey: utxoKeys.publicKey,
+          privateKey: utxoKeys.privateKey,
+          address: btcAddress
         };
 
       case 'waves':
-        const wavesKeys = getEd25519KeyPair(DomainWaves.Instance(), mnemonic);
+        const wavesKeys = getEd25519KeyPair(currency, mnemonic);
         return {
           privateKey: wavesKeys.privateKey,
           publicKey: wavesKeys.publicKey,
@@ -143,11 +124,11 @@ export class HdWallet {
         };
 
       case 'xlm':
-        const stellarKeyPair = getEd25519KeyPair(DomainStellar.Instance(), mnemonic);
+        const stellarKeyPair = getEd25519KeyPair(currency, mnemonic);
         return {
-          address: stellarKeyPair.publicKey,
           publicKey: stellarKeyPair.publicKey,
-          privateKey: stellarKeyPair.privateKey
+          privateKey: stellarKeyPair.privateKey,
+          address: stellarKeyPair.publicKey
         };
 
       // case 'ton':

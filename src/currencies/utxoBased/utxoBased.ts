@@ -9,6 +9,7 @@ import {
 } from 'bitcoinjs-lib-cash';
 import { toCashAddress, toLegacyAddress } from 'bchaddrjs';
 import {
+  currencyFactory,
   ICurrency,
   MnemonicDescriptor,
   UTXO,
@@ -17,40 +18,37 @@ import {
 } from '../../types';
 import { FromDecimal, Tbn } from '../../blockchain.utils';
 import BigNumber from 'bignumber.js';
-import * as Currency from '../../DomainCurrency';
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../../networks';
 import { getSecp256k1KeyPair } from '../../hd-wallet';
+import { DomainBitcoin, DomainBitcoinCash, DomainLitecoin } from '../../DomainCurrency';
 
-export function Bitcoin(secret: string | MnemonicDescriptor): ICurrency {
-  if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getSecp256k1KeyPair(Currency.DomainBitcoin.Instance(), secret);
-    return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoin.Instance());
-  }
-  return new UtxoBased(secret, Currency.DomainBitcoin.Instance());
-}
+export const Bitcoin = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainBitcoin.Instance(),
+    getKeyPair: getSecp256k1KeyPair,
+    instance: UtxoBased
+  })(secret);
 
-export function Litecoin(secret: string | MnemonicDescriptor): ICurrency {
-  if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getSecp256k1KeyPair(Currency.DomainLitecoin.Instance(), secret);
-    return new UtxoBased(keyPair.privateKey, Currency.DomainLitecoin.Instance());
-  }
-  return new UtxoBased(secret, Currency.DomainLitecoin.Instance());
-}
+export const BitcoinCash = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainBitcoinCash.Instance(),
+    getKeyPair: getSecp256k1KeyPair,
+    instance: UtxoBased
+  })(secret);
 
-export function BitcoinCash(secret: string | MnemonicDescriptor): ICurrency {
-  if (secret instanceof MnemonicDescriptor) {
-    const keyPair = getSecp256k1KeyPair(Currency.DomainBitcoinCash.Instance(), secret);
-    return new UtxoBased(keyPair.privateKey, Currency.DomainBitcoinCash.Instance());
-  }
-  return new UtxoBased(secret, Currency.DomainBitcoinCash.Instance());
-}
+export const Litecoin = (secret: string | MnemonicDescriptor): ICurrency =>
+  currencyFactory({
+    currency: DomainLitecoin.Instance(),
+    getKeyPair: getSecp256k1KeyPair,
+    instance: UtxoBased
+  })(secret);
 
 export class UtxoBased implements ICurrency {
   private readonly address: string;
 
   constructor(
     private readonly privateKey: string,
-    private currency: Currency.DomainBitcoin | Currency.DomainBitcoinCash | Currency.DomainLitecoin
+    private currency: DomainBitcoin | DomainBitcoinCash | DomainLitecoin
   ) {
     const keyPair: Signer = this.getKeyPair(privateKey);
     const payment: Payment = payments.p2pkh({
