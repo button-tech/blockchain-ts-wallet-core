@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/button-tech/blockchain-ts-wallet-core.svg?branch=master)](https://travis-ci.org/button-tech/blockchain-ts-wallet-core)
 
 ## About
-TS library that implements wallet functionality for all multiple blockchains.
+TS library that implements wallet functionality for all multiple blockchains. Allows to create multiple private keys from one mnemonic, get public key, get address or sign transaction
 
 ### Supported blockchains
 
@@ -23,7 +23,7 @@ TS library that implements wallet functionality for all multiple blockchains.
 
 
 ## Inpiration
-[Trust Wallet: Wallet Core project](https://github.com/trustwallet/wallet-core) - C++ version for multiple platoforms, except frontend. 
+[Trust Wallet: Wallet Core project](https://github.com/trustwallet/wallet-core) - C++ version for multiple platforms, except frontend. 
 
 
 ## Installation
