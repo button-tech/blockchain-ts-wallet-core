@@ -1,6 +1,6 @@
 {
   "name": "test-krboktv",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "description": "HdWallet and sign transaction library for typescript",
   "keywords": [],
   "main": "dist/index.js",
@@ -113,6 +113,6 @@
     "tslint-config-prettier": "^1.15.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.12.0",
-    "typescript": "^3.0.3"
+    "typescript": "~3.5.3"
   }
 }
