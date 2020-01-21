@@ -40,7 +40,7 @@ export class EthereumBasedCurrency implements ICurrency {
       throw new Error('Ethereum private key is invalid');
     }
     this.address = toChecksumAddress(
-      privateToAddress(new Buffer(this.privateKey, 'hex')).toString('hex')
+      privateToAddress(Buffer.from(this.privateKey, 'hex')).toString('hex')
     );
   }
 
@@ -69,7 +69,7 @@ export class EthereumBasedCurrency implements ICurrency {
       privateKey = privateKey.substring(2);
     }
     const tx = new Transaction(txParam, this.getTransactionOptions());
-    const privateKeyBuffer = new Buffer(privateKey, 'hex');
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
     tx.sign(privateKeyBuffer);
     const serializedTx = tx.serialize();
     return serializedTx.toString('hex');

@@ -43,7 +43,7 @@ export function getEd25519KeyPair(
     case 'waves':
       const privK = ed2curve.convertSecretKey(keys.privateKey);
       return {
-        privateKey: new Buffer(privK).toString('hex'),
+        privateKey: Buffer.from(privK).toString('hex'),
         publicKey: keys.publicKey.toString('hex')
       };
     default:
@@ -83,7 +83,7 @@ const derivePath = (path: string, seed: string): Key => {
 
 const getMasterKeyFromSeed = (seed: string): Key => {
   const hmac = createHmac('sha512', ED25519_CURVE);
-  const I = hmac.update(new Buffer(seed, 'hex')).digest();
+  const I = hmac.update(Buffer.from(seed, 'hex')).digest();
   const IL = I.slice(0, 32);
   const IR = I.slice(32);
   return {
@@ -125,5 +125,5 @@ const isValidPath = (path: string) => {
 
 function getPublicKey(privateKey: Buffer): Buffer {
   const keys = box.keyPair.fromSecretKey(new Uint8Array(privateKey));
-  return new Buffer(keys.publicKey);
+  return Buffer.from(keys.publicKey);
 }

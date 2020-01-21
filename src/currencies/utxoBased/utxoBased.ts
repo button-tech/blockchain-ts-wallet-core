@@ -89,7 +89,7 @@ export class UtxoBased implements ICurrency {
         currentInput.txid,
         currentInput.vout,
         currentInput.confirmations,
-        new Buffer(currentInput.scriptPubKey, 'hex')
+        Buffer.from(currentInput.scriptPubKey, 'hex')
       );
     }
 
@@ -123,9 +123,9 @@ export class UtxoBased implements ICurrency {
   private getKeyPair(privateKey: string, network?: Network): Signer {
     if (network) {
       const options: any = { network };
-      return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'), options);
+      return ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), options);
     }
-    return ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'));
+    return ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'));
   }
 
   private getPrivateKey(privateKey: string): Signer {

@@ -178,21 +178,21 @@ export class HdWallet {
   }
 
   private getEthereumAddress(privateKey: string): string {
-    const addressBuffer = privateToAddress(new Buffer(privateKey, 'hex'));
+    const addressBuffer = privateToAddress(Buffer.from(privateKey, 'hex'));
     const hexAddress = addressBuffer.toString('hex');
     return addHexPrefix(toChecksumAddress(hexAddress));
   }
 
   private buildWavesAddress(publicKey: string): string {
     const publicKey1 = basex('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz').encode(
-      new Buffer(publicKey, 'hex')
+      Buffer.from(publicKey, 'hex')
     );
     return address({ publicKey: publicKey1 });
   }
 
   private getUtxoAddress(currency: IDomainCurrency, publicKey: string): string {
     const btcOpt = {
-      pubkey: new Buffer(publicKey, 'hex'),
+      pubkey: Buffer.from(publicKey, 'hex'),
       network: this.getNetwork(currency)
     };
     const p = payments.p2pkh(btcOpt);

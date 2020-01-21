@@ -26,7 +26,7 @@ export class WavesCurrency implements ICurrency {
       privK = privateKey(secret);
     } else {
       privK = basex('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz').encode(
-        new Buffer(secret, 'hex')
+        Buffer.from(secret, 'hex')
       );
     }
 
