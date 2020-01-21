@@ -51,7 +51,7 @@ describe('Addresses from private keys test', () => {
   ];
 
   for (let test of addressTest) {
-    it(`${test.currencyName} address test`, () => {
+    it(`should derive correct ${test.currencyName} address`, () => {
       const address = test.func(test.privateKey).getAddress();
       expect(address).toEqual(test.shouldBe);
     });
@@ -104,13 +104,13 @@ describe('Addresses from mnemonic test', () => {
   ];
 
   for (let test of addressTest) {
-    it(`${test.currencyName} address test`, () => {
+    it(`should derive correct ${test.currencyName} address`, () => {
       const address = test.func(mnemonic).getAddress();
       expect(address).toEqual(test.shouldBe);
     });
   }
 
-  it('Waves address test from mnemonic phrase without derivation', () => {
+  it('should get correct waves address from mnemonic phrase without derivation', () => {
     const address = Waves(mnemonic.phrase).getAddress();
     expect(address).toEqual('3PJopNv8bp7DLP2PHxRKJURDMWVguM8ZJZp');
   });

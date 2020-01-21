@@ -11,7 +11,7 @@ import {
 } from '../src';
 
 describe('Sign transaction from private keys test', () => {
-  it('Sign Stellar transaction test', async () => {
+  it('should sign Stellar transaction test', async () => {
     // todo: different values because of communication with network
 
     // const privateKey = '';
@@ -25,7 +25,7 @@ describe('Sign transaction from private keys test', () => {
     expect(true).toEqual(true);
   });
 
-  it('Sign Ethereum transaction test', async () => {
+  it('should sign Ethereum transaction', async () => {
     const privateKey = '04e17ebf3b33a81a98ee779e50b725e03bbbacaca689c9f02a465800dd955e7c';
     const params: EthereumTransactionParams = {
       toAddress: '0x6f387b7d5FA35a874218128E778F568294069e4C',
@@ -43,7 +43,7 @@ describe('Sign transaction from private keys test', () => {
     );
   });
 
-  it('Sign EthereumClassic transaction test', async () => {
+  it('should sign EthereumClassic transaction', async () => {
     const privateKey = '0abf5a1937ae3c28144a6110cf3f6edc7e67c20b46572af21ce268f2dea9fdd7';
     const params: EthereumTransactionParams = {
       toAddress: '0x8ac03e162d1F0C417f5F057fE41321d00511e2BD',
@@ -61,7 +61,7 @@ describe('Sign transaction from private keys test', () => {
     );
   });
 
-  it('Sign BitcoinCash transaction test', async () => {
+  it('should sign  BitcoinCash transaction', async () => {
     const privateKey = '2b894d28b2bf96b5da66ce9e8d29ee2e754a59df0fc411ca01aace64f2023868';
     const input1: UTXO = {
       address: 'bitcoincash:qzqvhc0ksf2y4x0ta5nxhy8sf2wr5r6h55524c3m4h',
@@ -91,7 +91,7 @@ describe('Sign transaction from private keys test', () => {
     );
   });
 
-  it('Sign Litecoin transaction test', async () => {
+  it('should sign  Litecoin transaction', async () => {
     const privateKey = 'db5dabe349cac60fae79ad1203538541239df681f370e5c27f46422a12bdff59';
     const input1: UTXO = {
       address: 'LfJeaRarYo31fx5DFA4D96hESS3mgHAbmd',
@@ -120,7 +120,7 @@ describe('Sign transaction from private keys test', () => {
     );
   });
 
-  it('Sign Bitcoin transaction test', async () => {
+  it('should sign  Bitcoin transaction', async () => {
     const privateKey = '651ba268e08b41f412e74491ab81b698338bb77878328d0deddef57989475269';
     const input1: UTXO = {
       address: '1HRSXxPox3DDN19iY4nYoUPiGbErzzDDXh',
@@ -162,7 +162,7 @@ describe('Sign transaction from private keys test', () => {
     );
   });
 
-  it('Sign Waves transaction test', async () => {
+  it('should sign Waves transaction test', async () => {
     const timestamp = 1579620411538;
     const goodTx = {
       type: 4,

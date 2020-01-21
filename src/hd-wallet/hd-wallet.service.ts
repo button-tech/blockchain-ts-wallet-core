@@ -4,8 +4,9 @@ import { address } from '@waves/ts-lib-crypto';
 import { entropyToMnemonic, validateMnemonic } from 'bip39';
 import { EnDict } from './wordlist.en';
 import * as basex from 'base-x';
+import * as randomBytes from 'randombytes';
 
-import { hasStrongRandom, uint8ArrayToHex } from './hd-wallet.utils';
+import { uint8ArrayToHex } from './hd-wallet.utils';
 import {
   DomainBitcoin,
   DomainBitcoinCash,
@@ -32,7 +33,7 @@ export interface Currencies {
   bch: Keys;
   waves: Keys;
   xlm: Keys;
-  ton: Keys;
+  // ton: Keys;
 }
 
 export interface Keys {
@@ -53,11 +54,6 @@ export class HdWallet {
   }
 
   static generateMnemonic(numWords: NumWords = 12): string {
-    if (!hasStrongRandom()) {
-      alert('This browser does not support strong randomness');
-      return '';
-    }
-
     // get the amount of entropy (bits) to use
     const strength = (numWords / 3) * 32;
 
@@ -67,42 +63,33 @@ export class HdWallet {
     // 18   -> 192 bit / 24 bytes
     // 21   -> 224 bit / 28 bytes
     // 24   -> 256 bit / 32 bytes
-    const b = new Uint8Array(strength / 8);
-    const entropy = crypto.getRandomValues(b);
-
+    const entropy = randomBytes(strength / 8);
     return entropyToMnemonic(uint8ArrayToHex(entropy), EnDict);
   }
 
   generateAllKeyPairs(index: number): Currencies {
     const keyPairsObject = Object.create(null);
 
-    const ethereum = DomainEthereum.Instance();
-    const ethereumClassic = DomainEthereumClassic.Instance();
-    const bitcoin = DomainBitcoin.Instance();
-    const bitcoinCash = DomainBitcoinCash.Instance();
-    const litecoin = DomainLitecoin.Instance();
-    const waves = DomainWaves.Instance();
-    const stellar = DomainStellar.Instance();
-    // const ton = DomainTON.Instance()
+    const currencies: Array<IDomainCurrency> = [
+      DomainEthereum.Instance(),
+      DomainEthereumClassic.Instance(),
+      DomainBitcoin.Instance(),
+      DomainBitcoinCash.Instance(),
+      DomainLitecoin.Instance(),
+      DomainWaves.Instance(),
+      DomainStellar.Instance()
+      // DomainTON.Instance()
+    ];
 
-    keyPairsObject[ethereum.short] = this.generateKeyPair(ethereum, index, this.password);
-    keyPairsObject[ethereumClassic.short] = this.generateKeyPair(
-      ethereumClassic,
-      index,
-      this.password
-    );
-    keyPairsObject[bitcoinCash.short] = this.generateKeyPair(bitcoinCash, index, this.password);
-    keyPairsObject[bitcoin.short] = this.generateKeyPair(bitcoin, index, this.password);
-    keyPairsObject[litecoin.short] = this.generateKeyPair(litecoin, index, this.password);
-    keyPairsObject[waves.short] = this.generateKeyPair(waves, index, this.password);
-    keyPairsObject[stellar.short] = this.generateKeyPair(stellar, index, this.password);
-    // keyPairsObject[ton.short] = this.generateKeyPair(ton, index, this.password)
+    for (let cur of currencies) {
+      keyPairsObject[cur.short] = this.generateKeyPair(cur, index);
+    }
 
     return keyPairsObject;
   }
 
-  generateKeyPair(currency: IDomainCurrency, index: number, password?: string): Keys {
-    const mnemonic = new MnemonicDescriptor(this.words, index, password);
+  generateKeyPair(currency: IDomainCurrency, index: number): Keys {
+    const mnemonic = new MnemonicDescriptor(this.words, index, this.password);
     switch (currency.short) {
       case 'eth':
         const ethKeys = getSecp256k1KeyPair(DomainEthereum.Instance(), mnemonic);

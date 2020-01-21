@@ -1,7 +1,3 @@
-export function hasStrongRandom(): boolean {
-  return 'crypto' in window && window.crypto !== null;
-}
-
 export function uint8ArrayToHex(a: Uint8Array): string {
   let s = '';
   // tslint:disable-next-line:prefer-for-of
