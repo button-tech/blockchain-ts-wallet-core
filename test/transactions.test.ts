@@ -4,7 +4,9 @@ import {
   BitcoinCash,
   EthereumTransactionParams,
   UTXO,
-  UtxoTransactionParams
+  UtxoTransactionParams,
+  Waves,
+  WavesTransactionParams
 } from '../src';
 
 describe('Sign transaction from private keys test', () => {
@@ -128,6 +130,41 @@ describe('Sign transaction from private keys test', () => {
         '01210224de1a3a7d9bd87ec2a7687faa31d14fca634d80de583504312158adbd5ca91b0b000000012f6c020' +
         '0000000001976a9146dd5b74f8f9372d8ba754a8ce68e3550e26845d288ac00000000'
     );
+  });
+
+  it('Sign Waves transaction test', async () => {
+    const timestamp = 1579620411538;
+    const goodTx = {
+      type: 4,
+      version: 2,
+      senderPublicKey: '74HcK2LW19QQJxB4nmgKB33xKAdP5Cw7JPhU6ixc4htW',
+      assetId: null,
+      recipient: '3PDxEP33D3U1DrtPTasH5Hg3WR9nmuABDxX',
+      amount: 28286943,
+      attachment: '',
+      fee: 100000,
+      feeAssetId: null,
+      timestamp: timestamp,
+      // not fixed. But it's ok to compare tx ids
+      // 'proofs':
+      // ['5oMx4Z7SZHedyDpGM7vjB9pCzWibrN95NUpwRiR83X2mCd3wf1UJzwthdbS4QZM7N8W1jaiY9FAzC8wWtUuTFTZJ'],
+      id: '5yoaPUCEvJXdKRy8RqFuL1FmuAPJGAvrMEBNb8tAULS'
+    };
+
+    const privateKey =
+      'ankle demise capital subject receive scout road mesh armed item apart' +
+      ' million leave husband direct';
+    const params: WavesTransactionParams = {
+      toAddress: '3PDxEP33D3U1DrtPTasH5Hg3WR9nmuABDxX',
+      amount: '0.28286943',
+      timestamp: timestamp
+    };
+    const blockchain = Waves(privateKey);
+    const signedTx = await blockchain.signTransaction(params);
+
+    let txObj = JSON.parse(signedTx);
+    delete txObj.proofs;
+    expect(txObj).toEqual(goodTx);
   });
 });
 

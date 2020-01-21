@@ -60,6 +60,7 @@ export interface StellarTransactionParams {
 export interface WavesTransactionParams {
   toAddress: string;
   amount: string;
+  timestamp?: number;
 }
 
 export interface TxConfig {

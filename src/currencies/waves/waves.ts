@@ -1,6 +1,5 @@
-import { transfer } from 'waves-transactions';
-import { ITransferTransaction } from 'waves-transactions/transactions';
-import { address, privateKey, publicKey } from '@waves/ts-lib-crypto';
+import { transfer, ITransferTransaction } from '@waves/waves-transactions';
+import { address, privateKey, publicKey, TPrivateKey } from '@waves/ts-lib-crypto';
 import { ICurrency, MnemonicDescriptor, WavesDecimals, WavesTransactionParams } from '../../types';
 import { FromDecimal } from '../../blockchain.utils';
 import { getWavesKeyPair } from '../../hd-wallet';
@@ -15,12 +14,8 @@ export function Waves(secret: string | MnemonicDescriptor): ICurrency {
   return new WavesCurrency(secret);
 }
 
-interface IPrivateKey {
-  privateKey: string;
-}
-
 export class WavesCurrency implements ICurrency {
-  private readonly secret: IPrivateKey;
+  private readonly secret: TPrivateKey;
   private readonly address: string;
 
   constructor(secret: string) {
@@ -44,7 +39,7 @@ export class WavesCurrency implements ICurrency {
   }
 
   signTransaction(params: WavesTransactionParams): Promise<string> {
-    const timestamp = Date.now();
+    const timestamp = params.timestamp || Date.now();
     const signedTx: ITransferTransaction = transfer(
       // @ts-ignore
       {
