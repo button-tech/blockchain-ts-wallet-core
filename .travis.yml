@@ -2,14 +2,10 @@ language: node_js
 node_js:
 - "11.15.0"
 os: osx
-sudo: false
 
 git:
   submodules: true
 
-cache:
-  directories:
-  - node_modules
 
 compiler:
   - clang
