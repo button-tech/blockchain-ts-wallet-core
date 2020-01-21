@@ -68,12 +68,13 @@ export class UtxoBased implements ICurrency {
   }
 
   signTransaction(params: UtxoTransactionParams): Promise<string> {
-    const fromAddress = this.getAddress();
+    let fromAddress = this.getAddress();
 
     const value = FromDecimal(params.amount, UtxoDecimals).toNumber();
 
     let hashType = Transaction.SIGHASH_ALL;
     if (this.currency.short === 'bch') {
+      fromAddress = toLegacyAddress(fromAddress);
       params.toAddress = toLegacyAddress(params.toAddress);
       hashType = hashType | Transaction.SIGHASH_BITCOINCASHBIP143;
     }
