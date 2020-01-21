@@ -1,12 +1,11 @@
 import { createHmac } from 'crypto';
 import { Buffer } from 'buffer';
 import { mnemonicToSeedSync } from 'bip39';
-import { hdPath, KeyPair } from './hd-wallet.utils';
 import { StrKey, Keypair } from 'stellar-sdk';
 import { box } from 'tweetnacl';
 import * as ed2curve from 'ed2curve';
 import { IDomainCurrency } from '../DomainCurrency';
-import { MnemonicDescriptor } from '../types';
+import { hdPath, KeyPair, MnemonicDescriptor } from '../types';
 
 const ED25519_CURVE = 'ed25519 seed';
 const HARDENED_OFFSET = 0x80000000;

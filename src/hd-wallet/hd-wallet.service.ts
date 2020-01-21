@@ -6,7 +6,6 @@ import { EnDict } from './wordlist.en';
 import * as basex from 'base-x';
 import * as randomBytes from 'randombytes';
 
-import { uint8ArrayToHex } from './hd-wallet.utils';
 import {
   DomainBitcoin,
   DomainBitcoinCash,
@@ -22,7 +21,7 @@ import { getSecp256k1KeyPair } from './hd-key-secp256k1';
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig } from '../networks';
 import { getEd25519KeyPair } from './hd-key-ed25519';
 import { Buffer } from 'buffer';
-import { MnemonicDescriptor } from '../types';
+import { Keys, MnemonicDescriptor } from '../types';
 
 type NumWords = 12 | 15 | 18 | 21 | 24;
 
@@ -36,12 +35,6 @@ export interface Currencies {
   xlm: Keys;
   poa: Keys;
   // ton: Keys;
-}
-
-export interface Keys {
-  privateKey: string;
-  publicKey: string;
-  address: string;
 }
 
 export class HdWallet {
@@ -66,7 +59,7 @@ export class HdWallet {
     // 21   -> 224 bit / 28 bytes
     // 24   -> 256 bit / 32 bytes
     const entropy = randomBytes(strength / 8);
-    return entropyToMnemonic(uint8ArrayToHex(entropy), EnDict);
+    return entropyToMnemonic(Buffer.from(entropy).toString('hex'), EnDict);
   }
 
   generateAllKeyPairs(index: number): Currencies {

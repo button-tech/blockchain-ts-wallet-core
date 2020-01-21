@@ -2,12 +2,39 @@
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { IDomainCurrency } from './DomainCurrency';
-import { KeyPair } from './hd-wallet';
 
 export const EthereumDecimals = 18;
 export const StellarDecimals = 7;
 export const UtxoDecimals = 8;
 export const WavesDecimals = 8;
+
+export interface KeyPair {
+  privateKey: string;
+  publicKey: string;
+}
+
+export interface Keys {
+  privateKey: string;
+  publicKey: string;
+  address: string;
+}
+
+export const hdPath = {
+  bitcoin: "m/44'/0'/0'/0",
+  litecoin: "m/44'/2'/0'/0",
+  ripple: "m/44'/144'/0'/0",
+  bitcoinCash: "m/44'/145'/0'/0",
+
+  // ETH forks
+  ethereum: "m/44'/60'/0'/0",
+  ethereumClassic: "m/44'/61'/0'/0",
+  poa: "m/44'/178'/0'/0",
+  tron: "m/44'/195'/0'/0",
+
+  waves: "m/44'/5741564'/0'/0'/",
+  stellar: "m/44'/148'/",
+  ton: "m/44'/396'/"
+};
 
 export class MnemonicDescriptor {
   constructor(public phrase: string, public index: number, public password: string = '') {}

@@ -1,8 +1,7 @@
 import { mnemonicToSeedSync } from 'bip39';
 import * as bip32 from 'bip32';
-import { hdPath, KeyPair } from './hd-wallet.utils';
 import { BitcoinCashConfig, BitcoinConfig, LitecoinConfig, Network } from '../networks';
-import { MnemonicDescriptor } from '../types';
+import { hdPath, KeyPair, MnemonicDescriptor } from '../types';
 import { IDomainCurrency } from '../DomainCurrency';
 
 export function getSecp256k1KeyPair(
