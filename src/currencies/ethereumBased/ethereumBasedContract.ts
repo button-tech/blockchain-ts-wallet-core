@@ -82,8 +82,8 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
       });
       return Promise.all(promises);
     } else {
-      return new Promise((resolve, reject) => {
-        this.transactionReceiptAsync(txnHash, resolve, reject);
+      return new Promise(async (resolve, reject) => {
+        await this.transactionReceiptAsync(txnHash, resolve, reject);
       });
     }
   }
@@ -97,15 +97,15 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
     try {
       const receipt = this.web3.eth.getTransactionReceipt(txnHash);
       if (!receipt) {
-        setTimeout(() => {
-          this.transactionReceiptAsync(txnHash, resolve, reject);
+        setTimeout(async () => {
+          await this.transactionReceiptAsync(txnHash, resolve, reject);
         }, interval);
       } else {
         if (blocksToWait > 0) {
           const resolvedReceipt = await receipt;
           if (!resolvedReceipt || !resolvedReceipt.blockNumber) {
-            setTimeout(() => {
-              this.transactionReceiptAsync(txnHash, resolve, reject);
+            setTimeout(async () => {
+              await this.transactionReceiptAsync(txnHash, resolve, reject);
             }, interval);
           } else {
             try {
@@ -113,7 +113,7 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
               const current = await this.web3.eth.getBlock('latest');
               if (current.number - block.number >= blocksToWait) {
                 const txn = await this.web3.eth.getTransaction(txnHash);
-                if (txn.blockNumber != null) {
+                if (txn.blockNumber) {
                   resolve(resolvedReceipt);
                 } else {
                   reject(
@@ -121,13 +121,13 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
                   );
                 }
               } else {
-                setTimeout(() => {
-                  this.transactionReceiptAsync(txnHash, resolve, reject);
+                setTimeout(async () => {
+                  await this.transactionReceiptAsync(txnHash, resolve, reject);
                 }, interval);
               }
             } catch (e) {
-              setTimeout(() => {
-                this.transactionReceiptAsync(txnHash, resolve, reject);
+              setTimeout(async () => {
+                await this.transactionReceiptAsync(txnHash, resolve, reject);
               }, interval);
             }
           }

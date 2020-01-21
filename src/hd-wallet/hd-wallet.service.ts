@@ -183,11 +183,7 @@ export class HdWallet {
       network: this.getNetwork(currency)
     };
     const p = payments.p2pkh(btcOpt);
-    if (p === undefined) {
-      throw new Error('payment is undefined');
-    }
-    // @ts-ignore
-    return p.address;
+    return p.address!;
   }
 
   private getNetwork(currency: IDomainCurrency): Network {
