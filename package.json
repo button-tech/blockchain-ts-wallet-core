@@ -1,6 +1,6 @@
 {
   "name": "test-krboktv",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "HdWallet and sign transaction library for typescript",
   "keywords": [],
   "main": "dist/index.js",

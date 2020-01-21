@@ -28,11 +28,11 @@ export interface IContract extends ICurrency {
 
   getCallData(params: ContractCall): any;
 
-  callMethod$(params: ContractCall): Promise<any>;
+  callMethod(params: ContractCall): Promise<any>;
 
-  estimateGasRawData$?(params: TxConfig): Promise<number>;
+  estimateGasRawData?(params: TxConfig): Promise<number>;
 
-  awaitTx$(txnHash: Array<string> | string): Promise<any> | Promise<any[]>;
+  awaitTx(txnHash: Array<string> | string): Promise<any> | Promise<any[]>;
 }
 
 export interface EthereumTransactionParams {

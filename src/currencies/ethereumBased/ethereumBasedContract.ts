@@ -40,7 +40,7 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
     return params.contractInstance.methods[params.methodName](...executionParameters).encodeABI();
   }
 
-  estimateGasRawData$(params: TxConfig): Promise<number> {
+  estimateGasRawData(params: TxConfig): Promise<number> {
     const txConfig: TransactionConfig = {
       to: params.to,
       data: params.data,
@@ -52,7 +52,7 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
     return Promise.resolve(this.web3.eth.estimateGas(txConfig));
   }
 
-  callMethod$(params: ContractCall): Promise<any> {
+  callMethod(params: ContractCall): Promise<any> {
     const executionParameters = !params.executionParameters ? [] : params.executionParameters;
     return Promise.resolve(
       params.contractInstance.methods[params.methodName](...executionParameters).call({
@@ -74,11 +74,11 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
     }
   }
 
-  awaitTx$(txnHash: Array<string> | string): Promise<any> | Promise<any[]> {
+  awaitTx(txnHash: Array<string> | string): Promise<any> | Promise<any[]> {
     if (Array.isArray(txnHash)) {
       const promises: any = [];
       txnHash.forEach(oneTxHash => {
-        promises.push(this.awaitTx$(oneTxHash));
+        promises.push(this.awaitTx(oneTxHash));
       });
       return Promise.all(promises);
     } else {
