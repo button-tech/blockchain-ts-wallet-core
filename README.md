@@ -2,6 +2,30 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6fcfc61217ed4494a87ac1835c2edac2)](https://app.codacy.com/gh/button-tech/blockchain-ts-wallet-core?utm_source=github.com&utm_medium=referral&utm_content=button-tech/blockchain-ts-wallet-core&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/button-tech/blockchain-ts-wallet-core.svg?branch=master)](https://travis-ci.org/button-tech/blockchain-ts-wallet-core)
 
+## About
+TS library that implements wallet functionality for all multiple blockchains.
+
+### Supported blockchains
+
+| Index   | Name             | Symbol | Logo                                                                                                                        | URL                           |
+| ------- | ---------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| 0       | Bitcoin          | BTC    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png" width="32" />      | <https://bitcoin.org>         |
+| 2       | Litecoin         | LTC    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png" width="32" />     | <https://litecoin.org>        |
+| 60      | Ethereum         | ETH    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" width="32" />     | <https://ethereum.org>        |
+| 61      | Ethereum Classic | ETC    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/classic/info/logo.png" width="32" />      | <https://ethereumclassic.org> |
+| 144     | XRP              | XRP    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ripple/info/logo.png" width="32" />       | <https://ripple.com/xrp>      |
+| 145     | Bitcoin Cash     | BCH    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png" width="32" />  | <https://bitcoincash.org>     |
+| 148     | Stellar          | XLM    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/stellar/info/logo.png" width="32" />      | <https://stellar.org>         |
+| 178     | POA Network      | POA    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/poa/info/logo.png" width="32" />          | <https://poa.network>         |
+| 313     | Zilliqa          | ZIL    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/zilliqa/info/logo.png" width="32" />      | <https://zilliqa.com>         |
+| 396     | TON              | GRAM   | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ton/info/logo.png" width="32" />          | <https://test.ton.org>        |
+| 5741564 | Waves            | WAVES  | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/waves/info/logo.png" width="32" />        | <https://wavesplatform.com>   |
+
+
+## Inpiration
+[Trust Wallet: Wallet Core project](https://github.com/trustwallet/wallet-core) - C++ version for multiple platoforms, except frontend. 
+
+
 ## Installation
 * `npm i -s @buttonwallet/blockchain-ts-wallet-core`  
 
@@ -106,5 +130,14 @@ const signedTx = blockchain.signTransaction(params)
 f86d8201568501ad274800825208946f387b7d5fa35a874218128e778f568294069e4c87021e8f1ed73c008025a0af698edeaae7cfb5a7c6b5091f000baaaa741a9cd7cf60e53dccc21a1dcec22fa03ad3edf9cfc535c21e4d4ddebccad05ea07d3d09bba1be9fdffc40ce2adef040
 */
 ```
+
+
+# Contributing
+
+The best way to submit feedback and report bugs is to [open a GitHub issue](https://github.com/button-tech/blockchain-ts-wallet-core/issues/new)
+
+# License
+
+blockchain-ts-wallet-core is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
 
 
