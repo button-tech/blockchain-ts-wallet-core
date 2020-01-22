@@ -3,6 +3,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import builtins from 'rollup-plugin-node-builtins';
+
 // @ts-ignore
 import camelCase from 'lodash.camelcase';
 import typescript from 'rollup-plugin-typescript2';
@@ -34,10 +35,12 @@ export default {
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage
     resolve({
-      mainFields: ['module', 'main']
+      jsnext: true,
+      main: true,
+      browser: true
     }),
 
     // Resolve source maps to the original source
-    sourceMaps(),
+    sourceMaps()
   ],
 };

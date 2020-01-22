@@ -35,6 +35,17 @@ or
 const TsWalletCore = require('@buttonwallet/blockchain-ts-wallet-core');
 ```
 
+#### For Browser
+```bash
+git clone https://github.com/button-tech/blockchain-ts-wallet-core.git
+
+cd blockchain-ts-wallet-core
+
+npm i
+
+npm run build:browser // the output data will be located in the build folder
+```
+
 ### HDWallet
 
 #### Generate mnemonic
