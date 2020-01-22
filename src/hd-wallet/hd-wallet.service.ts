@@ -101,11 +101,11 @@ export class HdWallet {
       case 'bch':
       case 'ltc':
         const utxoKeys = getSecp256k1KeyPair(currency, mnemonic);
-        const btcAddress = this.getUtxoAddress(currency, utxoKeys.publicKey);
+        const utxoAddress = this.getUtxoAddress(currency, utxoKeys.publicKey);
         return {
           publicKey: utxoKeys.publicKey,
           privateKey: utxoKeys.privateKey,
-          address: btcAddress
+          address: utxoAddress
         };
 
       case 'waves':

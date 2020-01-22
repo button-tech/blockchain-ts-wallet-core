@@ -1,6 +1,6 @@
 {
   "name": "@buttonwallet/blockchain-ts-wallet-core",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "HdWallet and sign transaction library for typescript",
   "keywords": [],
   "main": "dist/index.js",
@@ -18,9 +18,9 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "lint": "tslint --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
@@ -113,6 +113,6 @@
     "tslint-config-prettier": "^1.15.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.12.0",
-    "typescript": "~3.5.3"
+    "typescript": "^3.6.0"
   }
 }
