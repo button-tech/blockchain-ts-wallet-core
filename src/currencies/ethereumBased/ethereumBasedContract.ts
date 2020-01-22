@@ -15,12 +15,12 @@ import { EthereumBasedCurrency } from './ethereumBased';
 import { getSecp256k1KeyPair } from '../../hd-wallet';
 import { DomainEthereum, DomainEthereumClassic } from '../../DomainCurrency';
 
-export const EthereumTokens = (secret: string | MnemonicDescriptor): ICurrency =>
+export const EthereumTokens = (secret: string | MnemonicDescriptor): ICurrency & IContract =>
   currencyFactory({
     currency: DomainEthereum.Instance(),
     getKeyPair: getSecp256k1KeyPair,
     instance: EthereumContract
-  })(secret);
+  })(secret) as ICurrency & IContract;
 
 export class EthereumContract extends EthereumBasedCurrency implements IContract {
   private web3: Web3;

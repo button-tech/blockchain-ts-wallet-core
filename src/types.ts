@@ -47,7 +47,7 @@ interface CurrencyFactory {
 }
 
 export function currencyFactory(factory: CurrencyFactory) {
-  return function(secret: string | MnemonicDescriptor): ICurrency {
+  return function(secret: string | MnemonicDescriptor) {
     if (secret instanceof MnemonicDescriptor) {
       const keyPair = factory.getKeyPair(factory.currency, secret);
       return new factory.instance(keyPair.privateKey, factory.currency);
