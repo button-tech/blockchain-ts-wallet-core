@@ -1,6 +1,6 @@
 {
   "name": "@buttonwallet/blockchain-ts-wallet-core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "HdWallet and sign transaction library for typescript",
   "keywords": [],
   "main": "dist/index.js",
@@ -113,6 +113,6 @@
     "tslint-config-prettier": "^1.15.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.12.0",
-    "typescript": "^3.6.0"
+    "typescript": "^3.5.3"
   }
 }
