@@ -43,7 +43,9 @@ cd blockchain-ts-wallet-core
 
 npm i
 
-npm run build:browser // the output data will be located in the build folder
+npm run build:browser 
+
+# the output data will be located in the build folder
 ```
 
 ### HDWallet
