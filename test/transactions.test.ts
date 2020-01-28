@@ -11,8 +11,6 @@ import {
   EthereumTransactionParams,
   FromDecimal,
   Litecoin,
-  Tbn,
-  ToDecimal,
   UTXO,
   UtxoTransactionParams,
   Waves,
