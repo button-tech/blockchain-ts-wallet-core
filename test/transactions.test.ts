@@ -97,7 +97,9 @@ describe('Sign transaction from private keys test', () => {
       methodName: 'transfer',
       executionParameters: [
         '0x8ac03e162d1F0C417f5F057fE41321d00511e2BD',
-        FromDecimal('0.0000123', 18).toNumber()
+        FromDecimal('0.999000999000999000999000999', 18)
+          .toNumber()
+          .toFixed()
       ]
     };
     const callData = blockchain.getCallData(contractCall);
@@ -111,10 +113,10 @@ describe('Sign transaction from private keys test', () => {
     };
     const signedTx = await blockchain.signTransaction(params);
     expect(signedTx).toEqual(
-      'f8a8178447868c00828ca0946b175474e89094c44da98b954eedeac495271d0f80b844a9059cbb0000000' +
-        '000000000000000008ac03e162d1f0c417f5f057fe41321d00511e2bd0000000000000000000000000000' +
-        '0000000000000000000000000b2fd121780025a03e0b09a7fa99a7d07465e4153b6c34c1bed43bfb7c785' +
-        'f8ae0a7e3e3bd0e7de0a005229719f21c08cefb0ea9d8ad4aced6e7fa27ea519e9b38e9ce378d5f3b6a63'
+      'f8a8178447868c00828ca0946b175474e89094c44da98b954eedeac495271d0f80b844a9059cbb000000000' +
+        '0000000000000008ac03e162d1f0c417f5f057fe41321d00511e2bd00000000000000000000000000000000' +
+        '00000000000000000ddd2a1d9bb7048026a0355acbe550b8d348266275590fbab0c607a2dd7e8a3a30f8291' +
+        '1fb5cfb26e40ba02c67d7aef8708df6097caa7ccc8e4b7a9fffc5e2d687177f12879ae121b685c9'
     );
   });
 
