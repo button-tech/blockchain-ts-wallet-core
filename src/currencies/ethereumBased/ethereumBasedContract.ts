@@ -62,7 +62,7 @@ export class EthereumContract extends EthereumBasedCurrency implements IContract
     const executionParameters = !params.executionParameters ? [] : params.executionParameters;
     return Promise.resolve(
       params.contractInstance.methods[params.methodName](...executionParameters).call({
-        from: params.addressFrom
+        from: this.getAddress()
       })
     );
   }

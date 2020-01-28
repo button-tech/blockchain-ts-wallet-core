@@ -3,8 +3,8 @@ import { privateToAddress, addHexPrefix, toChecksumAddress } from 'ethereumjs-ut
 import { address } from '@waves/ts-lib-crypto';
 import { entropyToMnemonic, validateMnemonic } from 'bip39';
 import { EnDict } from './wordlist.en';
-import * as basex from 'base-x';
-import * as randomBytes from 'randombytes';
+import basex from 'base-x';
+import randomBytes from 'randombytes';
 
 import {
   DomainBitcoin,

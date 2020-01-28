@@ -10,7 +10,7 @@ import {
 import { FromDecimal } from '../../blockchain.utils';
 import { getEd25519KeyPair } from '../../hd-wallet';
 import { Buffer } from 'buffer';
-import * as basex from 'base-x';
+import basex from 'base-x';
 import { DomainWaves } from '../../DomainCurrency';
 
 export const Waves = (secret: string | MnemonicDescriptor): ICurrency =>

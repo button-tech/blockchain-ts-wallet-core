@@ -1,14 +1,24 @@
-import { Ethereum, EthereumClassic, PoaNetwork } from '../src/currencies/ethereumBased';
+import {
+  Ethereum,
+  EthereumClassic,
+  EthereumTokens,
+  PoaNetwork
+} from '../src/currencies/ethereumBased';
 import {
   Bitcoin,
   BitcoinCash,
+  ContractCall,
   EthereumTransactionParams,
+  FromDecimal,
   Litecoin,
+  Tbn,
+  ToDecimal,
   UTXO,
   UtxoTransactionParams,
   Waves,
   WavesTransactionParams
 } from '../src';
+import { ERC_20_ABI } from './erc20.abi';
 
 describe('Sign transaction from private keys test', () => {
   it('should sign Stellar transaction test', async () => {
@@ -76,6 +86,37 @@ describe('Sign transaction from private keys test', () => {
       'f86a378447868c00825208948ac03e162d1f0c417f5f057fe41321d00511e2bd8727ac4827f97c00801ba0e8' +
         '87be5184ad9be25af8e936511b1a0ef43bf25318346ba9b4ed796dfc3f4613a079b2b6afbc14cc7f759d15f4' +
         '5c1102bf8d8b2ea74fac77ebfdfcf769ac23b291'
+    );
+  });
+
+  it('should sign Ethereum Token transaction', async () => {
+    const privateKey = '0abf5a1937ae3c28144a6110cf3f6edc7e67c20b46572af21ce268f2dea9fdd7';
+    const contractAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
+    const blockchain = EthereumTokens(privateKey);
+    const instance = blockchain.getInstance(ERC_20_ABI, contractAddress);
+    const contractCall: ContractCall = {
+      contractInstance: instance,
+      methodName: 'transfer',
+      executionParameters: [
+        '0x8ac03e162d1F0C417f5F057fE41321d00511e2BD',
+        FromDecimal('0.0000123', 18).toNumber()
+      ]
+    };
+    const callData = blockchain.getCallData(contractCall);
+    const params: EthereumTransactionParams = {
+      toAddress: contractAddress,
+      amount: '0',
+      nonce: 23,
+      gasPrice: 1200000000,
+      gasLimit: 36000,
+      data: callData
+    };
+    const signedTx = await blockchain.signTransaction(params);
+    expect(signedTx).toEqual(
+      'f8a8178447868c00828ca0946b175474e89094c44da98b954eedeac495271d0f80b844a9059cbb0000000' +
+        '000000000000000008ac03e162d1f0c417f5f057fe41321d00511e2bd0000000000000000000000000000' +
+        '0000000000000000000000000b2fd121780025a03e0b09a7fa99a7d07465e4153b6c34c1bed43bfb7c785' +
+        'f8ae0a7e3e3bd0e7de0a005229719f21c08cefb0ea9d8ad4aced6e7fa27ea519e9b38e9ce378d5f3b6a63'
     );
   });
 

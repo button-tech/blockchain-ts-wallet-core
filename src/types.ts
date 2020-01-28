@@ -108,26 +108,10 @@ export interface WavesTransactionParams {
   timestamp?: number;
 }
 
-export interface TxConfig {
-  to: string;
-  data: string;
-  from?: string;
-  gas?: number;
-  value?: string;
-  gasPrice?: string;
-}
-
 export interface ContractCall {
   contractInstance: Contract;
   methodName: string;
-  contractAddress: string;
-  addressFrom?: string;
-  privateKey?: string;
   executionParameters?: Array<any>;
-  nonce?: number;
-  gasLimit?: number;
-  gasPrice?: number;
-  amount?: string;
 }
 
 export interface UTXO {
