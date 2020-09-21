@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "@waves/ts-lib-crypto": "^1.4.2",
-    "@waves/waves-transactions": "^3.25.0",
+    "@waves/waves-transactions": "^4.1.1",
     "bchaddrjs": "^0.4.5",
     "bignumber.js": "^9.0.0",
     "bip39": "^3.0.2",
