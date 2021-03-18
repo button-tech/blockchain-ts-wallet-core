@@ -73,7 +73,7 @@
     "web3": "^1.2.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.1.2",
+    "@commitlint/cli": "^12.0.1",
     "@commitlint/config-conventional": "^7.1.2",
     "@types/bchaddrjs": "^0.4.0",
     "@types/ed2curve": "^0.2.2",
